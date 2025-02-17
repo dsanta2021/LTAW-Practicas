@@ -1,4 +1,3 @@
-/* styles.css */
 body {
     font-family: Arial, sans-serif;
     background-color: #f4f4f4;
@@ -27,7 +26,4 @@ header {
     border-radius: 5px;
 }
 
-/* script.js */
-document.addEventListener("DOMContentLoaded", () => {
-    console.log("Tienda Friki cargada");
-});
+
