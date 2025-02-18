@@ -1,10 +1,20 @@
 const fs = require('fs');
 const http = require('http');
 const path = require('path');
+const { URL } = require('url');
 
-//-- Configuración
-const PUERTO = 8001;
-const BASE_DIR = path.join(__dirname, 'public');
+//-- Configuración (Especificación)
+const PUERTO = 8001;    
+
+//-- Rutas
+const PUBLIC_DIR = path.join(__dirname, 'public');
+const RUTAS = {
+    index: path.join(PUBLIC_DIR, 'index.html'),
+    error: path.join(PUBLIC_DIR, 'error.html'),
+    img: path.join(PUBLIC_DIR, 'img'),
+    css: path.join(PUBLIC_DIR, 'css'),
+    js: path.join(PUBLIC_DIR, 'js')
+};
 
 //-- Mapeo de extensiones a tipos MIME
 const mimeTypes = {
@@ -12,40 +22,75 @@ const mimeTypes = {
     '.css': 'text/css',
     '.js': 'application/javascript',
     '.jpg': 'image/jpeg',
+    '.jpeg': 'image/jpeg',
     '.png': 'image/png',
     '.gif': 'image/gif',
-    '.ico': 'image/x-icon'
 };
 
-//-- Crear el servidor
-const server = http.createServer((req, res) => {
-    console.log(`Petición recibida: ${req.url}`);
+// Función para servir archivos estáticos
+function servirArchivo(res, rutaArchivo) {
+    const ext = path.extname(rutaArchivo).toLowerCase();
+    const contentType = mimeTypes[ext];
 
-    //-- Si la URL es "/", servir "index.html"
-    let filePath = req.url === '/' ? '/index.html' : req.url;
-    filePath = path.join(BASE_DIR, filePath);
-
-    //-- Obtener la extensión del archivo
-    const ext = path.extname(filePath);
-    
-    //-- Comprobar si la extensión es válida
-    if (!mimeTypes[ext]) {
-        res.writeHead(400, { 'Content-Type': 'text/html' });
-        res.end('<h1>Error 400 - Solicitud no válida</h1>');
-        return;
-    }
-
-    //-- Leer y servir el archivo solicitado
-    fs.readFile(filePath, (err, data) => {
+    fs.readFile(rutaArchivo, (err, data) => {
         if (err) {
-            console.error(`Error al leer el archivo: ${filePath}`);
+            console.error(`Error al leer el archivo: ${rutaArchivo}`);
             res.writeHead(404, { 'Content-Type': 'text/html' });
-            res.end('<h1>Error 404 - Archivo no encontrado</h1>');
+            res.end('<h1>Error 404 - Not Found</h1>');
         } else {
-            res.writeHead(200, { 'Content-Type': mimeTypes[ext] });
+            res.writeHead(200, { 'Content-Type': contentType });
             res.end(data);
         }
     });
+}
+
+//-- Crear el servidor
+const server = http.createServer((req, res) => {
+    const url = new URL(req.url, `http://${req.headers.host}`);
+    const extension = path.extname(url.pathname);
+    let filePath = path.join(PUBLIC_DIR, url.pathname);
+
+    switch (url.pathname) {
+        case '/':
+            console.log("Petición: Página principal");
+            filePath = RUTAS.index
+            break;
+
+        case '/error.html':
+            console.log("Petición: Página de error");
+            filePath = RUTAS.error
+            break;
+    }
+
+    switch (extension) {
+        case '.html':
+            path.join(PUBLIC_DIR, path.basename(url.pathname));
+            break;
+
+        case '.css':
+            filePath = path.join(RUTAS.css, path.basename(url.pathname));
+            break;
+
+        case '.js':
+            filePath = path.join(RUTAS.js, path.basename(url.pathname));
+            break;
+
+        case '.jpg':
+        case '.jpeg':
+        case '.png':
+        case '.gif':
+            filePath = path.join(RUTAS.img, path.basename(url.pathname));
+            break;
+
+        default:
+            console.log("Petición: Página de error");
+            carpeta = RUTAS.error;
+            break;
+    }
+
+    console.log('Sirviendo: ' + filePath);
+    servirArchivo(res, filePath);
+
 });
 
 //-- Iniciar el servidor
