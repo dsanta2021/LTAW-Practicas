@@ -1,33 +1,54 @@
-//-- Imports
 const fs = require('fs');
-const URL = require('url').URL;
 const http = require('http');
+const path = require('path');
 
-//-- Especificaciones
+//-- Configuración
 const PUERTO = 8001;
+const BASE_DIR = path.join(__dirname, 'public');
+
+//-- Mapeo de extensiones a tipos MIME
+const mimeTypes = {
+    '.html': 'text/html',
+    '.css': 'text/css',
+    '.js': 'application/javascript',
+    '.jpg': 'image/jpeg',
+    '.png': 'image/png',
+    '.gif': 'image/gif',
+    '.ico': 'image/x-icon'
+};
 
 //-- Crear el servidor
 const server = http.createServer((req, res) => {
+    console.log(`Petición recibida: ${req.url}`);
+
+    //-- Si la URL es "/", servir "index.html"
+    let filePath = req.url === '/' ? '/index.html' : req.url;
+    filePath = path.join(BASE_DIR, filePath);
+
+    //-- Obtener la extensión del archivo
+    const ext = path.extname(filePath);
     
-  //-- Indicamos que se ha recibido una petición
-  console.log("Petición recibida!");
+    //-- Comprobar si la extensión es válida
+    if (!mimeTypes[ext]) {
+        res.writeHead(400, { 'Content-Type': 'text/html' });
+        res.end('<h1>Error 400 - Solicitud no válida</h1>');
+        return;
+    }
 
-  //switch(req) {
-  //  case ()
-  //}
-
-  //-- Cabecera que indica el tipo de datos del
-  //-- cuerpo de la respuesta: Texto plano
-  res.setHeader('Content-Type', 'text/plain');
-
-  //-- Mensaje del cuerpo
-  res.write("Soy el Happy server!!\n");
-
-  //-- Terminar la respuesta y enviarla
-  res.end();
+    //-- Leer y servir el archivo solicitado
+    fs.readFile(filePath, (err, data) => {
+        if (err) {
+            console.error(`Error al leer el archivo: ${filePath}`);
+            res.writeHead(404, { 'Content-Type': 'text/html' });
+            res.end('<h1>Error 404 - Archivo no encontrado</h1>');
+        } else {
+            res.writeHead(200, { 'Content-Type': mimeTypes[ext] });
+            res.end(data);
+        }
+    });
 });
 
-//-- Activar el servidor: ¡Que empiece la fiesta!
-server.listen(PUERTO);
-
-console.log("Happy server activado!. Escuchando en puerto: " + PUERTO);
+//-- Iniciar el servidor
+server.listen(PUERTO, () => {
+    console.log(`🚀 Servidor en marcha en http://localhost:${PUERTO}`);
+});
