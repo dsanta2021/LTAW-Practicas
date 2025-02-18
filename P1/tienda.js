@@ -1,3 +1,6 @@
+//-- Imports
+const fs = require('fs');
+const URL = require('url').URL;
 const http = require('http');
 
 //-- Especificaciones
@@ -8,6 +11,10 @@ const server = http.createServer((req, res) => {
     
   //-- Indicamos que se ha recibido una petición
   console.log("Petición recibida!");
+
+  //switch(req) {
+  //  case ()
+  //}
 
   //-- Cabecera que indica el tipo de datos del
   //-- cuerpo de la respuesta: Texto plano
