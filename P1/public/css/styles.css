@@ -1,25 +1,89 @@
+/* Estilos generales */
 body {
     font-family: Arial, sans-serif;
     background-color: #f4f4f4;
-    text-align: center;
+    margin: 0;
+    padding: 0;
 }
 
-header {
-    background-color: #333;
-    color: white;
-    padding: 1rem;
-}
-
-a {
-    text-decoration: none;
-    color: #fff;
-}
-
-.productos {
+/* Barra superior */
+.barra-superior {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #232f3e;
+    color: white;
+    padding: 10px 20px;
+}
+
+.barra-superior .logo h1 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.barra-superior .buscador {
+    display: flex;
+}
+
+.barra-superior .buscador input {
+    padding: 5px;
+    width: 200px;
+    border-radius: 5px;
+    border: none;
+}
+
+.barra-superior .buscador button {
+    background-color: #febd69;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.barra-superior .acciones {
+    display: flex;
+    gap: 10px;
+}
+
+.barra-superior .acciones select,
+.barra-superior .acciones a {
+    background: none;
+    border: none;
+    color: white;
+    text-decoration: none;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+/* Barra de navegación */
+.barra-navegacion {
+    display: flex;
+    justify-content: flex-start;
     gap: 20px;
-    margin-top: 20px;
+    background-color: #37475a;
+    padding: 10px 20px;
+}
+
+.barra-navegacion button,
+.barra-navegacion a {
+    color: white;
+    background: none;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.barra-navegacion button {
+    font-size: 1.5rem;
+    background-color: transparent;
+}
+
+/* Sección de productos */
+.productos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    padding: 20px;
 }
 
 .producto {
@@ -27,7 +91,7 @@ a {
     padding: 15px;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    width: 200px;
+    text-align: center;
 }
 
 .producto img {
@@ -45,28 +109,29 @@ a {
 }
 
 .producto a {
+    display: inline-block;
+    margin-top: 10px;
     color: #0066cc;
     text-decoration: none;
+    font-weight: bold;
 }
 
 .producto a:hover {
     text-decoration: underline;
 }
 
-.producto-detalle img {
-    width: 300px;
-    border-radius: 5px;
-}
+/* Responsive */
+@media (max-width: 768px) {
+    .barra-superior {
+        flex-direction: column;
+        align-items: center;
+    }
 
-button {
-    background-color: #333;
-    color: white;
-    border: none;
-    padding: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-}
+    .barra-superior .buscador input {
+        width: 100%;
+    }
 
-button:hover {
-    background-color: #555;
+    .productos {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
 }

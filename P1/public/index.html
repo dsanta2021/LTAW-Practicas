@@ -5,12 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tienda Friki</title>
     <link rel="stylesheet" href="styles.css">
-    
 </head>
 <body>
-    <header>
-        <h1>Tienda Friki</h1>
+    <!-- Barra superior -->
+    <header class="barra-superior">
+        <div class="logo">
+            <h1>Tienda Friki</h1>
+        </div>
+        <div class="buscador">
+            <input type="text" placeholder="Buscar productos...">
+            <button>🔍</button>
+        </div>
+        <div class="acciones">
+            <select>
+                <option>🇪🇸 ES</option>
+                <option>🇬🇧 EN</option>
+            </select>
+            <a href="#">Inicio</a>
+            <a href="#">Contacto</a>
+            <a href="#">🛒 Carrito</a>
+        </div>
     </header>
+
+    <!-- Segunda barra -->
+    <nav class="barra-navegacion">
+        <button class="menu-hamburguesa">☰ Menú</button>
+        <a href="#">🔥 Ofertas</a>
+        <a href="#">🆕 Últimas novedades</a>
+    </nav>
+
+    <!-- Sección de productos -->
     <main>
         <section class="productos">
             <div class="producto">
@@ -30,6 +54,18 @@
                 <h2>Póster exclusivo</h2>
                 <p>Descripción breve del producto.</p>
                 <a href="producto3.html">Ver más</a>
+            </div>
+            <div class="producto">
+                <img src="img/producto4.jpg" alt="Producto 4">
+                <h2>Taza personalizada</h2>
+                <p>Descripción breve del producto.</p>
+                <a href="producto4.html">Ver más</a>
+            </div>
+            <div class="producto">
+                <img src="img/producto5.jpg" alt="Producto 5">
+                <h2>Réplica de espada</h2>
+                <p>Descripción breve del producto.</p>
+                <a href="producto5.html">Ver más</a>
             </div>
         </section>
     </main>
