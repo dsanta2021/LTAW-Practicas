@@ -26,4 +26,16 @@ document.addEventListener("DOMContentLoaded", () => {
             alert("Producto no disponible");
         }
     });
+
+    // Selector de idioma
+    const languageSelector = document.querySelector("select");
+    
+    languageSelector.addEventListener("change", (event) => {
+        if (event.target.value === "🇬🇧 EN") {
+            window.location.href = "index_en.html";
+        } else {
+            window.location.href = "index.html";
+        }
+    });
+    
 });
