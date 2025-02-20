@@ -13,7 +13,7 @@ body {
     align-items: center;
     background-color: #232f3e;
     color: white;
-    padding: 10px 20px;
+    padding: 30px 50px;
 }
 
 .barra-superior .logo h1 {
@@ -26,8 +26,8 @@ body {
 }
 
 .barra-superior .buscador input {
-    padding: 5px;
-    width: 200px;
+    padding: 10px;
+    width: 300px;
     border-radius: 5px;
     border: none;
 }
@@ -35,6 +35,7 @@ body {
 .barra-superior .buscador button {
     background-color: #febd69;
     border: none;
+    border-radius: 5px;
     padding: 5px 10px;
     cursor: pointer;
 }
@@ -58,23 +59,29 @@ body {
 .barra-navegacion {
     display: flex;
     justify-content: flex-start;
-    gap: 20px;
+    gap: 30px;
     background-color: #37475a;
-    padding: 10px 20px;
+    padding: 5px 30px;
 }
+
+.barra-navegacion .menu {
+    font-weight: bold;
+    color: #ffffff; /* Color llamativo */
+}
+
 
 .barra-navegacion button,
 .barra-navegacion a {
     color: white;
     background: none;
     border: none;
-    font-size: 1rem;
+    font-size: 1.2rem;
     cursor: pointer;
     text-decoration: none;
 }
 
 .barra-navegacion button {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     background-color: transparent;
 }
 
@@ -93,15 +100,21 @@ body {
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .producto img {
-    width: 100%;
+    width: 300px; /* Tamaño fijo */
+    height: 400px; /* Tamaño fijo */
+    object-fit: cover; /* Recorta la imagen sin distorsionarla */
     border-radius: 5px;
 }
 
 .producto h2 {
     font-size: 1.2rem;
+    margin: 10px 0;
 }
 
 .producto p {
@@ -113,6 +126,7 @@ body {
     color: #0066cc;
     text-decoration: none;
     font-weight: bold;
+    margin-top: auto; /* Hace que el botón se mantenga abajo */
 }
 
 .producto a:hover {
