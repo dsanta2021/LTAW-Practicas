@@ -167,3 +167,23 @@
 .btn-comprar:hover {
     background: #e68900;
 }
+
+.btn-inicio {
+    background: #6fbeff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background 0.3s ease;
+}
+
+.btn-inicio a {
+    color: white;
+    text-decoration: none;
+}
+
+.btn-inicio:hover {
+    background: #289eff;
+}
