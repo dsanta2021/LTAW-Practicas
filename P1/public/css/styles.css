@@ -106,9 +106,9 @@ body {
 }
 
 .producto img {
-    width: 300px; /* Tamaño fijo */
-    height: 400px; /* Tamaño fijo */
-    object-fit: cover; /* Recorta la imagen sin distorsionarla */
+    width: 300px;
+    height: 400px;
+    object-fit: cover;
     border-radius: 5px;
 }
 
