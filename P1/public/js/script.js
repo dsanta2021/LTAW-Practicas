@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const searchButton = document.querySelector(".buscador button");
     const productos = document.querySelectorAll(".producto");
 
-    searchButton.addEventListener("click", () => {
+    const realizarBusqueda = () => {
         const searchTerm = searchInput.value.toLowerCase();
         let found = false;
         
@@ -23,7 +23,14 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         
         if (!found) {
-            alert("Producto no disponible");
+            window.location.href = "producto_no_encontrado.html";
+        }
+    };
+
+    searchButton.addEventListener("click", realizarBusqueda);
+    searchInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+            realizarBusqueda();
         }
     });
 
