@@ -1,0 +1,123 @@
+/* Estilos generales */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+/* Barra superior */
+.barra-superior {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #232f3e;
+    color: white;
+    padding: 30px 50px;
+}
+
+.barra-superior .logo h1 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.barra-superior .buscador {
+    display: flex;
+}
+
+.barra-superior .buscador input {
+    padding: 10px;
+    width: 300px;
+    border-radius: 5px;
+    border: none;
+}
+
+.barra-superior .buscador button {
+    background-color: #febd69;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.barra-superior .acciones {
+    display: flex;
+    gap: 10px;
+}
+
+.barra-superior .acciones select,
+.barra-superior .acciones a {
+    background: none;
+    border: none;
+    color: white;
+    text-decoration: none;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+/* Barra de navegación */
+.barra-navegacion {
+    display: flex;
+    justify-content: flex-start;
+    gap: 30px;
+    background-color: #37475a;
+    padding: 5px 30px;
+}
+
+.barra-navegacion .menu {
+    font-weight: bold;
+    color: #ffffff; 
+}
+
+
+.barra-navegacion button,
+.barra-navegacion a {
+    color: white;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.barra-navegacion button {
+    font-size: 1.2rem;
+    background-color: transparent;
+}
+
+/* Error */
+.error_404 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+    text-align: left;
+}
+.error-content {
+    display: flex;
+    align-items: center;
+}
+.error-text {
+    margin-right: 20px;
+}
+.error-text h1 {
+    font-weight: bold;
+    font-size: 40px;
+}
+.error-text p {
+    margin: 10px 0;
+    font-size: 20px;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+.error-text button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    border-radius: 5px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+.error-text button:hover {
+    background-color: #0056b3;
+}
