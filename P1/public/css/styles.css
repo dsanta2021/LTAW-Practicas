@@ -81,8 +81,9 @@ body {
 /* Sección de productos */
 .productos {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(3, 1fr); /* 3 columnas por fila */
     gap: 20px;
+    justify-content: center;
     padding: 20px;
 }
 
@@ -109,8 +110,6 @@ body {
 }
 
 .producto a {
-    display: inline-block;
-    margin-top: 10px;
     color: #0066cc;
     text-decoration: none;
     font-weight: bold;
