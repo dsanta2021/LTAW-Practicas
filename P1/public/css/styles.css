@@ -1,7 +1,8 @@
 /* Estilos generales */
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
+    font-family: 'Press Start 2P', cursive; /* Fuente estilo arcade */
+    background-color: #121212;
+    color: white;
     margin: 0;
     padding: 0;
 }
@@ -10,13 +11,15 @@ body {
 .logo {
     display: flex;
     align-items: center;
-    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
     cursor: pointer;
+    color: #00FFF7;
+    text-shadow: 0 0 5px #00FFF7, 0 0 10px #00FFF7;
 }
 
 .logo img {
     height: 80px;
-    margin-right: 10px; 
+    margin-right: 10px;
+    filter: invert(1) sepia(1) saturate(1) hue-rotate(180deg);
 }
 
 /* Barra superior */
@@ -24,64 +27,82 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #232f3e;
+    background-color: #1a1a1a;
     color: white;
     padding: 30px 50px;
-}
-
-.barra-superior .logo h1 {
-    margin: 0;
-    font-size: 1.5rem;
-}
-
-.barra-superior .buscador {
-    display: flex;
+    box-shadow: 0px 0px 15px #FF00FF;
 }
 
 .barra-superior .buscador input {
     padding: 10px;
     width: 300px;
     border-radius: 5px;
-    border: none;
+    border: 2px solid #00FFF7;
+    background-color: #232323;
+    color: white;
 }
 
 .barra-superior .buscador button {
-    background-color: #febd69;
+    background-color: #FFD700;
     border: none;
     border-radius: 5px;
     padding: 5px 10px;
     cursor: pointer;
-}
-
-.barra-superior .acciones {
-    display: flex;
-    gap: 10px;
-}
-
-.barra-superior .acciones select,
-.barra-superior .acciones a {
-    background: none;
-    border: none;
     color: white;
-    text-decoration: none;
-    font-size: 1rem;
-    cursor: pointer;
+    font-weight: bold;
+    text-shadow: 0 0 5px #FFD700;
 }
+
+.barra-superior .buscador button:hover {
+    background-color: #FF00FF;
+}
+
+.barra-superior .acciones select {
+    background-color: #1a1a2e; 
+    color: #00ffcc; 
+    border: 2px solid #00ffcc; 
+    padding: 8px 12px;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    appearance: none; 
+    font-weight: bold;
+    transition: 0.3s ease;
+}
+
+.barra-superior .acciones select:hover {
+    background-color: #00ffcc; 
+    color: #1a1a2e;
+}
+
+.barra-superior .acciones a {
+    font-size: 1.2rem; 
+    padding: 10px 15px; 
+    font-weight: bold; 
+}
+
+.barra-superior .acciones a:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+    transition: 0.3s ease;
+}
+
 
 /* Barra de navegación */
 .barra-navegacion {
     display: flex;
     justify-content: flex-start;
     gap: 30px;
-    background-color: #37475a;
-    padding: 5px 30px;
+    background-color: #232323;
+    padding: 10px 30px;
+    box-shadow: 0px 0px 10px #32CD32;
 }
 
 .barra-navegacion .menu {
     font-weight: bold;
-    color: #ffffff; /* Color llamativo */
+    color: #00FFF7;
+    text-shadow: 0 0 5px #00FFF7;
 }
-
 
 .barra-navegacion button,
 .barra-navegacion a {
@@ -91,31 +112,39 @@ body {
     font-size: 1.2rem;
     cursor: pointer;
     text-decoration: none;
+    transition: color 0.3s ease;
 }
 
-.barra-navegacion button {
-    font-size: 1.2rem;
-    background-color: transparent;
+.barra-navegacion button:hover,
+.barra-navegacion a:hover {
+    color: #FF00FF;
+    text-shadow: 0 0 5px #FF00FF;
 }
 
 /* Sección de productos */
 .productos {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 columnas por fila */
+    grid-template-columns: repeat(3, 1fr);
     gap: 20px;
     justify-content: center;
     padding: 20px;
 }
 
 .producto {
-    background: white;
+    background: #1a1a1a;
     padding: 15px;
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 0px 10px #FF4500;
     text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.producto:hover {
+    transform: scale(1.05);
+    box-shadow: 0px 0px 15px #FF00FF;
 }
 
 .producto img {
@@ -123,41 +152,64 @@ body {
     height: 400px;
     object-fit: cover;
     border-radius: 5px;
+    border: 2px solid #00FFF7;
 }
 
 .producto h2 {
     font-size: 1.2rem;
     margin: 10px 0;
+    color: #FFD700;
+    text-shadow: 0 0 5px #FFD700;
 }
 
 .producto p {
     font-size: 1rem;
-    color: #777;
+    color: #ccc;
 }
 
 .producto a {
-    color: #0066cc;
+    color: #00FFF7;
     text-decoration: none;
     font-weight: bold;
-    margin-top: auto; /* Hace que el botón se mantenga abajo */
+    margin-top: auto;
 }
 
 .producto a:hover {
     text-decoration: underline;
+    color: #FF00FF;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .barra-superior {
-        flex-direction: column;
-        align-items: center;
-    }
+/* Botones */
+.btn-comprar {
+    background: #FF4500;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background 0.3s ease;
+    box-shadow: 0px 0px 10px #FF4500;
+}
 
-    .barra-superior .buscador input {
-        width: 100%;
-    }
+.btn-comprar:hover {
+    background: #FF00FF;
+    box-shadow: 0px 0px 15px #FF00FF;
+}
 
-    .productos {
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    }
+.btn-inicio {
+    background: #32CD32;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background 0.3s ease;
+    box-shadow: 0px 0px 10px #32CD32;
+}
+
+.btn-inicio:hover {
+    background: #00FFF7;
+    box-shadow: 0px 0px 15px #00FFF7;
 }

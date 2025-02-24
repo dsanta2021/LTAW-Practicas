@@ -1,99 +1,25 @@
-/* Barra superior */
-.barra-superior {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #232f3e;
-    color: white;
-    padding: 30px 50px;
-}
-
-.barra-superior .logo h1 {
+/* Estilos para productos */
+body {
+    font-family: 'Press Start 2P', cursive;
+    background-color: #0a0a0a;
+    color: #00ffcc;
+    text-align: center;
     margin: 0;
-    font-size: 1.5rem;
+    padding: 0;
 }
 
-.barra-superior .buscador {
-    display: flex;
-}
-
-.barra-superior .buscador input {
-    padding: 10px;
-    width: 300px;
-    border-radius: 5px;
-    border: none;
-}
-
-.barra-superior .buscador button {
-    background-color: #febd69;
-    border: none;
-    border-radius: 5px;
-    padding: 5px 10px;
-    cursor: pointer;
-}
-
-.barra-superior .acciones {
-    display: flex;
-    gap: 10px;
-}
-
-.barra-superior .acciones select,
-.barra-superior .acciones a {
-    background: none;
-    border: none;
-    color: white;
-    text-decoration: none;
-    font-size: 1rem;
-    cursor: pointer;
-}
-
-/* Barra de navegación */
-.barra-navegacion {
-    display: flex;
-    justify-content: flex-start;
-    gap: 30px;
-    background-color: #37475a;
-    padding: 5px 30px;
-}
-
-.barra-navegacion .menu {
-    font-weight: bold;
-    color: #ffffff; /* Color llamativo */
-}
-
-
-.barra-navegacion button,
-.barra-navegacion a {
-    color: white;
-    background: none;
-    border: none;
-    font-size: 1.2rem;
-    cursor: pointer;
-    text-decoration: none;
-}
-
-.barra-navegacion button {
-    font-size: 1.2rem;
-    background-color: transparent;
-}
-
-/* Nombre del producto */
 .nombre-producto {
-    text-align: center; 
-    font-family: Arial Black; 
-    font-weight: bold; 
-    font-size: 36px; 
-    color: #000000; 
-    text-shadow: 0 1px 0 #ddd, 0 2px 0 #ccc, 0 3px 0 #bbb, 0 4px 0 #aaa, 0 5px 0 #acacac, 0 6px 1px rgba(0,0,0,0.1), 0 0 5px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.3), 0 3px 5px rgba(0,0,0,0.2), 0 5px 10px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.2), 0 20px 20px rgba(0,0,0,0.15);
-    }
+    font-size: 28px;
+    color: #ff00ff;
+    text-shadow: 0px 0px 10px #ff00ff;
+}
 
-/* Galería de imágenes */
 .galeria {
     display: flex;
     justify-content: center;
     width: 900px;
     height: 440px;
-    margin: 0 auto;
+    margin: 20px auto;
     border-radius: 8px;
 }
 
@@ -102,88 +28,62 @@
     height: 100%;
     flex-grow: 1;
     object-fit: cover;
-    opacity: .8;
-    transition: .5s ease;
+    opacity: 0.8;
+    transition: 0.5s ease;
+    filter: drop-shadow(0px 0px 5px #00ffcc);
 }
 
 .galeria img:hover {
-    cursor: crosshair;
     width: 300px;
     opacity: 1;
-    filter: contrast(120%);
-}
-
-/* Contenido del producto */
-.producto-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    margin: 20px auto;
-    max-width: 900px;
-    padding: 20px;
+    filter: contrast(120%) drop-shadow(0px 0px 15px #00ffcc);
 }
 
 .detalles-producto {
-    text-align: center;
-    background: #f8f8f8;
+    background: rgba(255, 0, 255, 0.2);
     padding: 20px;
     border-radius: 8px;
     width: 60%;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-.detalles-producto h2 {
-    font-size: 24px;
-    margin-bottom: 10px;
-}
-
-.detalles-producto p {
-    font-size: 16px;
-    margin: 5px 0;
-}
-
-.detalles-producto p span {
-    font-weight: bold;
+    margin: 20px auto;
+    box-shadow: 0px 0px 15px #ff00ff;
 }
 
 .precio {
-    color: #000000;
     font-size: 22px;
+    color: #ffcc00;
     font-weight: bold;
 }
 
-.btn-comprar {
-    background: #ff9800;
-    color: white;
-    border: none;
-    padding: 10px 15px;
+.btn-comprar, .btn-inicio {
+    display: inline-block;
+    padding: 10px 20px;
     font-size: 16px;
-    cursor: pointer;
+    font-family: 'Press Start 2P', cursive;
+    text-decoration: none;
+    border: 2px solid;
     border-radius: 5px;
-    transition: background 0.3s ease;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-comprar {
+    background: #ff00ff;
+    border-color: #ff00ff;
+    color: white;
 }
 
 .btn-comprar:hover {
-    background: #e68900;
+    background: #cc00cc;
+    box-shadow: 0px 0px 15px #ff00ff;
 }
 
 .btn-inicio {
-    background: #6fbeff;
+    background: #00ccff;
+    border-color: #00ccff;
     color: white;
-    border: none;
-    padding: 10px 15px;
-    font-size: 16px;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: background 0.3s ease;
-}
-
-.btn-inicio a {
-    color: white;
-    text-decoration: none;
 }
 
 .btn-inicio:hover {
-    background: #289eff;
+    background: #0099cc;
+    box-shadow: 0px 0px 15px #00ccff;
 }
