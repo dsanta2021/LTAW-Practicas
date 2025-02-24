@@ -7,6 +7,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const searchInput = document.querySelector(".buscador input");
     const searchButton = document.querySelector(".buscador button");
     const productos = document.querySelectorAll(".producto");
+    const products = [
+        'Funko Pop! Harry Potter And Buckbeak', 
+        'Figura Acción Sora',
+        'Taza de Star Wars',
+        'Figura Acción Erza Scarlet',
+        'Taza de Genshin Impact',
+        'Funko Pop! Captain Jack Sparrow Sparrow',
+        'Figura Acción Shen-Long',
+        'Funko Pop! Satoru Gojo',
+        'Taza de Super Mario'
+    ];
 
     const realizarBusqueda = () => {
         const searchTerm = searchInput.value.toLowerCase();
