@@ -6,35 +6,11 @@ document.addEventListener("DOMContentLoaded", () => {
     // Buscador de productos
     const searchInput = document.querySelector(".buscador input");
     const searchButton = document.querySelector(".buscador button");
-    const productos = document.querySelectorAll(".producto");
-    const products = [
-        'Funko Pop! Harry Potter And Buckbeak', 
-        'Figura Acción Sora',
-        'Taza de Star Wars',
-        'Figura Acción Erza Scarlet',
-        'Taza de Genshin Impact',
-        'Funko Pop! Captain Jack Sparrow Sparrow',
-        'Figura Acción Shen-Long',
-        'Funko Pop! Satoru Gojo',
-        'Taza de Super Mario'
-    ];
 
     const realizarBusqueda = () => {
-        const searchTerm = searchInput.value.toLowerCase();
-        let found = false;
-        
-        productos.forEach(producto => {
-            const nombre = producto.querySelector("h2").textContent.toLowerCase();
-            if (nombre.includes(searchTerm)) {
-                producto.style.display = "block";
-                found = true;
-            } else {
-                producto.style.display = "none";
-            }
-        });
-        
-        if (!found) {
-            window.location.href = "producto_no_encontrado.html";
+        const searchTerm = searchInput.value.trim().toLowerCase();
+        if (searchTerm) {
+            window.location.href = `index.html?search=${encodeURIComponent(searchTerm)}`;
         }
     };
 
@@ -44,6 +20,29 @@ document.addEventListener("DOMContentLoaded", () => {
             realizarBusqueda();
         }
     });
+
+    // Filtrar productos si hay un término de búsqueda en la URL
+    const params = new URLSearchParams(window.location.search);
+    const searchTerm = params.get("search");
+
+    if (searchTerm) {
+        const productos = document.querySelectorAll(".producto");
+        let found = false;
+
+        productos.forEach(producto => {
+            const nombre = producto.querySelector("h2").textContent.toLowerCase();
+            if (nombre.includes(searchTerm)) {
+                producto.style.display = "block";
+                found = true;
+            } else {
+                producto.style.display = "none";
+            }
+        });
+
+        if (!found) {
+            window.location.href = "producto_no_encontrado.html";
+        }
+    }
 
     // Selector de idioma
     const languageSelector = document.querySelector("select");
