@@ -6,6 +6,18 @@ body {
     padding: 0;
 }
 
+/* Nombre y Logo */
+.logo {
+    display: flex;
+    align-items: center;
+    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+.logo img {
+    height: 80px;
+    margin-right: 10px; 
+}
+
 /* Barra superior */
 .barra-superior {
     display: flex;

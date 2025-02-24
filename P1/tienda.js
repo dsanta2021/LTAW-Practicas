@@ -26,6 +26,7 @@ const mimeTypes = {
     '.jpeg': 'image/jpeg',
     '.png': 'image/png',
     '.gif': 'image/gif',
+    '.ico': 'image/x-icon'
 };
 
 // Función para servir archivos estáticos
@@ -87,6 +88,7 @@ const server = http.createServer((req, res) => {
         case '.jpeg':
         case '.png':
         case '.gif':
+        case '.ico':
             filePath = path.join(RUTAS.img, path.basename(url.pathname));
             break;
 
