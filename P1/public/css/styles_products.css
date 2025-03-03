@@ -14,6 +14,15 @@ body {
     text-shadow: 0px 0px 10px #ff00ff;
 }
 
+/* Nombre del producto */
+.nombre-producto {
+    font-size: 28px;
+    color: #ff00ff;
+    text-shadow: 0px 0px 10px #ff00ff;
+    margin: 20px;
+}
+
+/* Galería de imágenes */
 .galeria {
     display: flex;
     justify-content: center;
@@ -31,6 +40,7 @@ body {
     opacity: 0.8;
     transition: 0.5s ease;
     filter: drop-shadow(0px 0px 5px #00ffcc);
+    overflow: hidden;
 }
 
 .galeria img:hover {
@@ -39,6 +49,7 @@ body {
     filter: contrast(120%) drop-shadow(0px 0px 15px #00ffcc);
 }
 
+/* Contenedor de detalles del producto */
 .detalles-producto {
     background: rgba(255, 0, 255, 0.2);
     padding: 20px;
@@ -48,13 +59,16 @@ body {
     box-shadow: 0px 0px 15px #ff00ff;
 }
 
+/* Precio */
 .precio {
     font-size: 22px;
     color: #ffcc00;
     font-weight: bold;
 }
 
-.btn-comprar, .btn-inicio {
+/* Botones */
+.btn-comprar, 
+.btn-inicio {
     display: inline-block;
     padding: 10px 20px;
     font-size: 16px;
@@ -86,4 +100,70 @@ body {
 .btn-inicio:hover {
     background: #0099cc;
     box-shadow: 0px 0px 15px #00ccff;
+}
+
+/* Estilos responsivos */
+@media (max-width: 1024px) {
+    .galeria {
+        width: 100%;
+        height: 400px;
+    }
+
+    .detalles-producto {
+        width: 80%;
+    }
+}
+
+@media (max-width: 768px) {
+    .galeria {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .galeria img {
+        width: 100%;
+        height: auto;
+    }
+
+    .detalles-producto {
+        width: 90%;
+        padding: 15px;
+    }
+
+    .btn-comprar,
+    .btn-inicio {
+        font-size: 14px;
+        padding: 8px 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .nombre-producto {
+        font-size: 22px;
+    }
+
+    .galeria {
+        width: 100%;
+        height: auto;
+        flex-direction: column;
+    }
+
+    .galeria img {
+        width: 100%;
+        height: auto;
+    }
+
+    .detalles-producto {
+        width: 95%;
+    }
+
+    .precio {
+        font-size: 20px;
+    }
+
+    .btn-comprar,
+    .btn-inicio {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
 }

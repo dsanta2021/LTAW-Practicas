@@ -12,6 +12,7 @@ const PUBLIC_DIR = path.join(__dirname, 'public');
 const RUTAS = {
     index: path.join(PUBLIC_DIR, 'index.html'),
     error: path.join(PUBLIC_DIR, 'error.html'),
+    sin_producto: path.join(PUBLIC_DIR, 'producto_no_encontrado.html'),
     img: path.join(PUBLIC_DIR, 'img'),
     css: path.join(PUBLIC_DIR, 'css'),
     js: path.join(PUBLIC_DIR, 'js')
@@ -68,6 +69,11 @@ const server = http.createServer((req, res) => {
         case '/error.html':
             console.log("Petición: Página de error");
             filePath = RUTAS.error
+            break;
+
+        case '/producto_no_encontrado.html':
+            console.log("Petición: Página de error");
+            filePath = RUTAS.sin_producto
             break;
     }
 

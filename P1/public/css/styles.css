@@ -1,6 +1,6 @@
 /* Estilos generales */
 body {
-    font-family: 'Press Start 2P', cursive; /* Fuente estilo arcade */
+    font-family: 'Press Start 2P', cursive; 
     background-color: #121212;
     color: white;
     margin: 0;
@@ -31,6 +31,7 @@ body {
     color: white;
     padding: 30px 50px;
     box-shadow: 0px 0px 15px #FF00FF;
+    flex-wrap: wrap;
 }
 
 .barra-superior .buscador input {
@@ -51,13 +52,15 @@ body {
     color: white;
     font-weight: bold;
     text-shadow: 0 0 5px #FFD700;
+    margin-bottom: 20px;
 }
 
 .barra-superior .buscador button:hover {
     background-color: #FF00FF;
 }
 
-.barra-superior .acciones select {
+.barra-superior .acciones select, 
+.barra-superior .acciones a {
     background-color: #1a1a2e; 
     color: #00ffcc; 
     border: 2px solid #00ffcc; 
@@ -75,27 +78,19 @@ body {
     color: #1a1a2e;
 }
 
-.barra-superior .acciones a {
-    font-size: 1.2rem; 
-    padding: 10px 15px; 
-    font-weight: bold; 
-}
-
 .barra-superior .acciones a:hover {
     background-color: rgba(255, 255, 255, 0.2);
-    border-radius: 5px;
-    transition: 0.3s ease;
 }
-
 
 /* Barra de navegación */
 .barra-navegacion {
     display: flex;
-    justify-content: flex-start;
+    justify-content: center;
     gap: 30px;
     background-color: #232323;
     padding: 10px 30px;
     box-shadow: 0px 0px 10px #32CD32;
+    flex-wrap: wrap;
 }
 
 .barra-navegacion .menu {
@@ -180,7 +175,8 @@ body {
 }
 
 /* Botones */
-.btn-comprar {
+.btn-comprar,
+.btn-inicio {
     background: #FF4500;
     color: white;
     border: none;
@@ -197,19 +193,44 @@ body {
     box-shadow: 0px 0px 15px #FF00FF;
 }
 
-.btn-inicio {
-    background: #32CD32;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    font-size: 16px;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: background 0.3s ease;
-    box-shadow: 0px 0px 10px #32CD32;
-}
-
 .btn-inicio:hover {
     background: #00FFF7;
     box-shadow: 0px 0px 15px #00FFF7;
+}
+
+/* Estilos responsivos */
+@media (max-width: 1024px) {
+    .productos {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .barra-superior {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .barra-superior .buscador,
+    .barra-superior .acciones {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .barra-navegacion {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .productos {
+        grid-template-columns: repeat(1, 1fr);
+    }
+
+    .producto img {
+        width: 90%;
+        height: auto;
+    }
 }

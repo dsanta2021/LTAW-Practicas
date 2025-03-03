@@ -31,6 +31,7 @@ body {
     color: white;
     padding: 30px 50px;
     box-shadow: 0px 0px 15px #FF00FF;
+    flex-wrap: wrap;
 }
 
 .barra-superior .buscador input {
@@ -51,13 +52,15 @@ body {
     color: white;
     font-weight: bold;
     text-shadow: 0 0 5px #FFD700;
+    margin-bottom: 20px;
 }
 
 .barra-superior .buscador button:hover {
     background-color: #FF00FF;
 }
 
-.barra-superior .acciones select {
+.barra-superior .acciones select, 
+.barra-superior .acciones a {
     background-color: #1a1a2e; 
     color: #00ffcc; 
     border: 2px solid #00ffcc; 
@@ -75,26 +78,19 @@ body {
     color: #1a1a2e;
 }
 
-.barra-superior .acciones a {
-    font-size: 1.2rem; /* Aumentar el tamaño del texto */
-    padding: 10px 15px; /* Agregar más espacio dentro del botón */
-    font-weight: bold; /* Hacer el texto más grueso */
-}
-
 .barra-superior .acciones a:hover {
-    background-color: rgba(255, 255, 255, 0.2); /* Un efecto al pasar el mouse */
-    border-radius: 5px;
-    transition: 0.3s ease;
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
 /* Barra de navegación */
 .barra-navegacion {
     display: flex;
-    justify-content: flex-start;
+    justify-content: center;
     gap: 30px;
     background-color: #232323;
     padding: 10px 30px;
     box-shadow: 0px 0px 10px #32CD32;
+    flex-wrap: wrap;
 }
 
 .barra-navegacion .menu {
@@ -161,4 +157,32 @@ body {
 .error-text button:hover {
     background-color: #cc0000;
     box-shadow: 0px 0px 15px #ff0000;
+}
+
+/* Estilos responsivos */
+@media (max-width: 1024px) {
+    .productos {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .barra-superior {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .barra-superior .buscador,
+    .barra-superior .acciones {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .barra-navegacion {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
 }
