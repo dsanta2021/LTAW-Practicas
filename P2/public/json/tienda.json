@@ -1,0 +1,144 @@
+{
+    "usuarios": [
+      {
+        "nombre": "root",
+        "nombreReal": "Administrador",
+        "correo": "admin@frikishop.com"
+      },
+      {
+        "nombre": "DragonSlayer",
+        "nombreReal": "Natsu Dragneel",
+        "correo": "natsufiredragon@example.com"
+      }
+    ],
+    "productos": [ 
+      {
+        "id": 1,
+        "nombre": "Funko Pop! Harry Potter And Buckbeak",
+        "miniDescripion": "Funko Pop! Rides Deluxe: Harry Potter Prisoner of Azkaban - Harry & Buckbeak",
+        "Oferta": "Si",
+        "Novedad": "No",
+        "description": [
+            "Funko Pop! Rides Deluxe: Harry Potter Prisoner of Azkaban - Harry & Buckbeak - Figura de Vinilo Coleccionable",
+            "Tamaño: 5,5 pulgadas (14 cm) de ancho y 5,5 pulgadas (14 cm) de alto"
+            ],
+        "precio": 31.99,
+        "stock": 17,
+        "imagen": ["producto1_1.jpg", "producto1_2.jpg", "producto1_3.jpg"]
+      },
+      {
+        "id": 2,
+        "nombre": "Figura Acción Sora",
+        "miniDescripcion": "Figura coleccionable de Sora de la saga de videojuegos Kingdom Hearts",
+        "Oferta": "No",
+        "Novedad": "Si",
+        "description": [
+            "Kingdom Hearts III - Sora [Play Arts Kai][Importación Japonesa]",
+            "Tamaño: W80mm x D50mm×H224mm"
+            ],
+        "precio": 161.18,
+        "stock": 8,
+        "imagen": ["producto2_1.jpg", "producto2_2.jpg", "producto2_3.jpg"]
+      },
+      {
+        "id": 3,
+        "nombre": "Taza de Star Wars",
+        "miniDescripcion": "Taza de cerámica de Darth Vader",
+        "Oferta": "Si",
+        "Novedad": "Si",
+        "description": [
+            "Taza de cerámica con frase y dibujo de Star Wars. Apto para microondas",
+            "Tamaño: 330 ml - 8x10x12 centímetros"
+            ],
+        "precio": 14.95,
+        "stock": 15,
+        "imagen": ["producto3_1.jpg", "producto3_2.jpg", "producto3_3.jpg"]
+      },
+      {
+        "id": 4,
+        "nombre": "Figura Acción Erza Scarlet",
+        "miniDescripcion": "Bellfine - Fairy Tail Última Temporada: Erza Scarlet Figura de PVC Escala 1:8",
+        "Oferta": "Si",
+        "Novedad": "No",
+        "description": [
+            "Una importación de Bellfine de la popular serie animada Fairy Tail. Expresiones faciales y vestuarios intercambiables",
+            "Tamaño: 35,6l. x 15,2an. x 17,8al. cm"
+            ],
+        "precio": 289.99,
+        "stock": 4,
+        "imagen": ["producto4_1.jpg", "producto4_2.jpg", "producto4_3.jpg"]
+      },
+      {
+        "id": 5,
+        "nombre": "Taza de Genshin Impact",
+        "miniDescripcion": "Taza del personaje Klee del videojuego Genshin Impact",
+        "Oferta": "No",
+        "Novedad": "Si",
+        "description": [
+            "Genshin Impact Offficial Merchandise - Diseñada según la habilidad del personaje Klee, Jumpy Dumpty",
+            "Tamaño: 360 ml - 11an. x 15al. cm"
+            ],
+        "precio": 35.99,
+        "stock": 11,
+        "imagen": ["producto5_1.jpg", "producto5_2.jpg", "producto5_3.jpg"]
+      },
+      {
+        "id": 6,
+        "nombre": "Funko Pop! Captain Jack Sparrow Sparrow",
+        "miniDescripcion": "Funko Pop! Movies: Captain Jack Sparrow Sparrow - Pirates of The Caribbean",
+        "Oferta": "No",
+        "Novedad": "No",
+        "description": [
+            "Funko Pop! Movies: PotC - Captain Jack Sparrow Sparrow - (Opening) - Pirates of The Caribbean - Piratas del Caribe - Figura de Vinilo Coleccionable",
+            "Tamaño: 10l. x 10an. x 10al. cm"
+            ],
+        "precio": 15.99,
+        "stock": 13,
+        "imagen": ["producto6_1.jpg", "producto6_2.jpg", "producto6_3.jpg"]
+      },
+      {
+        "id": 7,
+        "nombre": "Figura Acción Shen-Long",
+        "miniDescripcion": "Figura coleccionable del dragón de la serie animada Dragon Ball con las bolas del dragón",
+        "Oferta": "No",
+        "Novedad": "No",
+        "description": [
+            "Figura Shen-Long con set de bolas de cristal de 3,5 cm y soporte con caja de regalo para coleccionismo",
+            "Tamaño: 10l. x 10an. x 15al. cm"
+            ],
+        "precio": 52.72,
+        "stock": 25,
+        "imagen": ["producto7_1.jpg", "producto7_2.jpg", "producto7_3.jpg"]
+      },
+      {
+        "id": 8,
+        "nombre": "Funko Pop! Satoru Gojo",
+        "miniDescripcion": "Funko Pop! Animation: Jujutsu Kaisen - Satoru Gojo",
+        "Oferta": "Si",
+        "Novedad": "Si",
+        "description": [
+            "Funko Pop! Animation: Jujutsu Kaisen - Satoru Gojo - Figuras Miniaturas Coleccionables",
+            "Tamaño: 11l. x 9an. x 16al. cm"
+            ],
+        "precio": 16.00,
+        "stock": 9,
+        "imagen": ["producto8_1.jpg", "producto8_2.jpg", "producto8_3.jpg"]
+      },
+      {
+        "id": 9,
+        "nombre": "Figura Acción Naruto",
+        "miniDescripcion": "Taza nova de cerámica de Super Mario",
+        "Oferta": "No",
+        "Novedad": "No",
+        "description": [
+            "Elegante taza de cerámica decorada con sutiles y originales diseños basados en el personaje más famosos del mundo de los videojuegos, Mario.",
+            "Tamaño: 360 ml - 8an. x 10al. cm"
+            ],
+        "precio": 13.60,
+        "stock": 19,
+        "imagen": ["producto9_1.jpg", "producto9_2.jpg", "producto9_3.jpg"]
+      }
+    ],
+    "pedidos": []
+  }
+  
