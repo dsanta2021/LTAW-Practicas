@@ -1,0 +1,188 @@
+/* Estilos generales */
+body {
+    font-family: 'Press Start 2P', cursive; /* Fuente estilo arcade */
+    background-color: #121212;
+    color: white;
+    margin: 0;
+    padding: 0;
+}
+
+/* Nombre y Logo */
+.logo {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    color: #00FFF7;
+    text-shadow: 0 0 5px #00FFF7, 0 0 10px #00FFF7;
+}
+
+.logo img {
+    height: 80px;
+    margin-right: 10px;
+    filter: invert(1) sepia(1) saturate(1) hue-rotate(180deg);
+}
+
+/* Barra superior */
+.barra-superior {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #1a1a1a;
+    color: white;
+    padding: 30px 50px;
+    box-shadow: 0px 0px 15px #FF00FF;
+    flex-wrap: wrap;
+}
+
+.barra-superior .buscador input {
+    padding: 10px;
+    width: 300px;
+    border-radius: 5px;
+    border: 2px solid #00FFF7;
+    background-color: #232323;
+    color: white;
+}
+
+.barra-superior .buscador button {
+    background-color: #FFD700;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    color: white;
+    font-weight: bold;
+    text-shadow: 0 0 5px #FFD700;
+    margin-bottom: 20px;
+}
+
+.barra-superior .buscador button:hover {
+    background-color: #FF00FF;
+}
+
+.barra-superior .acciones select, 
+.barra-superior .acciones a {
+    background-color: #1a1a2e; 
+    color: #00ffcc; 
+    border: 2px solid #00ffcc; 
+    padding: 8px 12px;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    appearance: none; 
+    font-weight: bold;
+    transition: 0.3s ease;
+}
+
+.barra-superior .acciones select:hover {
+    background-color: #00ffcc; 
+    color: #1a1a2e;
+}
+
+.barra-superior .acciones a:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Barra de navegación */
+.barra-navegacion {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    background-color: #232323;
+    padding: 10px 30px;
+    box-shadow: 0px 0px 10px #32CD32;
+    flex-wrap: wrap;
+}
+
+.barra-navegacion .menu {
+    font-weight: bold;
+    color: #00FFF7;
+    text-shadow: 0 0 5px #00FFF7;
+}
+
+.barra-navegacion button,
+.barra-navegacion a {
+    color: white;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.barra-navegacion button:hover,
+.barra-navegacion a:hover {
+    color: #FF00FF;
+    text-shadow: 0 0 5px #FF00FF;
+}
+
+.error_404 {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 750px;
+    text-align: center;
+    color: #ff0000;
+    text-shadow: 0px 0px 10px #ff0000;
+}
+
+.error-content img {
+    width: 300px;
+    filter: drop-shadow(0px 0px 15px #ff0000);
+}
+
+.error-text h1 {
+    font-size: 50px;
+    font-weight: bold;
+}
+
+.error-text p {
+    font-size: 20px;
+    color: #ffffff;
+}
+
+.error-text button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    border-radius: 5px;
+    background-color: #ff0000;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-family: 'Press Start 2P', cursive;
+    transition: all 0.3s;
+}
+
+.error-text button:hover {
+    background-color: #cc0000;
+    box-shadow: 0px 0px 15px #ff0000;
+}
+
+/* Estilos responsivos */
+@media (max-width: 1024px) {
+    .productos {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .barra-superior {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .barra-superior .buscador,
+    .barra-superior .acciones {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .barra-navegacion {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+}

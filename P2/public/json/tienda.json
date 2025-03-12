@@ -15,7 +15,7 @@
       {
         "id": 1,
         "nombre": "Funko Pop! Harry Potter And Buckbeak",
-        "miniDescripion": "Funko Pop! Rides Deluxe: Harry Potter Prisoner of Azkaban - Harry & Buckbeak",
+        "miniDescripcion": "Funko Pop! Rides Deluxe: Harry Potter Prisoner of Azkaban - Harry & Buckbeak",
         "Oferta": "Si",
         "Novedad": "No",
         "description": [
@@ -24,7 +24,7 @@
             ],
         "precio": 31.99,
         "stock": 17,
-        "imagen": ["producto1_1.jpg", "producto1_2.jpg", "producto1_3.jpg"]
+        "imagen": ["producto1.jpg", "producto1_1.jpg", "producto1_2.jpg"]
       },
       {
         "id": 2,
@@ -38,7 +38,7 @@
             ],
         "precio": 161.18,
         "stock": 8,
-        "imagen": ["producto2_1.jpg", "producto2_2.jpg", "producto2_3.jpg"]
+        "imagen": ["producto2.jpg", "producto2_1.jpg", "producto2_2.jpg"]
       },
       {
         "id": 3,
@@ -52,7 +52,7 @@
             ],
         "precio": 14.95,
         "stock": 15,
-        "imagen": ["producto3_1.jpg", "producto3_2.jpg", "producto3_3.jpg"]
+        "imagen": ["producto3.jpg", "producto3_1.jpg", "producto3_2.jpg"]
       },
       {
         "id": 4,
@@ -66,7 +66,7 @@
             ],
         "precio": 289.99,
         "stock": 4,
-        "imagen": ["producto4_1.jpg", "producto4_2.jpg", "producto4_3.jpg"]
+        "imagen": ["producto4.jpg", "producto4_1.jpg", "producto4_2.jpg"]
       },
       {
         "id": 5,
@@ -80,7 +80,7 @@
             ],
         "precio": 35.99,
         "stock": 11,
-        "imagen": ["producto5_1.jpg", "producto5_2.jpg", "producto5_3.jpg"]
+        "imagen": ["producto5.jpg", "producto5_1.jpg", "producto5_2.jpg"]
       },
       {
         "id": 6,
@@ -94,7 +94,7 @@
             ],
         "precio": 15.99,
         "stock": 13,
-        "imagen": ["producto6_1.jpg", "producto6_2.jpg", "producto6_3.jpg"]
+        "imagen": ["producto6.jpg", "producto6_1.jpg", "producto6_2.jpg"]
       },
       {
         "id": 7,
@@ -108,7 +108,7 @@
             ],
         "precio": 52.72,
         "stock": 25,
-        "imagen": ["producto7_1.jpg", "producto7_2.jpg", "producto7_3.jpg"]
+        "imagen": ["producto7.jpg", "producto7_1.jpg", "producto7_2.jpg"]
       },
       {
         "id": 8,
@@ -122,7 +122,7 @@
             ],
         "precio": 16.00,
         "stock": 9,
-        "imagen": ["producto8_1.jpg", "producto8_2.jpg", "producto8_3.jpg"]
+        "imagen": ["producto8.jpg", "producto8_1.jpg", "producto8_2.jpg"]
       },
       {
         "id": 9,
@@ -136,7 +136,7 @@
             ],
         "precio": 13.60,
         "stock": 19,
-        "imagen": ["producto9_1.jpg", "producto9_2.jpg", "producto9_3.jpg"]
+        "imagen": ["producto9.jpg", "producto9_1.jpg", "producto9_2.jpg"]
       }
     ],
     "pedidos": []
