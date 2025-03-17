@@ -190,22 +190,66 @@ function generarPaginaFiltrada(res, criterio, valor) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${criterio}</title>
+    <title>FrikiShop - ${criterio}: ${valor}</title>
     <link rel="stylesheet" href="/css/styles.css">
+    <link rel="icon" href="/img/favicon.ico" type="image/x-icon">
+    <script defer src="/js/script.js"></script>
 </head>
 <body>
-    <h1>${criterio}</h1>
-    <ul>`;
+    <header class="barra-superior">
+        <div class="logo">
+            <img src="/img/logo.png" alt="Logo de FrikiShop">
+            <h1>FrikiShop</h1>
+        </div>
+        <div class="buscador">
+            <input type="text" placeholder="Buscar productos...">
+            <button>🔍</button>
+        </div>
+        <div class="acciones">
+            <select>
+                <option>🇪🇸 ES</option>
+                <option>🇬🇧 EN</option>
+            </select>
+            <a href="/">Inicio</a>
+            <a href="#">Contacto</a>
+            <a href="#">🛒 Carrito</a>
+        </div>
+    </header>
 
-    productosFiltrados.forEach(producto => {
-        contenido += `<li><a href='/producto/${producto.id}'>${producto.nombre} - ${producto.precio}€</a></li>`;
-    });
+    <nav class="barra-navegacion">
+        <button class="menu">☰ Menú</button>
+        <a href="/ofertas">🔥 Ofertas</a>
+        <a href="/novedades">🆕 Últimas novedades</a>
+    </nav>
 
-    contenido += '</ul><a href="/">Volver</a></body></html>';
+    <main>
+        <section class="productos">`;
+
+    if (productosFiltrados.length > 0) {
+        productosFiltrados.forEach(producto => {
+            contenido += `
+                <div class="producto">
+                    <a href="/producto/${producto.id}"><img src="/img/${producto.imagen[0]}" alt="${producto.nombre}"></a>
+                    <h2>${producto.nombre}</h2>
+                    <p>${producto.miniDescripcion}</p>
+                    <a href="/producto/${producto.id}">Ver más</a>
+                </div>`;
+        });
+    } else {
+        contenido += `<p class="mensaje-no-encontrado">No se encontraron productos para este criterio.</p>`;
+    }
+
+    contenido += `
+        </section>
+        <a href="/" class="btn-volver">Volver a la tienda</a>
+    </main>
+</body>
+</html>`;
 
     res.writeHead(200, { 'Content-Type': 'text/html' });
     res.end(contenido);
 }
+
 
 //-- Servir Archivos Estáticos
 function servirArchivoEstatico(req, res) {
