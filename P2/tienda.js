@@ -1,6 +1,8 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const url = require('url');
+const querystring = require('querystring');
 
 //-- Rutas
 const PUBLIC_DIR = path.join(__dirname, 'public');
@@ -43,6 +45,20 @@ const server = http.createServer((req, res) => {
         case url === '/novedades':
             generarPaginaFiltrada(res, 'Novedad', 'Si');
             break;
+
+        case url === '/login':
+            if (req.method === 'POST') handleLogin(req, res);
+            else mostrarLogin(res);
+            break;
+
+        case url === '/register':
+            if (req.method === 'POST') handleRegister(req, res);
+            else mostrarRegistro(res);
+            break;
+
+        case url === '/logout':
+            handleLogout(res);
+            break;
         
         default:
             servirArchivoEstatico(req, res);
@@ -79,8 +95,8 @@ function generarPaginaPrincipal(res) {
                 <option>🇬🇧 EN</option>
             </select>
             <a href="#">Inicio</a>
-            <a href="#">Contacto</a>
-            <a href="#">🛒 Carrito</a>
+            <a href="/login">Log-In</a>
+            <a href="/carrito">🛒 Carrito</a>
         </div>
     </header>
     
@@ -150,8 +166,8 @@ function generarPaginaProducto(res, id) {
                 <option>🇬🇧 EN</option>
             </select>
             <a href="/">Inicio</a>
-            <a href="#">Contacto</a>
-            <a href="#">🛒 Carrito</a>
+            <a href="/login">Log-In</a>
+            <a href="/carrito">🛒 Carrito</a>
         </div>
     </header>
     <nav class="barra-navegacion">
@@ -178,7 +194,6 @@ function generarPaginaProducto(res, id) {
     res.writeHead(200, { 'Content-Type': 'text/html' });
     res.end(contenido);
 }
-
 
 //-- Generar Página Filtrada (Ofertas / Novedades)
 function generarPaginaFiltrada(res, criterio, valor) {
@@ -211,8 +226,8 @@ function generarPaginaFiltrada(res, criterio, valor) {
                 <option>🇬🇧 EN</option>
             </select>
             <a href="/">Inicio</a>
-            <a href="#">Contacto</a>
-            <a href="#">🛒 Carrito</a>
+            <a href="/login">Log-In</a>
+            <a href="/carrito">🛒 Carrito</a>
         </div>
     </header>
 
@@ -250,7 +265,6 @@ function generarPaginaFiltrada(res, criterio, valor) {
     res.end(contenido);
 }
 
-
 //-- Servir Archivos Estáticos
 function servirArchivoEstatico(req, res) {
     let filePath = path.join(PUBLIC_DIR, req.url);
@@ -266,6 +280,90 @@ function servirArchivoEstatico(req, res) {
             res.end(data);
         }
     });
+}
+
+//-- Manejar Login
+function handleLogin(req, res) {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+        let { username } = querystring.parse(body);
+        let tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
+        let usuario = tienda.usuarios.find(u => u.username === username);
+
+        if (usuario) {
+            res.setHeader('Set-Cookie', `usuario=${username}; HttpOnly`);
+            res.writeHead(302, { 'Location': '/' });
+            res.end();
+        } else {
+            res.writeHead(401, { 'Content-Type': 'text/html' });
+            res.end('<h2>Usuario no registrado. <a href="/register">Regístrate aquí</a></h2>');
+        }
+    });
+}
+
+//-- Manejar Registro
+function handleRegister(req, res) {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+        let { name, username, email } = querystring.parse(body);
+        let tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
+        
+        if (tienda.usuarios.some(u => u.username === username)) {
+            res.writeHead(400, { 'Content-Type': 'text/html' });
+            res.end('<h2>Ese usuario ya existe. <a href="/login">Inicia sesión aquí</a></h2>');
+            return;
+        }
+        
+        tienda.usuarios.push({ name, username, email });
+        fs.writeFileSync(RUTAS.db, JSON.stringify(tienda, null, 2));
+        res.writeHead(302, { 'Location': '/login' });
+        res.end();
+    });
+}
+
+//-- Manejar Logout
+function handleLogout(res) {
+    res.setHeader('Set-Cookie', 'usuario=; Max-Age=0');
+    res.writeHead(302, { 'Location': '/' });
+    res.end();
+}
+
+//-- Mostrar Formulario de Login
+function mostrarLogin(res) {
+    let contenido = `
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FrikiShop</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" href="img/favicon.ico" type="image/x-icon">
+    <script defer src="js/script.js"></script>
+</head>
+        <h2>Iniciar Sesión</h2>
+        <form method="POST">
+            <label>Usuario: <input type="text" name="username" required></label>
+            <button type="submit">Entrar</button>
+        </form>
+    `;
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.end(contenido);
+}
+
+//-- Mostrar Formulario de Registro
+function mostrarRegistro(res) {
+    let contenido = `
+        <h2>Registro</h2>
+        <form method="POST">
+            <label>Nombre Real: <input type="text" name="name" required></label>
+            <label>Usuario: <input type="text" name="username" required></label>
+            <label>Email: <input type="email" name="email" required></label>
+            <button type="submit">Registrarse</button>
+        </form>
+    `;
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.end(contenido);
 }
 
 server.listen(8001, () => {
