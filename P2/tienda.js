@@ -297,7 +297,50 @@ function handleLogin(req, res) {
             res.end();
         } else {
             res.writeHead(401, { 'Content-Type': 'text/html' });
-            res.end('<h2>Usuario no registrado. <a href="/register">Regístrate aquí</a></h2>');
+            let contenido = `
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FrikiShop</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" href="img/favicon.ico" type="image/x-icon">
+    <script defer src="js/script.js"></script>
+</head>
+<body>
+    <header class="barra-superior">
+        <div class="logo">
+            <img src="img/logo.png" alt="Logo de FrikiShop">
+            <h1>FrikiShop</h1>
+        </div>
+        <div class="buscador">
+            <input type="text" placeholder="Buscar productos...">
+            <button>🔍</button>
+        </div>
+        <div class="acciones">
+            <select>
+                <option>🇪🇸 ES</option>
+                <option>🇬🇧 EN</option>
+            </select>
+            <a href="#">Inicio</a>
+            <a href="/login">Log-In</a>
+            <a href="/carrito">🛒 Carrito</a>
+        </div>
+    </header>
+    
+    <nav class="barra-navegacion">
+        <button class="menu">☰ Menú</button>
+        <a href="/ofertas">🔥 Ofertas</a>
+        <a href="/novedades">🆕 Últimas novedades</a>
+    </nav>
+        <h2>Iniciar Sesión</h2>
+        <form method="POST">
+            <label>Usuario: <input type="text" name="username" required></label>
+            <button type="submit">Entrar</button>
+        </form>
+        <h3>Usuario no registrado. <a href="/register">Regístrate aquí</a></h3>
+    `;
+            res.end(contenido);
         }
     });
 }
@@ -333,6 +376,7 @@ function handleLogout(res) {
 //-- Mostrar Formulario de Login
 function mostrarLogin(res) {
     let contenido = `
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -341,11 +385,38 @@ function mostrarLogin(res) {
     <link rel="icon" href="img/favicon.ico" type="image/x-icon">
     <script defer src="js/script.js"></script>
 </head>
+<body>
+    <header class="barra-superior">
+        <div class="logo">
+            <img src="img/logo.png" alt="Logo de FrikiShop">
+            <h1>FrikiShop</h1>
+        </div>
+        <div class="buscador">
+            <input type="text" placeholder="Buscar productos...">
+            <button>🔍</button>
+        </div>
+        <div class="acciones">
+            <select>
+                <option>🇪🇸 ES</option>
+                <option>🇬🇧 EN</option>
+            </select>
+            <a href="#">Inicio</a>
+            <a href="/login">Log-In</a>
+            <a href="/carrito">🛒 Carrito</a>
+        </div>
+    </header>
+    
+    <nav class="barra-navegacion">
+        <button class="menu">☰ Menú</button>
+        <a href="/ofertas">🔥 Ofertas</a>
+        <a href="/novedades">🆕 Últimas novedades</a>
+    </nav>
         <h2>Iniciar Sesión</h2>
         <form method="POST">
             <label>Usuario: <input type="text" name="username" required></label>
             <button type="submit">Entrar</button>
         </form>
+        <p>¿No tienes cuenta? <a href="/register">Regístrate aquí</a></p>
     `;
     res.writeHead(200, { 'Content-Type': 'text/html' });
     res.end(contenido);
@@ -354,6 +425,41 @@ function mostrarLogin(res) {
 //-- Mostrar Formulario de Registro
 function mostrarRegistro(res) {
     let contenido = `
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FrikiShop</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" href="img/favicon.ico" type="image/x-icon">
+    <script defer src="js/script.js"></script>
+</head>
+<body>
+    <header class="barra-superior">
+        <div class="logo">
+            <img src="img/logo.png" alt="Logo de FrikiShop">
+            <h1>FrikiShop</h1>
+        </div>
+        <div class="buscador">
+            <input type="text" placeholder="Buscar productos...">
+            <button>🔍</button>
+        </div>
+        <div class="acciones">
+            <select>
+                <option>🇪🇸 ES</option>
+                <option>🇬🇧 EN</option>
+            </select>
+            <a href="#">Inicio</a>
+            <a href="/login">Log-In</a>
+            <a href="/carrito">🛒 Carrito</a>
+        </div>
+    </header>
+    
+    <nav class="barra-navegacion">
+        <button class="menu">☰ Menú</button>
+        <a href="/ofertas">🔥 Ofertas</a>
+        <a href="/novedades">🆕 Últimas novedades</a>
+    </nav>
         <h2>Registro</h2>
         <form method="POST">
             <label>Nombre Real: <input type="text" name="name" required></label>
