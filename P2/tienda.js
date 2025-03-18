@@ -376,47 +376,40 @@ function handleLogout(res) {
 //-- Mostrar Formulario de Login
 function mostrarLogin(res) {
     let contenido = `
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FrikiShop</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="icon" href="img/favicon.ico" type="image/x-icon">
-    <script defer src="js/script.js"></script>
-</head>
-<body>
-    <header class="barra-superior">
-        <div class="logo">
-            <img src="img/logo.png" alt="Logo de FrikiShop">
-            <h1>FrikiShop</h1>
-        </div>
-        <div class="buscador">
-            <input type="text" placeholder="Buscar productos...">
-            <button>🔍</button>
-        </div>
-        <div class="acciones">
-            <select>
-                <option>🇪🇸 ES</option>
-                <option>🇬🇧 EN</option>
-            </select>
-            <a href="#">Inicio</a>
-            <a href="/login">Log-In</a>
-            <a href="/carrito">🛒 Carrito</a>
-        </div>
-    </header>
-    
-    <nav class="barra-navegacion">
-        <button class="menu">☰ Menú</button>
-        <a href="/ofertas">🔥 Ofertas</a>
-        <a href="/novedades">🆕 Últimas novedades</a>
-    </nav>
-        <h2>Iniciar Sesión</h2>
-        <form method="POST">
-            <label>Usuario: <input type="text" name="username" required></label>
-            <button type="submit">Entrar</button>
-        </form>
-        <p>¿No tienes cuenta? <a href="/register">Regístrate aquí</a></p>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Login - Tienda Friki</title>
+            <link rel="icon" href="/img/favicon.ico" type="image/x-icon">
+            <link rel="stylesheet" href="/css/login_register.css">
+        </head>
+        <body>
+            <div class="container">
+                <header>
+                    <img src="/img/logo.png" alt="Tienda Friki" class="logo">
+                    <h1>Tienda Friki</h1>
+                </header>
+                <nav>
+                    <a href="index.html">Inicio</a>
+                    <a href="#" id="change-language">Idioma</a>
+                    <a href="register.html">Registrarse</a>
+                </nav>
+                <main>
+                    <form action="/login" method="post" class="auth-form">
+                        <h2>Iniciar Sesión</h2>
+                        <label for="username">Nombre de usuario</label>
+                        <input type="text" id="username" name="username" required>
+                        
+                        <label for="password">Contraseña</label>
+                        <input type="password" id="password" name="password" required>
+                        
+                        <button type="submit">Iniciar Sesión</button>
+                    </form>
+                </main>
+            </div>
+        </body>
+        </html>
     `;
     res.writeHead(200, { 'Content-Type': 'text/html' });
     res.end(contenido);
@@ -425,48 +418,46 @@ function mostrarLogin(res) {
 //-- Mostrar Formulario de Registro
 function mostrarRegistro(res) {
     let contenido = `
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FrikiShop</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="icon" href="img/favicon.ico" type="image/x-icon">
-    <script defer src="js/script.js"></script>
-</head>
-<body>
-    <header class="barra-superior">
-        <div class="logo">
-            <img src="img/logo.png" alt="Logo de FrikiShop">
-            <h1>FrikiShop</h1>
-        </div>
-        <div class="buscador">
-            <input type="text" placeholder="Buscar productos...">
-            <button>🔍</button>
-        </div>
-        <div class="acciones">
-            <select>
-                <option>🇪🇸 ES</option>
-                <option>🇬🇧 EN</option>
-            </select>
-            <a href="#">Inicio</a>
-            <a href="/login">Log-In</a>
-            <a href="/carrito">🛒 Carrito</a>
-        </div>
-    </header>
-    
-    <nav class="barra-navegacion">
-        <button class="menu">☰ Menú</button>
-        <a href="/ofertas">🔥 Ofertas</a>
-        <a href="/novedades">🆕 Últimas novedades</a>
-    </nav>
-        <h2>Registro</h2>
-        <form method="POST">
-            <label>Nombre Real: <input type="text" name="name" required></label>
-            <label>Usuario: <input type="text" name="username" required></label>
-            <label>Email: <input type="email" name="email" required></label>
-            <button type="submit">Registrarse</button>
-        </form>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Registro - Tienda Friki</title>
+            <link rel="icon" href="/img/favicon.ico" type="image/x-icon">
+            <link rel="stylesheet" href="/css/login_register.css">
+        </head>
+        <body>
+            <div class="container">
+                <header>
+                    <img src="logo.png" alt="Tienda Friki" class="logo">
+                    <h1>Tienda Friki</h1>
+                </header>
+                <nav>
+                    <a href="/img/index.html">Inicio</a>
+                    <a href="#" id="change-language">Idioma</a>
+                    <a href="login.html">Log-In</a>
+                </nav>
+                <main>
+                    <form action="/register" method="post" class="auth-form">
+                        <h2>Registrarse</h2>
+                        <label for="realname">Nombre real</label>
+                        <input type="text" id="realname" name="realname" required>
+                        
+                        <label for="username">Nombre de usuario</label>
+                        <input type="text" id="username" name="username" required>
+                        
+                        <label for="email">Correo electrónico</label>
+                        <input type="email" id="email" name="email" required>
+                        
+                        <label for="password">Contraseña</label>
+                        <input type="password" id="password" name="password" required>
+                        
+                        <button type="submit">Registrarse</button>
+                    </form>
+                </main>
+            </div>
+        </body>
+        </html>
     `;
     res.writeHead(200, { 'Content-Type': 'text/html' });
     res.end(contenido);
