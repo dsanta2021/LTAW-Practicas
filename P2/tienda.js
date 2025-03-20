@@ -380,15 +380,15 @@ function mostrarLogin(res) {
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Login - Tienda Friki</title>
+            <title>Login - FrikiShop</title>
             <link rel="icon" href="/img/favicon.ico" type="image/x-icon">
             <link rel="stylesheet" href="/css/login_register.css">
         </head>
         <body>
             <div class="container">
                 <header>
-                    <img src="/img/logo.png" alt="Tienda Friki" class="logo">
-                    <h1>Tienda Friki</h1>
+                    <img src="/img/logo.png" alt="FrikiShop" class="logo">
+                    <h1>FrikiShop</h1>
                 </header>
                 <nav>
                     <a href="index.html">Inicio</a>
@@ -422,18 +422,18 @@ function mostrarRegistro(res) {
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Registro - Tienda Friki</title>
+            <title>Registro - FrikiShop</title>
             <link rel="icon" href="/img/favicon.ico" type="image/x-icon">
             <link rel="stylesheet" href="/css/login_register.css">
         </head>
         <body>
             <div class="container">
                 <header>
-                    <img src="logo.png" alt="Tienda Friki" class="logo">
-                    <h1>Tienda Friki</h1>
+                    <img src="/img/logo.png" alt="FrikiShop" class="logo">
+                    <h1>FrikiShop</h1>
                 </header>
                 <nav>
-                    <a href="/img/index.html">Inicio</a>
+                    <a href="index.html">Inicio</a>
                     <a href="#" id="change-language">Idioma</a>
                     <a href="login.html">Log-In</a>
                 </nav>
