@@ -27,15 +27,15 @@ const mimeTypes = {
 //-- Parsear Cookies
 function parseCookies(req) {
     let list = {};
-    let cookieHeader = req.headers.cookie;
+    let cookieHeader = req.headers.cookie; // Obtener la cabecera de cookies del request
 
     if (cookieHeader) {
         cookieHeader.split(';').forEach(cookie => {
-            let [name, ...rest] = cookie.split('=');
-            name = name.trim();
-            let value = rest.join('=').trim();
+            let [name, ...rest] = cookie.split('='); // Separar el nombre y el valor de la cookie
+            name = name.trim(); // Limpiar el nombre de la cookie (espacios en blanco)
+            let value = rest.join('=').trim(); // Unir el resto en caso de que el valor contenga '='
             if (value) {
-                list[name] = decodeURIComponent(value);
+                list[name] = decodeURIComponent(value); // Decodificar el valor de la cookie
             }
         });
     }
@@ -78,6 +78,15 @@ const server = http.createServer((req, res) => {
 
         case url === '/logout':
             handleLogout(res);
+            break;
+
+        case url === '/carrito':
+            generarPaginaCarrito(res, cookies);
+            break;
+
+        case url.startsWith('/agregar/') && req.method === 'POST':
+            let idProductoAgregar = url.split('/').pop();
+            agregarAlCarrito(req, res, idProductoAgregar, false, cookies);  //No redirigir a la página de carrito
             break;
         
         default:
@@ -210,12 +219,28 @@ function generarPaginaProducto(res, id, cookies = {}) {
             <h3><span>${producto.description[0]}</span></h3>
             <p><span>Tamaño:</span> ${producto.description[1]}</p>
             <h3><span class="precio">${producto.precio} €</span></h3>
-            <button class="btn-comprar">Agregar al carrito</button>
+            <button class="btn-comprar" onclick="añadirAlCarrito('${producto.id}')">Agregar al carrito</button>
             <button class="btn-inicio"><a href="/">Home</a></button>
         </section>
     </main>
+    <script>
+        async function añadirAlCarrito(idProducto) {
+            try {
+                const response = await fetch('/agregar/' + idProducto, { method: 'POST' });
+                if (response.ok) {
+                    alert('Producto añadido al carrito');
+                } else {
+                    alert('Error al añadir el producto al carrito');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al añadir el producto al carrito');
+            }
+        }
+    </script>
 </body>
 </html>`;
+
 
     res.writeHead(200, { 'Content-Type': 'text/html' });
     res.end(contenido);
@@ -517,7 +542,10 @@ function handleRegister(req, res) {
 
 //-- Manejar Logout
 function handleLogout(res) {
-    res.setHeader('Set-Cookie', 'usuario=; Max-Age=0');
+    // Eliminar las cookies 'usuario' y 'carrito'
+    res.setHeader('Set-Cookie', 'usuario=; Max-Age=0; Path=/; HttpOnly');
+
+    // Redirigir al usuario a la página principal
     res.writeHead(302, { 'Location': '/' });
     res.end();
 }
@@ -610,6 +638,167 @@ function mostrarRegistro(res) {
     `;
     res.writeHead(200, { 'Content-Type': 'text/html' });
     res.end(contenido);
+}
+
+function generarPaginaCarrito(res, cookies = {}) {
+    let tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
+
+    console.log('Productos en tienda.json:', tienda.productos); // Depuración
+
+    let usuario = cookies.usuario || null;
+    if (!usuario) {
+        let contenido = `<!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Carrito - FrikiShop</title>
+            <link rel="stylesheet" href="/css/styles.css">
+            <link rel="stylesheet" href="/css/styles_carrito.css">
+        </head>
+        <body>
+            <header class="barra-superior">
+                <div class="logo">
+                    <img src="/img/logo.png" alt="Logo de FrikiShop">
+                    <h1>FrikiShop</h1>
+                </div>
+                <div class="buscador">
+                    <input type="text" placeholder="Buscar productos...">
+                    <button>🔍</button>
+                </div>
+                <div class="acciones">
+                    <select>
+                        <option>🇪🇸 ES</option>
+                        <option>🇬🇧 EN</option>
+                    </select>
+                    <a href="/">Inicio</a>
+                    <a href="/login">Log-In</a>
+                    <a href="/carrito">🛒 Carrito</a>
+                </div>
+            </header>
+
+            <main class="error-container">
+                <div class="error-content">
+                    <h1>Acceso denegado</h1>
+                    <p>Debes iniciar sesión para ver tu carrito.</p>
+                    <a href="/login" class="btn-login">Inicia sesión aquí</a>
+                </div>
+            </main>
+        </body>
+        </html>`;
+        res.writeHead(401, { 'Content-Type': 'text/html' });
+        res.end(contenido);
+        return;
+    }
+
+    let carrito = cookies.carrito ? JSON.parse(cookies.carrito) : []; // Parsear la cookie del carrito correctamente
+    
+    console.log('Contenido del carrito:', carrito); // Depuración
+
+     // Filtrar los productos que están en el carrito
+    let productosCarrito = carrito.map(item => {
+        let producto = tienda.productos.find(p => p.id == item.id);
+        if (producto) {
+            return { ...producto, cantidad: item.cantidad }; // Añadir la cantidad al producto
+        }
+        return null;
+    }).filter(p => p !== null); // Eliminar productos no encontrados
+
+    console.log('Productos encontrados en el carrito:', productosCarrito); // Depuración
+
+    let total = 0;
+
+    let contenido = `<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito - FrikiShop</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/styles_carrito.css">
+</head>
+<body>
+    <header class="barra-superior">
+        <div class="logo">
+            <img src="/img/logo.png" alt="Logo de FrikiShop">
+            <h1>FrikiShop</h1>
+        </div>
+        <div class="buscador">
+            <input type="text" placeholder="Buscar productos...">
+            <button>🔍</button>
+        </div>
+        <div class="acciones">
+            <select>
+                <option>🇪🇸 ES</option>
+                <option>🇬🇧 EN</option>
+            </select>
+            <a href="/">Inicio</a>
+            ${usuario 
+                ? `<span class="usuario">👤 ${usuario}</span> <a href="/logout">Log-Out</a>` 
+                : `<a href="/login">Log-In</a>`}
+            <a href="/carrito">🛒 Carrito</a>
+        </div>
+    </header>
+
+    <main class="carrito-container">
+        <section class="productos-carrito">
+            <h1>Tu Carrito</h1>`;
+
+    if (productosCarrito.length > 0) {
+        productosCarrito.forEach(producto => {
+            let subtotal = producto.precio * producto.cantidad;
+            total += subtotal;
+
+            contenido += `
+            <div class="producto-carrito">
+                <img src="/img/${producto.imagen[0]}" alt="${producto.nombre}">
+                <div class="detalles">
+                    <h2>${producto.nombre}</h2>
+                    <p>Precio: ${producto.precio} €</p>
+                    <p>Cantidad: ${producto.cantidad}</p>
+                    <p>Subtotal: ${subtotal} €</p>
+                </div>
+            </div>`;
+        });
+    } else {
+        contenido += `<p class="mensaje-vacio">Tu carrito está vacío. ¡Añade productos para empezar!</p>`;
+    }
+
+    contenido += `
+        </section>
+        <aside class="resumen-carrito">
+            <div class="total">
+                <h2>Total: ${total} €</h2>
+                <button class="btn-comprar">Realizar Pedido</button>
+            </div>
+        </aside>
+    </main>
+</body>
+</html>`;
+
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.end(contenido);
+}
+
+function agregarAlCarrito(req, res, idProducto, redirigir = true, cookies = {}) {
+    let carrito = cookies.carrito ? JSON.parse(cookies.carrito) : [];
+
+    let productoEnCarrito = carrito.find(p => p.id === idProducto);
+    if (productoEnCarrito) {
+        productoEnCarrito.cantidad += 1;
+    } else {
+        carrito.push({ id: idProducto, cantidad: 1 });
+    }
+
+    res.setHeader('Set-Cookie', `carrito=${encodeURIComponent(JSON.stringify(carrito))}; Path=/; HttpOnly`);
+
+    if (redirigir) {
+        res.writeHead(302, { 'Location': '/carrito' });
+        res.end();
+    } else {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, message: 'Producto añadido al carrito' }));
+    }
 }
 
 server.listen(8001, () => {

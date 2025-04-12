@@ -1,0 +1,158 @@
+/* Hacer que el header y la barra de navegación sean fijos */
+header.barra-superior {
+    position: sticky;
+    top: 0;
+    z-index: 1000; /* Asegura que esté por encima de otros elementos */
+    background-color: #222; /* Fondo oscuro para adaptarse al estilo */
+    color: #fff;
+    padding: 10px 20px;
+    border-bottom: 1px solid #444;
+}
+
+nav.barra-navegacion {
+    position: sticky;
+    top: 60px; /* Debajo del header */
+    z-index: 999;
+    background-color: #222;
+    color: #fff;
+    padding: 10px 20px;
+    border-bottom: 1px solid #444;
+}
+
+/* Contenedor principal del carrito */
+.carrito-container {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+gap: 20px;
+}
+
+/* Sección de productos (60% del ancho) */
+.productos-carrito {
+    width: 60%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Cada producto en el carrito */
+.producto-carrito {
+    display: flex;
+    align-items: center;
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 15px;
+    background-color: #222;
+color: #fff;
+}
+
+.productos-carrito h1 {
+    text-align: center;
+    margin-bottom: 20px; 
+    font-size: 2.5em; 
+    color: #fff; 
+}
+
+.producto-carrito img {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    margin-right: 20px;
+border-radius: 8px;
+}
+
+.producto-carrito .detalles {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Sección de resumen (40% del ancho) */
+.resumen-carrito {
+    width: 35%;
+    max-width: 300px;
+    height: 200px;
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 20px;
+    background-color: #222;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: sticky;
+    top: 120px; 
+    margin-right: auto; /* Centrar entre el final de los productos y el lateral derecho */
+    margin-left: auto;
+}
+
+.resumen-carrito .total {
+    text-align: center;
+font-size: 1.5em;
+    font-weight: bold;
+}
+
+.resumen-carrito .btn-comprar {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+transition: background-color 0.3s ease;
+}
+
+.resumen-carrito .btn-comprar:hover {
+    background-color: #0056b3;
+}
+
+/* Mensaje cuando el carrito está vacío */
+.mensaje-vacio {
+    text-align: center;
+    font-size: 1.2em;
+    color: #888;
+}
+
+/* Centrar el mensaje de error */
+.error-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: calc(100vh - 100px); /* Altura completa menos el header */
+    text-align: center;
+}
+
+.error-content {
+    max-width: 600px;
+    padding: 20px;
+    border: 1px solid #444;
+    border-radius: 8px;
+    background-color: #222;
+    color: #fff;
+}
+
+.error-content h1 {
+    font-size: 2em;
+    margin-bottom: 10px;
+}
+
+.error-content p {
+    font-size: 1.2em;
+    margin-bottom: 20px;
+}
+
+.error-content .btn-login {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.error-content .btn-login:hover {
+    background-color: #0056b3;
+}

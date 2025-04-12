@@ -1,7 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     // Redirigir en Inicio y logo
     document.querySelector(".logo").addEventListener("click", () => window.location.href = "/");
-    document.querySelector(".acciones a[href='#']").addEventListener("click", () => window.location.href = "/");
     
     // Buscador de productos
     const searchInput = document.querySelector(".buscador input");
