@@ -294,6 +294,125 @@ function generarPaginaFiltrada(res, criterio, valor, cookies = {}) {
     res.end(contenido);
 }
 
+//-- Generar Página de Error 404
+function error404(res) {
+    let contenido = `<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tienda Friki</title>
+    <link rel="stylesheet" href="/css/styles_error.css">
+    <script defer src="js/script.js"></script>
+</head>
+<body>
+    <!-- Barra superior -->
+    <header class="barra-superior">
+        <div class="logo">
+            <img src="img/logo.png" alt="Logo de FrikiShop">
+            <h1>FrikiShop</h1>
+        </div>
+        <div class="buscador">
+            <input type="text" placeholder="Buscar productos...">
+            <button>🔍</button>
+        </div>
+        <div class="acciones">
+            <select>
+                <option>🇪🇸 ES</option>
+                <option>🇬🇧 EN</option>
+            </select>
+            <a href="#">Inicio</a>
+            <a href="#">Contacto</a>
+            <a href="#">🛒 Carrito</a>
+        </div>
+    </header>
+
+    <!-- Segunda barra -->
+    <nav class="barra-navegacion">
+        <button class="menu">☰ Menú</button>
+        <a href="#">🔥 Ofertas</a>
+        <a href="#">🆕 Últimas novedades</a>
+    </nav>
+
+    <main>
+        <section class="error_404">
+            <div class="error-content">
+                <img src="img/error_404.png" alt="Error Image">
+                <div class="error-text">
+                    <h1>Error 404 - Not Found</h1>
+                    <p>¡Ups! Something is wrong</p>
+                    <button onclick="window.location.href='index.html'">Back To Home</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+</body>
+</html>
+`;
+    res.writeHead(404, { 'Content-Type': 'text/html' });
+    res.end(contenido);
+}
+
+//-- Generar Página de Producto No Encontrado
+function productoNoEncontrado(res) {
+    let contenido = `<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tienda Friki</title>
+    <link rel="stylesheet" href="/css/styles_error.css">
+    <script defer src="js/script.js"></script>
+</head>
+<body>
+    <!-- Barra superior -->
+    <header class="barra-superior">
+        <div class="logo">
+            <img src="img/logo.png" alt="Logo de FrikiShop">
+            <h1>FrikiShop</h1>
+        </div>
+        <div class="buscador">
+            <input type="text" placeholder="Buscar productos...">
+            <button>🔍</button>
+        </div>
+        <div class="acciones">
+            <select>
+                <option>🇪🇸 ES</option>
+                <option>🇬🇧 EN</option>
+            </select>
+            <a href="#">Inicio</a>
+            <a href="#">Contacto</a>
+            <a href="#">🛒 Carrito</a>
+        </div>
+    </header>
+
+    <!-- Segunda barra -->
+    <nav class="barra-navegacion">
+        <button class="menu">☰ Menú</button>
+        <a href="#">🔥 Ofertas</a>
+        <a href="#">🆕 Últimas novedades</a>
+    </nav>
+
+    <main>
+        <section class="error_404">
+            <div class="error-content">
+                <img src="img/not_found.png" alt="Error Image">
+                <div class="error-text">
+                    <h1>Lo sentimos 😞</h1>
+                    <p>No hemos encontrado productos que coincidan con tu búsqueda</p>
+                    <button onclick="window.location.href='index.html'">Back To Home</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+</body>
+</html>`;
+    res.writeHead(404, { 'Content-Type': 'text/html' });
+    res.end(contenido);
+}
+
 //-- Servir Archivos Estáticos
 function servirArchivoEstatico(req, res) {
     let filePath = path.join(PUBLIC_DIR, req.url);
@@ -302,8 +421,7 @@ function servirArchivoEstatico(req, res) {
 
     fs.readFile(filePath, (err, data) => {
         if (err) {
-            res.writeHead(404, { 'Content-Type': 'text/html' });
-            res.end(fs.readFileSync(RUTAS.error));
+            error404(res); // Usar la función dinámica para el error 404
         } else {
             res.writeHead(200, { 'Content-Type': contentType });
             res.end(data);
