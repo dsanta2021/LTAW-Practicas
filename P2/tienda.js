@@ -24,26 +24,46 @@ const mimeTypes = {
     '.ico': 'image/x-icon'
 };
 
+//-- Parsear Cookies
+function parseCookies(req) {
+    let list = {};
+    let cookieHeader = req.headers.cookie;
+
+    if (cookieHeader) {
+        cookieHeader.split(';').forEach(cookie => {
+            let [name, ...rest] = cookie.split('=');
+            name = name.trim();
+            let value = rest.join('=').trim();
+            if (value) {
+                list[name] = decodeURIComponent(value);
+            }
+        });
+    }
+
+    return list;
+}
+
 //-- Servidor HTTP
 const server = http.createServer((req, res) => {
+    let cookies = parseCookies(req);
     let url = req.url;
 
     switch (true) {
         case url === '/' || url === '/index.html':
-            generarPaginaPrincipal(res);
+            generarPaginaPrincipal(res, cookies);
             break;
         
         case url.startsWith('/producto/'):
             let idProducto = url.split('/').pop();
-            generarPaginaProducto(res, idProducto);
+            generarPaginaProducto(res, idProducto, cookies);
             break;
         
         case url === '/ofertas':
-            generarPaginaFiltrada(res, 'Oferta', 'Si');
+            generarPaginaFiltrada(res, 'Oferta', 'Si', cookies);
             break;
         
         case url === '/novedades':
-            generarPaginaFiltrada(res, 'Novedad', 'Si');
+            generarPaginaFiltrada(res, 'Novedad', 'Si', cookies);
             break;
 
         case url === '/login':
@@ -66,8 +86,9 @@ const server = http.createServer((req, res) => {
 });
 
 //-- Generar Página Principal
-function generarPaginaPrincipal(res) {
+function generarPaginaPrincipal(res, cookies = {}) {
     let tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
+    let usuario = cookies.usuario || null;
 
     let contenido = `<!DOCTYPE html>
 <html lang="es">
@@ -95,7 +116,9 @@ function generarPaginaPrincipal(res) {
                 <option>🇬🇧 EN</option>
             </select>
             <a href="#">Inicio</a>
-            <a href="/login">Log-In</a>
+            ${usuario 
+                ? `<span class="usuario">👤 ${usuario}</span> <a href="/logout">Log-Out</a>` 
+                : `<a href="/login">Log-In</a>`}
             <a href="/carrito">🛒 Carrito</a>
         </div>
     </header>
@@ -130,9 +153,10 @@ function generarPaginaPrincipal(res) {
 }
 
 //-- Generar Página de Producto
-function generarPaginaProducto(res, id) {
+function generarPaginaProducto(res, id, cookies = {}) {
     let tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
     let producto = tienda.productos.find(p => p.id == id);
+    let usuario = cookies.usuario || null;
 
     if (!producto) {
         res.writeHead(404, { 'Content-Type': 'text/html' });
@@ -166,7 +190,9 @@ function generarPaginaProducto(res, id) {
                 <option>🇬🇧 EN</option>
             </select>
             <a href="/">Inicio</a>
-            <a href="/login">Log-In</a>
+             ${usuario 
+                ? `<span class="usuario">👤 ${usuario}</span> <a href="/logout">Log-Out</a>` 
+                : `<a href="/login">Log-In</a>`}
             <a href="/carrito">🛒 Carrito</a>
         </div>
     </header>
@@ -196,8 +222,9 @@ function generarPaginaProducto(res, id) {
 }
 
 //-- Generar Página Filtrada (Ofertas / Novedades)
-function generarPaginaFiltrada(res, criterio, valor) {
+function generarPaginaFiltrada(res, criterio, valor, cookies = {}) {
     let tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
+    let usuario = cookies.usuario || null;
     let productosFiltrados = tienda.productos.filter(p => p[criterio] === valor);
 
     let contenido = `<!DOCTYPE html>
@@ -226,7 +253,9 @@ function generarPaginaFiltrada(res, criterio, valor) {
                 <option>🇬🇧 EN</option>
             </select>
             <a href="/">Inicio</a>
-            <a href="/login">Log-In</a>
+            ${usuario 
+                ? `<span class="usuario">👤 ${usuario}</span> <a href="/logout">Log-Out</a>` 
+                : `<a href="/login">Log-In</a>`}
             <a href="/carrito">🛒 Carrito</a>
         </div>
     </header>
@@ -287,12 +316,14 @@ function handleLogin(req, res) {
     let body = '';
     req.on('data', chunk => { body += chunk; });
     req.on('end', () => {
-        let { username } = querystring.parse(body);
+        let { nombre, password } = querystring.parse(body);
         let tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
-        let usuario = tienda.usuarios.find(u => u.username === username);
+
+        // Buscar al usuario en la base de datos
+        let usuario = tienda.usuarios.find(u => u.nombre === nombre && u.password === password);
 
         if (usuario) {
-            res.setHeader('Set-Cookie', `usuario=${username}; HttpOnly`);
+            res.setHeader('Set-Cookie', `usuario=${nombre}; HttpOnly`);
             res.writeHead(302, { 'Location': '/' });
             res.end();
         } else {
@@ -350,16 +381,16 @@ function handleRegister(req, res) {
     let body = '';
     req.on('data', chunk => { body += chunk; });
     req.on('end', () => {
-        let { name, username, email } = querystring.parse(body);
+        let { nombre, nombreReal, correo, password} = querystring.parse(body);
         let tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
         
-        if (tienda.usuarios.some(u => u.username === username)) {
+        if (tienda.usuarios.some(u => u.nombre === nombre)) {
             res.writeHead(400, { 'Content-Type': 'text/html' });
             res.end('<h2>Ese usuario ya existe. <a href="/login">Inicia sesión aquí</a></h2>');
             return;
         }
         
-        tienda.usuarios.push({ name, username, email });
+        tienda.usuarios.push({ nombre, nombreReal, correo, password });
         fs.writeFileSync(RUTAS.db, JSON.stringify(tienda, null, 2));
         res.writeHead(302, { 'Location': '/login' });
         res.end();
@@ -393,13 +424,13 @@ function mostrarLogin(res) {
                 <nav>
                     <a href="index.html">Inicio</a>
                     <a href="#" id="change-language">Idioma</a>
-                    <a href="register.html">Registrarse</a>
+                    <a href="register">Registrarse</a>
                 </nav>
                 <main>
                     <form action="/login" method="post" class="auth-form">
                         <h2>Iniciar Sesión</h2>
-                        <label for="username">Nombre de usuario</label>
-                        <input type="text" id="username" name="username" required>
+                        <label for="nombre">Nombre de usuario</label>
+                        <input type="text" id="nombre" name="nombre" required>
                         
                         <label for="password">Contraseña</label>
                         <input type="password" id="password" name="password" required>
@@ -435,19 +466,19 @@ function mostrarRegistro(res) {
                 <nav>
                     <a href="index.html">Inicio</a>
                     <a href="#" id="change-language">Idioma</a>
-                    <a href="login.html">Log-In</a>
+                    <a href="login">Log-In</a>
                 </nav>
                 <main>
                     <form action="/register" method="post" class="auth-form">
                         <h2>Registrarse</h2>
-                        <label for="realname">Nombre real</label>
-                        <input type="text" id="realname" name="realname" required>
+                        <label for="nombreReal">Nombre real</label>
+                        <input type="text" id="nombreReal" name="nombreReal" required>
                         
-                        <label for="username">Nombre de usuario</label>
-                        <input type="text" id="username" name="username" required>
+                        <label for="nombre">Nombre de usuario</label>
+                        <input type="text" id="nombre" name="nombre" required>
                         
-                        <label for="email">Correo electrónico</label>
-                        <input type="email" id="email" name="email" required>
+                        <label for="correo">Correo electrónico</label>
+                        <input type="correo" id="correo" name="correo" required>
                         
                         <label for="password">Contraseña</label>
                         <input type="password" id="password" name="password" required>

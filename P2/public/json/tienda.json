@@ -3,12 +3,20 @@
     {
       "nombre": "root",
       "nombreReal": "Administrador",
-      "correo": "admin@frikishop.com"
+      "correo": "admin@frikishop.com",
+      "password": "admin123"
     },
     {
       "nombre": "DragonSlayer",
       "nombreReal": "Natsu Dragneel",
-      "correo": "natsufiredragon@example.com"
+      "correo": "natsufiredragon@example.com",
+      "password": "usuario1"
+    },
+    {
+      "nombre": "davidsc",
+      "nombreReal": "David",
+      "correo": "d.santa@gmail.com",
+      "password": "04032002"
     }
   ],
   "productos": [
