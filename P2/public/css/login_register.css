@@ -1,61 +1,112 @@
+/* Fondo de la página */
 body {
+    background-color: #121212; /* Fondo oscuro */
+    color: #fff; /* Texto blanco */
     font-family: Arial, sans-serif;
-    text-align: center;
-    background-color: #f0f0f0;
+    margin: 0;
+    padding: 0;
 }
 
+/* Contenedor principal */
 .container {
-    max-width: 400px;
+    max-width: 600px;
     margin: 50px auto;
     padding: 20px;
-    background: white;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
+    border: 1px solid #444; /* Bordes oscuros */
+    border-radius: 8px;
+    background-color: #222; /* Fondo oscuro */
+    color: #fff; /* Texto blanco */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra ligera */
 }
 
+/* Header */
 header {
     text-align: center;
+    margin-bottom: 20px;
 }
 
-.logo {
+header .logo {
     width: 100px;
+    height: auto;
+    margin-bottom: 10px;
+    filter: invert(1) sepia(1) saturate(1) hue-rotate(180deg);
 }
 
+header h1 {
+    font-size: 2em;
+    color: #fff; /* Texto blanco */
+}
+
+/* Navegación */
 nav {
-    margin: 10px 0;
+    text-align: center;
+    margin-bottom: 20px;
 }
 
 nav a {
-    margin: 0 10px;
+    color: #007bff; /* Azul para enlaces */
     text-decoration: none;
-    color: #333;
+    margin: 0 10px;
+    font-weight: bold;
 }
 
+nav a:hover {
+    color: #0056b3; /* Azul más oscuro al pasar el ratón */
+}
+
+/* Formulario */
 .auth-form {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    gap: 15px;
+}
+
+.auth-form h2 {
+    text-align: center;
+    color: #fff; /* Texto blanco */
 }
 
 .auth-form label {
-    margin-top: 10px;
+    font-size: 1em;
+    color: #fff; /* Texto blanco */
 }
 
 .auth-form input {
-    padding: 8px;
-    width: 80%;
-    margin-top: 5px;
+    padding: 10px;
+    border: 1px solid #444; /* Bordes oscuros */
+    border-radius: 5px;
+    background-color: #333; /* Fondo oscuro */
+    color: #fff; /* Texto blanco */
 }
 
+.auth-form input:focus {
+    outline: none;
+    border-color: #007bff; /* Azul al enfocar */
+}
+
+/* Botón */
 .auth-form button {
-    margin-top: 20px;
-    padding: 10px 15px;
-    background-color: #007bff;
-    color: white;
+    padding: 10px 20px;
+    background-color: #007bff; /* Azul */
+    color: #fff; /* Texto blanco */
     border: none;
+    border-radius: 5px;
     cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
 }
 
 .auth-form button:hover {
-    background-color: #0056b3;
+    background-color: #0056b3; /* Azul más oscuro al pasar el ratón */
+}
+
+/* Enlaces adicionales */
+.auth-form a {
+    color: #007bff; /* Azul */
+    text-decoration: none;
+    font-size: 0.9em;
+}
+
+.auth-form a:hover {
+    color: #0056b3; /* Azul más oscuro al pasar el ratón */
 }
