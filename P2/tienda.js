@@ -88,6 +88,11 @@ const server = http.createServer((req, res) => {
             generarPaginaCarrito(res, cookies);
             break;
 
+        case url.startsWith('/modificar-carrito/') && req.method === 'POST':
+            let [_, __, idProductoModificar, accion] = url.split('/');
+            modificarCarrito(req, res, idProductoModificar, accion, cookies);
+            break;
+
         case url.startsWith('/agregar/') && req.method === 'POST':
             let idProductoAgregar = url.split('/').pop();
             agregarAlCarrito(req, res, idProductoAgregar, false, cookies);  //No redirigir a la página de carrito
@@ -409,7 +414,7 @@ function generarPaginaFiltrada(res, criterio, valor, cookies = {}) {
     res.end(contenido);
 }
 
-//-- Generar Página de Error 404
+//-- Generar Página de Error
 function error(res, mensaje = 'Error 404: Página no encontrada') {
     let contenido = `<!DOCTYPE html>
 <html lang="es">
@@ -776,6 +781,7 @@ function mostrarRegistro(res) {
     res.end(contenido);
 }
 
+//-- Generar Página del Carrito
 function generarPaginaCarrito(res, cookies = {}) {
     let usuario;
 
@@ -989,6 +995,11 @@ function generarPaginaCarrito(res, cookies = {}) {
                             <p>Cantidad: ${p.cantidad}</p>
                             <p>Precio: ${p.precio.toFixed(2)} €</p>
                             <p>Subtotal: ${(p.precio * p.cantidad).toFixed(2)} €</p>
+                            <div class="acciones-producto">
+                                <button onclick="modificarCantidad('${p.id}', 'aumentar')">➕</button>
+                                <button onclick="modificarCantidad('${p.id}', 'disminuir')">➖</button>
+                                <button onclick="modificarCantidad('${p.id}', 'eliminar')">❌</button>
+                            </div>
                         </div>
                     </div>
                 `).join('')}
@@ -1004,6 +1015,20 @@ function generarPaginaCarrito(res, cookies = {}) {
             </div>
         </aside>
     </main>
+        <script>
+        async function modificarCantidad(idProducto, accion) {
+            try {
+                const response = await fetch('/modificar-carrito/' + idProducto + '/' + accion, { method: 'POST' });
+                if (response.ok) {
+                    location.reload(); // Recargar la página para reflejar los cambios
+                } else {
+                    alert('Error al modificar el carrito');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+    </script>
 </body>
 </html>`;
 
@@ -1011,6 +1036,7 @@ function generarPaginaCarrito(res, cookies = {}) {
     res.end(contenido);
 }
 
+//-- Manejar Agregaciones al Carrito
 function agregarAlCarrito(req, res, idProducto, redirigir = true, cookies = {}) {
     // Inicializar el carrito como un array vacío si no existe
     let usuario;
@@ -1054,6 +1080,59 @@ function agregarAlCarrito(req, res, idProducto, redirigir = true, cookies = {}) 
     }
 }
 
+//-- Manejar Modificaciones del Carrito
+function modificarCarrito(req, res, idProducto, accion, cookies = {}) {
+    let usuario;
+
+    try {
+        usuario = cookies.usuario ? JSON.parse(cookies.usuario) : null;
+    } catch (e) {
+        console.error('Error al parsear la cookie usuario:', e);
+        res.setHeader('Set-Cookie', 'usuario=; Max-Age=0; Path=/; HttpOnly');
+        usuario = null;
+    }
+
+    if (!usuario) {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, message: 'Debes iniciar sesión para modificar el carrito.' }));
+        return;
+    }
+
+    let carrito = usuario.carrito || [];
+    let productoEnCarrito = carrito.find(p => p.id === idProducto);
+
+    if (!productoEnCarrito) {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, message: 'Producto no encontrado en el carrito.' }));
+        return;
+    }
+
+    switch (accion) {
+        case 'aumentar':
+            productoEnCarrito.cantidad += 1;
+            break;
+        case 'disminuir':
+            productoEnCarrito.cantidad -= 1;
+            if (productoEnCarrito.cantidad <= 0) {
+                carrito = carrito.filter(p => p.id !== idProducto); // Eliminar si la cantidad es 0
+            }
+            break;
+        case 'eliminar':
+            carrito = carrito.filter(p => p.id !== idProducto); // Eliminar el producto
+            break;
+        default:
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ success: false, message: 'Acción no válida.' }));
+            return;
+    }
+
+    usuario.carrito = carrito;
+    res.setHeader('Set-Cookie', `usuario=${encodeURIComponent(JSON.stringify(usuario))}; Path=/; HttpOnly`);
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ success: true, message: 'Carrito actualizado.' }));
+}
+
+//-- Mostrar Formulario de Pedido
 function mostrarFormularioPedido(res, cookies = {}) {
     let usuario;
 
@@ -1157,6 +1236,7 @@ function mostrarFormularioPedido(res, cookies = {}) {
     res.end(contenido);
 }
 
+//-- Manejar Pedido
 function procesarPedido(req, res, cookies = {}) {
     let body = '';
     req.on('data', chunk => { body += chunk; });
@@ -1216,8 +1296,54 @@ function procesarPedido(req, res, cookies = {}) {
         console.log('Carrito del usuario eliminado.');
 
         // Confirmar el pedido al usuario
+        let contenido = `<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedido Confirmado - FrikiShop</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/styless_pedido_confirmado.css">
+    <link rel="icon" href="/img/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <header class="barra-superior">
+        <div class="logo">
+            <img src="/img/logo.png" alt="Logo de FrikiShop">
+            <h1>FrikiShop</h1>
+        </div>
+        <div class="buscador">
+            <input type="text" placeholder="Buscar productos...">
+            <button>🔍</button>
+        </div>
+        <div class="acciones">
+            <select>
+                <option>🇪🇸 ES</option>
+                <option>🇬🇧 EN</option>
+            </select>
+            <a href="/">Inicio</a>
+            <a href="/carrito">🛒 Carrito</a>
+        </div>
+    </header>
+
+    <nav class="barra-navegacion">
+        <button class="menu">☰ Menú</button>
+        <a href="/ofertas">🔥 Ofertas</a>
+        <a href="/novedades">🆕 Últimas novedades</a>
+    </nav>
+
+    <main class="pedido-confirmado">
+        <div class="pedido-contenido">
+            <img src="/img/confirmacion_compra.png" alt="Pedido realizado con éxito" class="pedido-imagen">
+            <h1>Pedido realizado con éxito</h1>
+            <p>¡Gracias por tu compra!</p>
+            <a href="/" class="btn-volver">Volver a la tienda</a>
+        </div>
+    </main>
+</body>
+</html>`;
         res.writeHead(200, { 'Content-Type': 'text/html' });
-        res.end(`<h2>Pedido realizado con éxito. ¡Gracias por tu compra! <a href="/">Volver a la tienda</a></h2>`);
+        res.end(contenido);
     });
 }
 

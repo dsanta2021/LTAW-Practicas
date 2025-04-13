@@ -1,0 +1,55 @@
+/* Estilos para la página de pedido confirmado */
+body {
+    background-color: #1a1a1a; /* Fondo oscuro */
+    color: #fff; /* Texto blanco */
+    font-family: 'Press Start 2P', cursive; /* Fuente retro */
+}
+
+.pedido-confirmado {
+    text-align: center;
+    padding: 50px;
+}
+
+.pedido-confirmado .pedido-imagen {
+    max-width: 300px;
+    margin-bottom: 20px;
+    filter: drop-shadow(0 0 15px #00ff00); /* Efecto de brillo verde */
+}
+
+.pedido-confirmado h1 {
+    font-size: 32px;
+    margin-bottom: 10px;
+    color: #00ccff; /* Azul neón */
+    text-shadow: 0 0 10px #00ccff, 0 0 20px #00ccff;
+}
+
+.pedido-confirmado p {
+    font-size: 22px; /* Tamaño de fuente más grande */
+    margin-bottom: 20px;
+    color: #ff00ff; /* Rosa neón */
+    text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff;
+}
+
+.pedido-confirmado .btn-volver {
+    display: inline-block;
+    padding: 15px 30px;
+    font-size: 16px;
+    text-decoration: none;
+    border: 2px solid #00ccff;
+    border-radius: 5px;
+    background-color: transparent;
+    color: #00ccff;
+    transition: all 0.3s;
+    text-shadow: 0 0 10px #00ccff, 0 0 20px #00ccff;
+    box-shadow: 0 0 15px #00ccff;
+}
+
+.pedido-confirmado .btn-volver:hover {
+    background-color: #00ccff;
+    color: #1a1a1a;
+    box-shadow: 0 0 25px #00ccff, 0 0 50px #00ccff;
+}
+
+.pedido-confirmado .btn-volver:active {
+    transform: scale(0.95); /* Efecto de clic */
+}
