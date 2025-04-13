@@ -845,6 +845,8 @@ function generarPaginaCarrito(res, cookies = {}) {
             <title>Carrito - FrikiShop</title>
             <link rel="stylesheet" href="/css/styles.css">
             <link rel="stylesheet" href="/css/styles_carrito.css">
+            <link rel="icon" href="img/favicon.ico" type="image/x-icon">
+            <script defer src="js/script.js"></script>
         </head>
         <body>
             <header class="barra-superior">
