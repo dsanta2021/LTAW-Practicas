@@ -52,16 +52,16 @@ const server = http.createServer((req, res) => {
         case url === '/' || url === '/index.html':
             generarPaginaPrincipal(res, cookies);
             break;
-        
+
         case url.startsWith('/producto/'):
             let idProducto = url.split('/').pop();
             generarPaginaProducto(res, idProducto, cookies);
             break;
-        
+
         case url === '/ofertas':
             generarPaginaFiltrada(res, 'Oferta', 'Si', cookies);
             break;
-        
+
         case url === '/novedades':
             generarPaginaFiltrada(res, 'Novedad', 'Si', cookies);
             break;
@@ -88,7 +88,15 @@ const server = http.createServer((req, res) => {
             let idProductoAgregar = url.split('/').pop();
             agregarAlCarrito(req, res, idProductoAgregar, false, cookies);  //No redirigir a la página de carrito
             break;
-        
+
+        case url === '/finalizar-pedido' || url === '/finalizar-pedido?':
+            if (req.method === 'POST') {
+                procesarPedido(req, res, cookies);
+            } else if (req.method === 'GET') {
+                mostrarFormularioPedido(res, cookies);
+            }
+            break;
+
         default:
             servirArchivoEstatico(req, res);
     }
@@ -125,9 +133,9 @@ function generarPaginaPrincipal(res, cookies = {}) {
                 <option>🇬🇧 EN</option>
             </select>
             <a href="#">Inicio</a>
-            ${usuario 
-                ? `<span class="usuario">👤 ${usuario}</span> <a href="/logout">Log-Out</a>` 
-                : `<a href="/login">Log-In</a>`}
+            ${usuario
+            ? `<span class="usuario">👤 ${usuario}</span> <a href="/logout">Log-Out</a>`
+            : `<a href="/login">Log-In</a>`}
             <a href="/carrito">🛒 Carrito</a>
         </div>
     </header>
@@ -199,9 +207,9 @@ function generarPaginaProducto(res, id, cookies = {}) {
                 <option>🇬🇧 EN</option>
             </select>
             <a href="/">Inicio</a>
-             ${usuario 
-                ? `<span class="usuario">👤 ${usuario}</span> <a href="/logout">Log-Out</a>` 
-                : `<a href="/login">Log-In</a>`}
+             ${usuario
+            ? `<span class="usuario">👤 ${usuario}</span> <a href="/logout">Log-Out</a>`
+            : `<a href="/login">Log-In</a>`}
             <a href="/carrito">🛒 Carrito</a>
         </div>
     </header>
@@ -278,9 +286,9 @@ function generarPaginaFiltrada(res, criterio, valor, cookies = {}) {
                 <option>🇬🇧 EN</option>
             </select>
             <a href="/">Inicio</a>
-            ${usuario 
-                ? `<span class="usuario">👤 ${usuario}</span> <a href="/logout">Log-Out</a>` 
-                : `<a href="/login">Log-In</a>`}
+            ${usuario
+            ? `<span class="usuario">👤 ${usuario}</span> <a href="/logout">Log-Out</a>`
+            : `<a href="/login">Log-In</a>`}
             <a href="/carrito">🛒 Carrito</a>
         </div>
     </header>
@@ -524,15 +532,15 @@ function handleRegister(req, res) {
     let body = '';
     req.on('data', chunk => { body += chunk; });
     req.on('end', () => {
-        let { nombre, nombreReal, correo, password} = querystring.parse(body);
+        let { nombre, nombreReal, correo, password } = querystring.parse(body);
         let tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
-        
+
         if (tienda.usuarios.some(u => u.nombre === nombre)) {
             res.writeHead(400, { 'Content-Type': 'text/html' });
             res.end('<h2>Ese usuario ya existe. <a href="/login">Inicia sesión aquí</a></h2>');
             return;
         }
-        
+
         tienda.usuarios.push({ nombre, nombreReal, correo, password });
         fs.writeFileSync(RUTAS.db, JSON.stringify(tienda, null, 2));
         res.writeHead(302, { 'Location': '/login' });
@@ -692,10 +700,10 @@ function generarPaginaCarrito(res, cookies = {}) {
     }
 
     let carrito = cookies.carrito ? JSON.parse(cookies.carrito) : []; // Parsear la cookie del carrito correctamente
-    
+
     console.log('Contenido del carrito:', carrito); // Depuración
 
-     // Filtrar los productos que están en el carrito
+    // Filtrar los productos que están en el carrito
     let productosCarrito = carrito.map(item => {
         let producto = tienda.productos.find(p => p.id == item.id);
         if (producto) {
@@ -733,9 +741,9 @@ function generarPaginaCarrito(res, cookies = {}) {
                 <option>🇬🇧 EN</option>
             </select>
             <a href="/">Inicio</a>
-            ${usuario 
-                ? `<span class="usuario">👤 ${usuario}</span> <a href="/logout">Log-Out</a>` 
-                : `<a href="/login">Log-In</a>`}
+            ${usuario
+            ? `<span class="usuario">👤 ${usuario}</span> <a href="/logout">Log-Out</a>`
+            : `<a href="/login">Log-In</a>`}
             <a href="/carrito">🛒 Carrito</a>
         </div>
     </header>
@@ -765,14 +773,16 @@ function generarPaginaCarrito(res, cookies = {}) {
     }
 
     contenido += `
-        </section>
-        <aside class="resumen-carrito">
-            <div class="total">
-                <h2>Total: ${total} €</h2>
-                <button class="btn-comprar">Realizar Pedido</button>
-            </div>
-        </aside>
-    </main>
+    </section>
+    <aside class="resumen-carrito">
+        <div class="total">
+            <h2>Total: ${total} €</h2>
+            <form action="/finalizar-pedido" method="GET">
+                <button type="submit" class="btn-comprar">Realizar Pedido</button>
+            </form>
+        </div>
+    </aside>
+</main>
 </body>
 </html>`;
 
@@ -799,6 +809,165 @@ function agregarAlCarrito(req, res, idProducto, redirigir = true, cookies = {}) 
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: true, message: 'Producto añadido al carrito' }));
     }
+}
+
+function mostrarFormularioPedido(res, cookies = {}) {
+    let usuario = cookies.usuario || null;
+    if (!usuario) {
+        res.writeHead(401, { 'Content-Type': 'text/html' });
+        res.end('<h2>Debes iniciar sesión para finalizar tu pedido. <a href="/login">Inicia sesión aquí</a></h2>');
+        return;
+    }
+
+    let carrito = cookies.carrito ? JSON.parse(cookies.carrito) : [];
+    if (carrito.length === 0) {
+        res.writeHead(400, { 'Content-Type': 'text/html' });
+        res.end('<h2>Tu carrito está vacío. <a href="/">Volver a la tienda</a></h2>');
+        return;
+    }
+
+    let tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
+
+    // Buscar los detalles de los productos en la base de datos
+    let productosCarrito = carrito.map(item => {
+        let producto = tienda.productos.find(p => p.id == item.id);
+        if (producto) {
+            return { ...producto, cantidad: item.cantidad };
+        }
+        return null;
+    }).filter(p => p !== null);
+
+    let total = productosCarrito.reduce((acc, producto) => acc + producto.precio * producto.cantidad, 0);
+
+    let contenido = `<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finalizar Pedido - FrikiShop</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/finalizar_pedido.css">
+</head>
+<body>
+    <header class="barra-superior">
+        <div class="logo">
+            <img src="/img/logo.png" alt="Logo de FrikiShop">
+            <h1>FrikiShop</h1>
+        </div>
+        <div class="buscador">
+            <input type="text" placeholder="Buscar productos...">
+            <button>🔍</button>
+        </div>
+        <div class="acciones">
+            <select>
+                <option>🇪🇸 ES</option>
+                <option>🇬🇧 EN</option>
+            </select>
+            <a href="/">Inicio</a>
+            ${usuario
+            ? `<span class="usuario">👤 ${usuario}</span> <a href="/logout">Log-Out</a>`
+            : `<a href="/login">Log-In</a>`}
+            <a href="/carrito">🛒 Carrito</a>
+        </div>
+    </header>
+
+    <main>
+        <form action="/finalizar-pedido" method="POST" class="auth-form">
+            <h2>Finalizar Pedido</h2>
+            <section class="productos-pedido">
+                ${productosCarrito.map(producto => `
+                    <div class="producto-pedido">
+                        <div class="producto-izquierda">
+                            <img src="/img/${producto.imagen[0]}" alt="${producto.nombre}">
+                            <h3>${producto.nombre}</h3>
+                        </div>
+                        <div class="producto-derecha">
+                            <p>Cantidad: ${producto.cantidad}</p>
+                            <p>Precio: ${producto.precio} €</p>
+                            <p>Subtotal: ${(producto.precio * producto.cantidad).toFixed(2)} €</p>
+                        </div>
+                    </div>
+                `).join('')}
+                <h3>Total: ${total.toFixed(2)} €</h3>
+            </section>
+            <label for="direccion">Dirección de envío:</label>
+            <input type="text" id="direccion" name="direccion" required>
+                
+            <label for="tarjeta">Número de tarjeta:</label>
+            <input type="text" id="tarjeta" name="tarjeta" required>
+                
+            <button type="submit">Confirmar Pedido</button>
+        </form>
+    </main>
+</body>
+</html>`;
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.end(contenido);
+}
+
+function procesarPedido(req, res, cookies = {}) {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+        let { direccion, tarjeta } = querystring.parse(body);
+        let usuario = cookies.usuario || null;
+
+        if (!usuario) {
+            res.writeHead(401, { 'Content-Type': 'text/html' });
+            res.end('<h2>Debes iniciar sesión para finalizar tu pedido. <a href="/login">Inicia sesión aquí</a></h2>');
+            return;
+        }
+
+        let carrito = cookies.carrito ? JSON.parse(cookies.carrito) : [];
+        if (carrito.length === 0) {
+            res.writeHead(400, { 'Content-Type': 'text/html' });
+            res.end('<h2>Tu carrito está vacío. <a href="/">Volver a la tienda</a></h2>');
+            return;
+        }
+
+        let tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
+
+        // Calcular el total del pedido y simplificar los datos de los productos
+        let total = 0;
+        let productosSimplificados = carrito.map(item => {
+            let producto = tienda.productos.find(p => p.id == item.id);
+            if (producto) {
+                let subtotal = producto.precio * item.cantidad;
+                total += subtotal;
+                return {
+                    nombre: producto.nombre,
+                    precio: producto.precio,
+                    cantidad: item.cantidad
+                };
+            }
+            return null;
+        }).filter(p => p !== null);
+
+        // Crear el objeto del pedido
+        let pedido = {
+            nombre: usuario, // Cambiar "usuario" a "nombre" para consistencia
+            direccion,
+            tarjeta: tarjeta.replace(/\d(?=\d{4})/g, '*'), // Enmascarar el número de tarjeta
+            total,
+            productos: productosSimplificados,
+            fecha: new Date().toISOString()
+        };
+        
+        // Guardar el pedido en la base de datos
+        tienda.pedidos = tienda.pedidos || [];
+        tienda.pedidos.push(pedido);
+        fs.writeFileSync(RUTAS.db, JSON.stringify(tienda, null, 2));
+
+        // Limpiar el carrito
+        //res.setHeader('Set-Cookie', 'carrito=; Max-Age=0; Path=/; HttpOnly');
+
+        // Limpiar el carrito
+res.setHeader('Set-Cookie', 'carrito=; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0; Path=/; HttpOnly');
+
+        // Confirmar el pedido al usuario
+        res.writeHead(200, { 'Content-Type': 'text/html' });
+        res.end(`<h2>Pedido realizado con éxito. ¡Gracias por tu compra! <a href="/">Volver a la tienda</a></h2>`);
+    });
 }
 
 server.listen(8001, () => {
