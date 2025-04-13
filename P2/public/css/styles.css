@@ -198,6 +198,68 @@ body {
     box-shadow: 0px 0px 15px #00FFF7;
 }
 
+/* Sugerencias */
+.sugerencias {
+    position: absolute;
+    background-color: #1a1a1a;
+    color: white;
+    border: 1px solid #00ccff;
+    border-radius: 5px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    width: auto; /* Ajustar automáticamente al contenido */
+    max-width: calc(100% - 50px); /* Limitar el ancho al tamaño del buscador y el botón */
+    margin-top: 5px;
+    display: none;
+    box-sizing: border-box; /* Asegura que el borde no afecte el ancho total */
+}
+
+.sugerencias div {
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.sugerencias div:hover {
+    background-color: #00ccff;
+    color: #1a1a1a;
+}
+
+/* Encabezado de la página de resultados */
+.titulo-pagina {
+    font-size: 24px;
+    color: #00ccff;
+    text-align: center;
+    margin: 20px 0;
+    font-family: 'Press Start 2P', cursive;
+}
+
+.termino-busqueda {
+    color: #ffcc00;
+}
+
+/* Botón "Ver más" */
+.btn-ver-mas {
+    display: inline-block;
+    padding: 10px 15px;
+    font-size: 14px;
+    font-family: 'Press Start 2P', cursive;
+    text-decoration: none;
+    border: 2px solid;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: #00ccff;
+    border-color: #00ccff;
+    color: white;
+}
+
+.btn-ver-mas:hover {
+    background: #0099cc;
+    box-shadow: 0px 0px 15px #00ccff;
+}
+
 /* Estilos responsivos */
 @media (max-width: 1024px) {
     .productos {

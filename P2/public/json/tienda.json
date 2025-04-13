@@ -253,6 +253,62 @@
         }
       ],
       "fecha": "2025-04-13T18:02:56.515Z"
+    },
+    {
+      "nombre": "davidsc",
+      "direccion": "sdfg",
+      "tarjeta": "fgh",
+      "total": 161.18,
+      "productos": [
+        {
+          "nombre": "Figura Acción Sora",
+          "precio": 161.18,
+          "cantidad": 1
+        }
+      ],
+      "fecha": "2025-04-13T19:25:56.352Z"
+    },
+    {
+      "nombre": "davidsc",
+      "direccion": "sdf",
+      "tarjeta": "sd",
+      "total": 161.18,
+      "productos": [
+        {
+          "nombre": "Figura Acción Sora",
+          "precio": 161.18,
+          "cantidad": 1
+        }
+      ],
+      "fecha": "2025-04-13T19:27:01.108Z"
+    },
+    {
+      "nombre": "davidsc",
+      "direccion": "dfghjkl",
+      "tarjeta": "******6652",
+      "total": 161.18,
+      "productos": [
+        {
+          "nombre": "Figura Acción Sora",
+          "precio": 161.18,
+          "cantidad": 1
+        }
+      ],
+      "fecha": "2025-04-13T19:27:36.343Z"
+    },
+    {
+      "nombre": "davidsc",
+      "direccion": "sdfg",
+      "tarjeta": "dfgh",
+      "total": 14.95,
+      "productos": [
+        {
+          "nombre": "Taza de Star Wars",
+          "precio": 14.95,
+          "cantidad": 1
+        }
+      ],
+      "fecha": "2025-04-13T19:28:14.040Z"
     }
   ]
 }

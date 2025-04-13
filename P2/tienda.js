@@ -106,8 +106,30 @@ const server = http.createServer((req, res) => {
             }
             break;
 
+        case url.startsWith('/buscar-autocompletado'):
+            const queryAuto = new URLSearchParams(url.split('?')[1]);
+            const terminoAuto = queryAuto.get('termino');
+            
+            if (req.method === 'GET' && terminoAuto) {
+                buscarProductos(res, terminoAuto); // Devuelve JSON para autocompletado
+            } else {
+                res.writeHead(400, { 'Content-Type': 'text/plain' });                    res.end('Solicitud inválida');
+            }
+            break;
+            
+        case url.startsWith('/buscar'):
+            const queryBuscar = new URLSearchParams(url.split('?')[1]);
+            const terminoBuscar = queryBuscar.get('termino');
+            
+            if (req.method === 'GET' && terminoBuscar) {
+                generarPaginaResultados(res, terminoBuscar, cookies); // Genera la página de resultados
+            } else {
+                res.writeHead(400, { 'Content-Type': 'text/plain' });                    res.end('Solicitud inválida');
+            }
+            break;
+
         default:
-            servirArchivoEstatico(req, res);
+            servirArchivoEstatico(req, res, cookies);
     }
 });
 
@@ -143,8 +165,9 @@ function generarPaginaPrincipal(res, cookies = {}) {
             <h1>FrikiShop</h1>
         </div>
         <div class="buscador">
-            <input type="text" placeholder="Buscar productos...">
-            <button>🔍</button>
+            <input type="text" id="buscador" placeholder="Buscar productos...">
+            <button onclick="realizarBusqueda()">🔍</button>
+            <div id="sugerencias" class="sugerencias"></div>
         </div>
         <div class="acciones">
             <select>
@@ -174,7 +197,7 @@ function generarPaginaPrincipal(res, cookies = {}) {
                 <a href="/producto/${producto.id}"><img src="img/${producto.imagen[0]}" alt="${producto.nombre}"></a>
                 <h2>${producto.nombre}</h2>
                 <p>${producto.miniDescripcion}</p>
-                <a href="/producto/${producto.id}">Ver más</a>
+                <a href="/producto/${producto.id}" class="btn-ver-mas">Ver más</a>
             </div>`;
     });
 
@@ -226,8 +249,9 @@ function generarPaginaProducto(res, id, cookies = {}) {
             <h1>FrikiShop</h1>
         </div>
         <div class="buscador">
-            <input type="text" placeholder="Buscar productos...">
+            <input type="text" id="buscador" placeholder="Buscar productos...">
             <button>🔍</button>
+            <div id="sugerencias" class="sugerencias"></div>
         </div>
         <div class="acciones">
             <select>
@@ -364,8 +388,9 @@ function generarPaginaFiltrada(res, criterio, valor, cookies = {}) {
             <h1>FrikiShop</h1>
         </div>
         <div class="buscador">
-            <input type="text" placeholder="Buscar productos...">
+            <input type="text" id="buscador" placeholder="Buscar productos...">
             <button>🔍</button>
+            <div id="sugerencias" class="sugerencias"></div>
         </div>
         <div class="acciones">
             <select>
@@ -396,7 +421,7 @@ function generarPaginaFiltrada(res, criterio, valor, cookies = {}) {
                     <a href="/producto/${producto.id}"><img src="/img/${producto.imagen[0]}" alt="${producto.nombre}"></a>
                     <h2>${producto.nombre}</h2>
                     <p>${producto.miniDescripcion}</p>
-                    <a href="/producto/${producto.id}">Ver más</a>
+                    <a href="/producto/${producto.id}" class="btn-ver-mas">Ver más</a>
                 </div>`;
         });
     } else {
@@ -415,14 +440,26 @@ function generarPaginaFiltrada(res, criterio, valor, cookies = {}) {
 }
 
 //-- Generar Página de Error
-function error(res, mensaje = 'Error 404: Página no encontrada') {
+function error(res, mensaje = 'Error 404 - Página no encontrada', cookies = {}) {
+    let usuario;
+
+    try {
+        usuario = cookies.usuario ? JSON.parse(cookies.usuario) : null;
+    } catch (e) {
+        console.error('Error al parsear la cookie usuario:', e);
+        usuario = null;
+    }
+    let nombre = usuario ? usuario.nombre : null;
+
     let contenido = `<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tienda Friki</title>
+    <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="/css/styles_error.css">
+    <link rel="icon" href="img/favicon.ico" type="image/x-icon">
     <script defer src="js/script.js"></script>
 </head>
 <body>
@@ -433,25 +470,28 @@ function error(res, mensaje = 'Error 404: Página no encontrada') {
             <h1>FrikiShop</h1>
         </div>
         <div class="buscador">
-            <input type="text" placeholder="Buscar productos...">
+            <input type="text" id="buscador" placeholder="Buscar productos...">
             <button>🔍</button>
+            <div id="sugerencias" class="sugerencias"></div>
         </div>
         <div class="acciones">
             <select>
                 <option>🇪🇸 ES</option>
                 <option>🇬🇧 EN</option>
             </select>
-            <a href="#">Inicio</a>
-            <a href="#">Contacto</a>
-            <a href="#">🛒 Carrito</a>
+            <a href="/">Inicio</a>
+            ${usuario
+            ? `<span class="usuario">👤 ${nombre}</span> <a href="/logout">Log-Out</a>`
+            : `<a href="/login">Log-In</a>`}
+            <a href="/carrito">🛒 Carrito</a>
         </div>
     </header>
 
     <!-- Segunda barra -->
     <nav class="barra-navegacion">
         <button class="menu">☰ Menú</button>
-        <a href="#">🔥 Ofertas</a>
-        <a href="#">🆕 Últimas novedades</a>
+        <a href="/ofertas">🔥 Ofertas</a>
+        <a href="/novedades">🆕 Últimas novedades</a>
     </nav>
 
     <main>
@@ -482,7 +522,9 @@ function productoNoEncontrado(res) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tienda Friki</title>
+    <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="/css/styles_error.css">
+    <link rel="icon" href="img/favicon.ico" type="image/x-icon">
     <script defer src="js/script.js"></script>
 </head>
 <body>
@@ -493,25 +535,25 @@ function productoNoEncontrado(res) {
             <h1>FrikiShop</h1>
         </div>
         <div class="buscador">
-            <input type="text" placeholder="Buscar productos...">
+            <input type="text" id="buscador" placeholder="Buscar productos...">
             <button>🔍</button>
+            <div id="sugerencias" class="sugerencias"></div>
         </div>
         <div class="acciones">
             <select>
                 <option>🇪🇸 ES</option>
                 <option>🇬🇧 EN</option>
             </select>
-            <a href="#">Inicio</a>
-            <a href="#">Contacto</a>
-            <a href="#">🛒 Carrito</a>
+            <a href="/">Inicio</a>
+            <a href="/carrito">🛒 Carrito</a>
         </div>
     </header>
 
     <!-- Segunda barra -->
     <nav class="barra-navegacion">
         <button class="menu">☰ Menú</button>
-        <a href="#">🔥 Ofertas</a>
-        <a href="#">🆕 Últimas novedades</a>
+        <a href="/ofertas">🔥 Ofertas</a>
+        <a href="/novedades">🆕 Últimas novedades</a>
     </nav>
 
     <main>
@@ -534,14 +576,14 @@ function productoNoEncontrado(res) {
 }
 
 //-- Servir Archivos Estáticos
-function servirArchivoEstatico(req, res) {
+function servirArchivoEstatico(req, res, cookie = {}) {
     let filePath = path.join(PUBLIC_DIR, req.url);
     let ext = path.extname(filePath);
     let contentType = mimeTypes[ext] || 'application/octet-stream';
 
     fs.readFile(filePath, (err, data) => {
         if (err) {
-            error(res); // Usar la función dinámica para el error
+            error(res, 'Error 404 - Página no encontrada', cookie); // Usar la función dinámica para el error
         } else {
             res.writeHead(200, { 'Content-Type': contentType });
             res.end(data);
@@ -811,8 +853,9 @@ function generarPaginaCarrito(res, cookies = {}) {
                     <h1>FrikiShop</h1>
                 </div>
                 <div class="buscador">
-                    <input type="text" placeholder="Buscar productos...">
+                    <input type="text" id="buscador" placeholder="Buscar productos...">
                     <button>🔍</button>
+                    <div id="sugerencias" class="sugerencias"></div>
                 </div>
                 <div class="acciones">
                     <select>
@@ -863,8 +906,9 @@ function generarPaginaCarrito(res, cookies = {}) {
                 <h1>FrikiShop</h1>
             </div>
             <div class="buscador">
-                <input type="text" placeholder="Buscar productos...">
+                <input type="text" id="buscador" placeholder="Buscar productos...">
                 <button>🔍</button>
+                <div id="sugerencias" class="sugerencias"></div>
             </div>
             <div class="acciones">
                 <select>
@@ -965,8 +1009,9 @@ function generarPaginaCarrito(res, cookies = {}) {
             <h1>FrikiShop</h1>
         </div>
         <div class="buscador">
-            <input type="text" placeholder="Buscar productos...">
+            <input type="text" id="buscador" placeholder="Buscar productos...">
             <button>🔍</button>
+            <div id="sugerencias" class="sugerencias"></div>
         </div>
         <div class="acciones">
             <select>
@@ -1144,13 +1189,13 @@ function mostrarFormularioPedido(res, cookies = {}) {
     }
 
     if (!usuario) {
-        error(res, 'Error 401 - Debes iniciar sesión para realizar tu pedido.');
+        error(res, 'Error 401 - Debes iniciar sesión para realizar tu pedido.', cookies);
         return;
     }
 
     let carrito = usuario.carrito || [];
     if (carrito.length === 0) {
-        error(res, 'Tu carrito está vacío. ¡Añade productos para realizar tu pedido!');
+        error(res, 'Tu carrito está vacío. ¡Añade productos para realizar tu pedido!', cookies);
         return;
     }
 
@@ -1186,8 +1231,9 @@ function mostrarFormularioPedido(res, cookies = {}) {
             <h1>FrikiShop</h1>
         </div>
         <div class="buscador">
-            <input type="text" placeholder="Buscar productos...">
+            <input type="text" id="buscador" placeholder="Buscar productos...">
             <button>🔍</button>
+            <div id="sugerencias" class="sugerencias"></div>
         </div>
         <div class="acciones">
             <select>
@@ -1312,10 +1358,6 @@ function procesarPedido(req, res, cookies = {}) {
             <img src="/img/logo.png" alt="Logo de FrikiShop">
             <h1>FrikiShop</h1>
         </div>
-        <div class="buscador">
-            <input type="text" placeholder="Buscar productos...">
-            <button>🔍</button>
-        </div>
         <div class="acciones">
             <select>
                 <option>🇪🇸 ES</option>
@@ -1325,12 +1367,6 @@ function procesarPedido(req, res, cookies = {}) {
             <a href="/carrito">🛒 Carrito</a>
         </div>
     </header>
-
-    <nav class="barra-navegacion">
-        <button class="menu">☰ Menú</button>
-        <a href="/ofertas">🔥 Ofertas</a>
-        <a href="/novedades">🆕 Últimas novedades</a>
-    </nav>
 
     <main class="pedido-confirmado">
         <div class="pedido-contenido">
@@ -1345,6 +1381,102 @@ function procesarPedido(req, res, cookies = {}) {
         res.writeHead(200, { 'Content-Type': 'text/html' });
         res.end(contenido);
     });
+}
+
+//-- Función para manejar la búsqueda de productos
+function buscarProductos(res, termino) {
+    let tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
+    const productos = tienda.productos.filter(producto =>
+        producto.nombre.toLowerCase().includes(termino.toLowerCase())
+    );
+
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(productos));
+}
+
+// Función para generar la página de resultados de búsqueda
+function generarPaginaResultados(res, termino, cookies = {}) {
+    let usuario;
+
+    try {
+        usuario = cookies.usuario ? JSON.parse(cookies.usuario) : null;
+    } catch (e) {
+        console.error('Error al parsear la cookie usuario:', e);
+        usuario = null;
+    }
+    let nombre = usuario ? usuario.nombre : null;
+
+    let tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
+    const productosFiltrados = tienda.productos.filter(producto =>
+        producto.nombre.toLowerCase().includes(termino.toLowerCase())
+    );
+
+    if (productosFiltrados.length === 0) {
+        // Si no hay productos, redirigir a la página de error
+        productoNoEncontrado(res);
+        return;
+    }
+
+    let contenido = `<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados de búsqueda</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="icon" href="/img/favicon.ico" type="image/x-icon">
+    <script defer src="/js/script.js"></script>
+</head>
+<body>
+    <header class="barra-superior">
+        <div class="logo">
+            <img src="/img/logo.png" alt="Logo de FrikiShop">
+            <h1>FrikiShop</h1>
+        </div>
+        <div class="buscador">
+            <input type="text" id="buscador" placeholder="Buscar productos...">
+            <button>🔍</button>
+            <div id="sugerencias" class="sugerencias"></div>
+        </div>
+        <div class="acciones">
+            <select>
+                <option>🇪🇸 ES</option>
+                <option>🇬🇧 EN</option>
+            </select>
+            <a href="/">Inicio</a>
+            ${usuario
+            ? `<span class="usuario">👤 ${nombre}</span> <a href="/logout">Log-Out</a>`
+            : `<a href="/login">Log-In</a>`}
+            <a href="/carrito">🛒 Carrito</a>
+        </div>
+    </header>
+
+    <nav class="barra-navegacion">
+        <button class="menu">☰ Menú</button>
+        <a href="/ofertas">🔥 Ofertas</a>
+        <a href="/novedades">🆕 Últimas novedades</a>
+    </nav>
+
+    <main>
+        <section class="resultados-busqueda">
+            <h1 class="titulo-pagina">Resultados para: <span class="termino-busqueda">"${termino}"</span></h1>
+            <section class="productos">
+                ${productosFiltrados.map(producto => `
+                    <div class="producto">
+                        <a href="/producto/${producto.id}"><img src="/img/${producto.imagen[0]}" alt="${producto.nombre}"></a>
+                        <h2>${producto.nombre}</h2>
+                        <p>${producto.miniDescripcion}</p>
+                        <a href="/producto/${producto.id}" class="btn-ver-mas">Ver más</a>
+                    </div>
+                `).join('')}
+            </section>
+        </section>
+    </main>
+</body>
+</html>`;
+
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.end(contenido);
 }
 
 server.listen(8001, () => {
