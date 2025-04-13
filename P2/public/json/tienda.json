@@ -184,29 +184,5 @@
     }
   ],
   "pedidos": [
-    {
-      "nombre": "davidsc",
-      "direccion": "ahaestudiy",
-      "tarjeta": "tusdui",
-      "total": 793.4100000000001,
-      "productos": [
-        {
-          "nombre": "Figura Acción Sora",
-          "precio": 161.18,
-          "cantidad": 4
-        },
-        {
-          "nombre": "Funko Pop! Harry Potter And Buckbeak",
-          "precio": 31.99,
-          "cantidad": 3
-        },
-        {
-          "nombre": "Figura Acción Shen-Long",
-          "precio": 52.72,
-          "cantidad": 1
-        }
-      ],
-      "fecha": "2025-04-13T11:42:39.073Z"
-    }
   ]
 }

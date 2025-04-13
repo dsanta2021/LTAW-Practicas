@@ -27,15 +27,19 @@ const mimeTypes = {
 //-- Parsear Cookies
 function parseCookies(req) {
     let list = {};
-    let cookieHeader = req.headers.cookie; // Obtener la cabecera de cookies del request
+    let cookieHeader = req.headers.cookie;
 
     if (cookieHeader) {
         cookieHeader.split(';').forEach(cookie => {
-            let [name, ...rest] = cookie.split('='); // Separar el nombre y el valor de la cookie
-            name = name.trim(); // Limpiar el nombre de la cookie (espacios en blanco)
-            let value = rest.join('=').trim(); // Unir el resto en caso de que el valor contenga '='
+            let [name, ...rest] = cookie.split('=');
+            name = name.trim();
+            let value = rest.join('=').trim();
             if (value) {
-                list[name] = decodeURIComponent(value); // Decodificar el valor de la cookie
+                try {
+                    list[name] = decodeURIComponent(value); // Decodificar el valor de la cookie
+                } catch (e) {
+                    console.error(`Error al decodificar la cookie ${name}:`, e);
+                }
             }
         });
     }
@@ -134,7 +138,7 @@ function generarPaginaPrincipal(res, cookies = {}) {
             </select>
             <a href="#">Inicio</a>
             ${usuario
-            ? `<span class="usuario">👤 ${usuario}</span> <a href="/logout">Log-Out</a>`
+            ? `<span class="usuario">👤 ${usuario.nombre}</span> <a href="/logout">Log-Out</a>`
             : `<a href="/login">Log-In</a>`}
             <a href="/carrito">🛒 Carrito</a>
         </div>
@@ -208,7 +212,7 @@ function generarPaginaProducto(res, id, cookies = {}) {
             </select>
             <a href="/">Inicio</a>
              ${usuario
-            ? `<span class="usuario">👤 ${usuario}</span> <a href="/logout">Log-Out</a>`
+            ? `<span class="usuario">👤 ${usuario.nombre}</span> <a href="/logout">Log-Out</a>`
             : `<a href="/login">Log-In</a>`}
             <a href="/carrito">🛒 Carrito</a>
         </div>
@@ -287,7 +291,7 @@ function generarPaginaFiltrada(res, criterio, valor, cookies = {}) {
             </select>
             <a href="/">Inicio</a>
             ${usuario
-            ? `<span class="usuario">👤 ${usuario}</span> <a href="/logout">Log-Out</a>`
+            ? `<span class="usuario">👤 ${usuario.nombre}</span> <a href="/logout">Log-Out</a>`
             : `<a href="/login">Log-In</a>`}
             <a href="/carrito">🛒 Carrito</a>
         </div>
@@ -474,7 +478,14 @@ function handleLogin(req, res) {
         let usuario = tienda.usuarios.find(u => u.nombre === nombre && u.password === password);
 
         if (usuario) {
-            res.setHeader('Set-Cookie', `usuario=${nombre}; HttpOnly`);
+            // Crear un objeto usuario con un carrito vacío
+            let usuarioData = {
+                nombre: usuario.nombre,
+                carrito: []
+            };
+
+            // Guardar la cookie como un JSON válido
+            res.setHeader('Set-Cookie', `usuario=${encodeURIComponent(JSON.stringify(usuarioData))}; Path=/; HttpOnly`);
             res.writeHead(302, { 'Location': '/' });
             res.end();
         } else {
@@ -649,11 +660,22 @@ function mostrarRegistro(res) {
 }
 
 function generarPaginaCarrito(res, cookies = {}) {
-    let tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
+    let usuario;
 
-    console.log('Productos en tienda.json:', tienda.productos); // Depuración
+    try {
+        usuario = cookies.usuario ? JSON.parse(cookies.usuario) : null;
+    } catch (e) {
+        console.error('Error al parsear la cookie usuario:', e);
+        // Eliminar la cookie inválida
+        res.setHeader('Set-Cookie', 'usuario=; Max-Age=0; Path=/; HttpOnly');
+        usuario = null;
+    }
 
-    let usuario = cookies.usuario || null;
+    if (usuario) {
+        console.log('Usuario:', usuario); // Depuración
+        console.log('Nombre del usuario:', usuario.nombre); // Depuración
+    }
+
     if (!usuario) {
         let contenido = `<!DOCTYPE html>
         <html lang="es">
@@ -699,9 +721,8 @@ function generarPaginaCarrito(res, cookies = {}) {
         return;
     }
 
-    let carrito = cookies.carrito ? JSON.parse(cookies.carrito) : []; // Parsear la cookie del carrito correctamente
-
-    console.log('Contenido del carrito:', carrito); // Depuración
+    let carrito = usuario.carrito || [];
+    let tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
 
     // Filtrar los productos que están en el carrito
     let productosCarrito = carrito.map(item => {
@@ -712,9 +733,7 @@ function generarPaginaCarrito(res, cookies = {}) {
         return null;
     }).filter(p => p !== null); // Eliminar productos no encontrados
 
-    console.log('Productos encontrados en el carrito:', productosCarrito); // Depuración
-
-    let total = 0;
+    let total = productosCarrito.reduce((acc, producto) => acc + producto.precio * producto.cantidad, 0);
 
     let contenido = `<!DOCTYPE html>
 <html lang="es">
@@ -742,66 +761,92 @@ function generarPaginaCarrito(res, cookies = {}) {
             </select>
             <a href="/">Inicio</a>
             ${usuario
-            ? `<span class="usuario">👤 ${usuario}</span> <a href="/logout">Log-Out</a>`
-            : `<a href="/login">Log-In</a>`}
+                ? `<span class="usuario">👤 ${usuario.nombre}</span> <a href="/logout">Log-Out</a>`
+                : `<a href="/login">Log-In</a>`}
             <a href="/carrito">🛒 Carrito</a>
         </div>
     </header>
 
     <main class="carrito-container">
         <section class="productos-carrito">
-            <h1>Tu Carrito</h1>`;
-
-    if (productosCarrito.length > 0) {
-        productosCarrito.forEach(producto => {
-            let subtotal = producto.precio * producto.cantidad;
-            total += subtotal;
-
-            contenido += `
-            <div class="producto-carrito">
-                <img src="/img/${producto.imagen[0]}" alt="${producto.nombre}">
-                <div class="detalles">
-                    <h2>${producto.nombre}</h2>
-                    <p>Precio: ${producto.precio} €</p>
-                    <p>Cantidad: ${producto.cantidad}</p>
-                    <p>Subtotal: ${subtotal} €</p>
+            <h1>Tu Carrito</h1>
+            ${productosCarrito.length > 0 ? productosCarrito.map(p => `
+                <div class="producto-carrito">
+                    <h2>${p.nombre}</h2>
+                    <p>Cantidad: ${p.cantidad}</p>
+                    <p>Precio: ${p.precio.toFixed(2)} €</p>
+                    <p>Subtotal: ${(p.precio * p.cantidad).toFixed(2)} €</p>
                 </div>
-            </div>`;
-        });
-    } else {
-        contenido += `<p class="mensaje-vacio">Tu carrito está vacío. ¡Añade productos para empezar!</p>`;
-    }
+            `).join('') : '<p>Tu carrito está vacío.</p>'}
+            <h2>Total: ${total.toFixed(2)} €</h2>
+        </section>
 
-    contenido += `
-    </section>
-    <aside class="resumen-carrito">
-        <div class="total">
-            <h2>Total: ${total} €</h2>
-            <form action="/finalizar-pedido" method="GET">
-                <button type="submit" class="btn-comprar">Realizar Pedido</button>
-            </form>
-        </div>
-    </aside>
-</main>
+        </section>
+             <aside class="resumen-carrito">
+                 <div class="total">
+                     <h2>Total: ${total} €</h2>
+                     <form action="/finalizar-pedido" method="GET">
+                         <button type="submit" class="btn-comprar">Realizar Pedido</button>
+                     </form>
+                 </div>
+             </aside>
+    </main>
 </body>
 </html>`;
+    // Remove the misplaced else block
+
+    // contenido += `
+    //         </section>
+    //         <aside class="resumen-carrito">
+    //             <div class="total">
+    //                 <h2>Total: ${total} €</h2>
+    //                 <form action="/finalizar-pedido" method="GET">
+    //                     <button type="submit" class="btn-comprar">Realizar Pedido</button>
+    //                 </form>
+    //             </div>
+    //         </aside>
+    //     </main>
+    //     </body>
+    //     </html>`;
 
     res.writeHead(200, { 'Content-Type': 'text/html' });
     res.end(contenido);
 }
 
 function agregarAlCarrito(req, res, idProducto, redirigir = true, cookies = {}) {
-    let carrito = cookies.carrito ? JSON.parse(cookies.carrito) : [];
+    // Inicializar el carrito como un array vacío si no existe
+    let usuario;
 
-    let productoEnCarrito = carrito.find(p => p.id === idProducto);
+    try {
+        usuario = cookies.usuario ? JSON.parse(cookies.usuario) : null;
+    } catch (e) {
+        console.error('Error al parsear la cookie usuario:', e);
+        // Eliminar la cookie inválida
+        res.setHeader('Set-Cookie', 'usuario=; Max-Age=0; Path=/; HttpOnly');
+        usuario = null;
+    }
+
+    if (!usuario) {
+        res.writeHead(401, { 'Content-Type': 'text/html' });
+        res.end('<h2>Debes iniciar sesión para agregar productos al carrito. <a href="/login">Inicia sesión aquí</a></h2>');
+        return;
+    }
+
+    // Inicializar el carrito del usuario si no existe
+    usuario.carrito = usuario.carrito || [];
+
+    // Buscar si el producto ya está en el carrito
+    let productoEnCarrito = usuario.carrito.find(p => p.id === idProducto);
     if (productoEnCarrito) {
         productoEnCarrito.cantidad += 1;
     } else {
-        carrito.push({ id: idProducto, cantidad: 1 });
+        usuario.carrito.push({ id: idProducto, cantidad: 1 });
     }
 
-    res.setHeader('Set-Cookie', `carrito=${encodeURIComponent(JSON.stringify(carrito))}; Path=/; HttpOnly`);
+    // Actualizar la cookie del carrito
+    res.setHeader('Set-Cookie', `usuario=${encodeURIComponent(JSON.stringify(usuario))}; Path=/; HttpOnly`);
 
+    // Redirigir o responder según el parámetro
     if (redirigir) {
         res.writeHead(302, { 'Location': '/carrito' });
         res.end();
@@ -812,14 +857,22 @@ function agregarAlCarrito(req, res, idProducto, redirigir = true, cookies = {}) 
 }
 
 function mostrarFormularioPedido(res, cookies = {}) {
-    let usuario = cookies.usuario || null;
+    let usuario;
+
+    try {
+        usuario = cookies.usuario ? JSON.parse(cookies.usuario) : null;
+    } catch (e) {
+        console.error('Error al parsear la cookie usuario:', e);
+        usuario = null;
+    }
+
     if (!usuario) {
         res.writeHead(401, { 'Content-Type': 'text/html' });
         res.end('<h2>Debes iniciar sesión para finalizar tu pedido. <a href="/login">Inicia sesión aquí</a></h2>');
         return;
     }
 
-    let carrito = cookies.carrito ? JSON.parse(cookies.carrito) : [];
+    let carrito = usuario.carrito || [];
     if (carrito.length === 0) {
         res.writeHead(400, { 'Content-Type': 'text/html' });
         res.end('<h2>Tu carrito está vacío. <a href="/">Volver a la tienda</a></h2>');
@@ -865,7 +918,7 @@ function mostrarFormularioPedido(res, cookies = {}) {
             </select>
             <a href="/">Inicio</a>
             ${usuario
-            ? `<span class="usuario">👤 ${usuario}</span> <a href="/logout">Log-Out</a>`
+            ? `<span class="usuario">👤 ${usuario.nombre}</span> <a href="/logout">Log-Out</a>`
             : `<a href="/login">Log-In</a>`}
             <a href="/carrito">🛒 Carrito</a>
         </div>
@@ -910,7 +963,7 @@ function procesarPedido(req, res, cookies = {}) {
     req.on('data', chunk => { body += chunk; });
     req.on('end', () => {
         let { direccion, tarjeta } = querystring.parse(body);
-        let usuario = cookies.usuario || null;
+        let usuario = cookies.usuario ? JSON.parse(cookies.usuario) : null;
 
         if (!usuario) {
             res.writeHead(401, { 'Content-Type': 'text/html' });
@@ -918,7 +971,7 @@ function procesarPedido(req, res, cookies = {}) {
             return;
         }
 
-        let carrito = cookies.carrito ? JSON.parse(cookies.carrito) : [];
+        let carrito = usuario.carrito || [];
         if (carrito.length === 0) {
             res.writeHead(400, { 'Content-Type': 'text/html' });
             res.end('<h2>Tu carrito está vacío. <a href="/">Volver a la tienda</a></h2>');
@@ -945,24 +998,23 @@ function procesarPedido(req, res, cookies = {}) {
 
         // Crear el objeto del pedido
         let pedido = {
-            nombre: usuario, // Cambiar "usuario" a "nombre" para consistencia
+            nombre: usuario.nombre,
             direccion,
             tarjeta: tarjeta.replace(/\d(?=\d{4})/g, '*'), // Enmascarar el número de tarjeta
             total,
             productos: productosSimplificados,
             fecha: new Date().toISOString()
         };
-        
+
         // Guardar el pedido en la base de datos
         tienda.pedidos = tienda.pedidos || [];
         tienda.pedidos.push(pedido);
         fs.writeFileSync(RUTAS.db, JSON.stringify(tienda, null, 2));
 
-        // Limpiar el carrito
-        //res.setHeader('Set-Cookie', 'carrito=; Max-Age=0; Path=/; HttpOnly');
-
-        // Limpiar el carrito
-res.setHeader('Set-Cookie', 'carrito=; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0; Path=/; HttpOnly');
+        // Limpiar el carrito del usuario
+        usuario.carrito = [];
+        res.setHeader('Set-Cookie', `usuario=${encodeURIComponent(JSON.stringify(usuario))}; Path=/; HttpOnly`);
+        console.log('Carrito del usuario eliminado.');
 
         // Confirmar el pedido al usuario
         res.writeHead(200, { 'Content-Type': 'text/html' });
