@@ -410,7 +410,7 @@ function generarPaginaFiltrada(res, criterio, valor, cookies = {}) {
 }
 
 //-- Generar Página de Error 404
-function error404(res) {
+function error(res, mensaje = 'Error 404: Página no encontrada') {
     let contenido = `<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -454,7 +454,7 @@ function error404(res) {
             <div class="error-content">
                 <img src="img/error_404.png" alt="Error Image">
                 <div class="error-text">
-                    <h1>Error 404 - Not Found</h1>
+                    <h1>${mensaje}</h1>
                     <p>¡Ups! Something is wrong</p>
                     <button onclick="window.location.href='index.html'">Back To Home</button>
                 </div>
@@ -536,7 +536,7 @@ function servirArchivoEstatico(req, res) {
 
     fs.readFile(filePath, (err, data) => {
         if (err) {
-            error404(res); // Usar la función dinámica para el error 404
+            error(res); // Usar la función dinámica para el error
         } else {
             res.writeHead(200, { 'Content-Type': contentType });
             res.end(data);
@@ -1065,15 +1065,13 @@ function mostrarFormularioPedido(res, cookies = {}) {
     }
 
     if (!usuario) {
-        res.writeHead(401, { 'Content-Type': 'text/html' });
-        res.end('<h2>Debes iniciar sesión para finalizar tu pedido. <a href="/login">Inicia sesión aquí</a></h2>');
+        error(res, 'Error 401 - Debes iniciar sesión para realizar tu pedido.');
         return;
     }
 
     let carrito = usuario.carrito || [];
     if (carrito.length === 0) {
-        res.writeHead(400, { 'Content-Type': 'text/html' });
-        res.end('<h2>Tu carrito está vacío. <a href="/">Volver a la tienda</a></h2>');
+        error(res, 'Tu carrito está vacío. ¡Añade productos para realizar tu pedido!');
         return;
     }
 
@@ -1166,16 +1164,16 @@ function procesarPedido(req, res, cookies = {}) {
         let { direccion, tarjeta } = querystring.parse(body);
         let usuario = cookies.usuario ? JSON.parse(cookies.usuario) : null;
 
+
+
         if (!usuario) {
-            res.writeHead(401, { 'Content-Type': 'text/html' });
-            res.end('<h2>Debes iniciar sesión para finalizar tu pedido. <a href="/login">Inicia sesión aquí</a></h2>');
+            error(res, 'Error 401 - Debes iniciar sesión para realizar tu pedido.');
             return;
         }
-
+    
         let carrito = usuario.carrito || [];
         if (carrito.length === 0) {
-            res.writeHead(400, { 'Content-Type': 'text/html' });
-            res.end('<h2>Tu carrito está vacío. <a href="/">Volver a la tienda</a></h2>');
+            error(res, 'Tu carrito está vacío. ¡Añade productos para realizar tu pedido!');
             return;
         }
 
