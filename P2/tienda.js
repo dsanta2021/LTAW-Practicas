@@ -255,20 +255,69 @@ function generarPaginaProducto(res, id, cookies = {}) {
         </section>
     </main>
     <script>
-        async function añadirAlCarrito(idProducto) {
-            try {
-                const response = await fetch('/agregar/' + idProducto, { method: 'POST' });
-                if (response.ok) {
-                    alert('Producto añadido al carrito');
-                } else {
-                    alert('Error al añadir el producto al carrito');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error al añadir el producto al carrito');
+    async function añadirAlCarrito(idProducto) {
+        try {
+            const response = await fetch('/agregar/' + idProducto, { method: 'POST' });
+            if (response.ok) {
+                mostrarNotificacion('Producto añadido al carrito');
+            } else {
+                mostrarNotificacion('Error al añadir el producto al carrito', true);
             }
+        } catch (error) {
+            console.error('Error:', error);
+            mostrarNotificacion('Error al añadir el producto al carrito', true);
         }
+    }
+
+    function mostrarNotificacion(mensaje, error = false) {
+        // Crear el contenedor de la notificación
+        const notificacion = document.createElement('div');
+        notificacion.className = 'notificacion ' + (error ? 'error' : 'exito');
+        notificacion.textContent = mensaje;
+
+        // Añadir la notificación al cuerpo del documento
+        document.body.appendChild(notificacion);
+
+        // Eliminar la notificación después de 3 segundos
+        setTimeout(() => {
+            notificacion.style.opacity = '0'; // Desvanecer
+            setTimeout(() => notificacion.remove(), 500); // Eliminar del DOM
+        }, 3000);
+    }
     </script>
+
+    <style>
+    /* Notificaciones */
+    .notificacion {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: #4caf50; /* Verde para éxito */
+        color: white;
+        padding: 15px 20px;
+        border-radius: 5px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        font-size: 16px;
+        z-index: 1000;
+        opacity: 1;
+        transition: opacity 0.5s ease, transform 0.5s ease;
+        transform: translateY(0);
+    }
+
+    .notificacion.error {
+        background-color: #f44336; /* Rojo para errores */
+    }
+
+    .notificacion.exito {
+        background-color: #4caf50; /* Verde para éxito */
+    }
+
+    .notificacion.oculta {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    <style>
+
 </body>
 </html>`;
 
@@ -520,47 +569,42 @@ function handleLogin(req, res) {
         } else {
             res.writeHead(401, { 'Content-Type': 'text/html' });
             let contenido = `
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FrikiShop</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="icon" href="img/favicon.ico" type="image/x-icon">
-    <script defer src="js/script.js"></script>
-</head>
-<body>
-    <header class="barra-superior">
-        <div class="logo">
-            <img src="img/logo.png" alt="Logo de FrikiShop">
-            <h1>FrikiShop</h1>
-        </div>
-        <div class="buscador">
-            <input type="text" placeholder="Buscar productos...">
-            <button>🔍</button>
-        </div>
-        <div class="acciones">
-            <select>
-                <option>🇪🇸 ES</option>
-                <option>🇬🇧 EN</option>
-            </select>
-            <a href="#">Inicio</a>
-            <a href="/login">Log-In</a>
-            <a href="/carrito">🛒 Carrito</a>
-        </div>
-    </header>
-    
-    <nav class="barra-navegacion">
-        <button class="menu">☰ Menú</button>
-        <a href="/ofertas">🔥 Ofertas</a>
-        <a href="/novedades">🆕 Últimas novedades</a>
-    </nav>
-        <h2>Iniciar Sesión</h2>
-        <form method="POST">
-            <label>Usuario: <input type="text" name="username" required></label>
-            <button type="submit">Entrar</button>
-        </form>
-        <h3>Usuario no registrado. <a href="/register">Regístrate aquí</a></h3>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Login - FrikiShop</title>
+            <link rel="icon" href="/img/favicon.ico" type="image/x-icon">
+            <link rel="stylesheet" href="/css/login_register.css">
+        </head>
+        <body>
+            <div class="container">
+                <header>
+                    <img src="/img/logo.png" alt="FrikiShop" class="logo">
+                    <h1>FrikiShop</h1>
+                </header>
+                <nav>
+                    <a href="index.html">Inicio</a>
+                    <a href="#" id="change-language">Idioma</a>
+                    <a href="register">Registrarse</a>
+                </nav>
+                <main>
+                    <form action="/login" method="post" class="auth-form">
+                        <h2>Iniciar Sesión</h2>
+                        <label for="nombre">Nombre de usuario</label>
+                        <input type="text" id="nombre" name="nombre" required>
+                        
+                        <label for="password">Contraseña</label>
+                        <input type="password" id="password" name="password" required>
+                        
+                        <p style="color: red; font-size: 14px;">Usuario o contraseña incorrectos</p>
+                        
+                        <button type="submit">Iniciar Sesión</button>
+                    </form>
+                </main>
+            </div>
+        </body>
+        </html>
     `;
             res.end(contenido);
         }
@@ -576,8 +620,52 @@ function handleRegister(req, res) {
         let tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
 
         if (tienda.usuarios.some(u => u.nombre === nombre)) {
+            let contenido = `
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Registro - FrikiShop</title>
+            <link rel="icon" href="/img/favicon.ico" type="image/x-icon">
+            <link rel="stylesheet" href="/css/login_register.css">
+        </head>
+        <body>
+            <div class="container">
+                <header>
+                    <img src="/img/logo.png" alt="FrikiShop" class="logo">
+                    <h1>FrikiShop</h1>
+                </header>
+                <nav>
+                    <a href="index.html">Inicio</a>
+                    <a href="#" id="change-language">Idioma</a>
+                    <a href="login">Log-In</a>
+                </nav>
+                <main>
+                    <form action="/register" method="post" class="auth-form">
+                        <h2>Registrarse</h2>
+                        <label for="nombreReal">Nombre real</label>
+                        <input type="text" id="nombreReal" name="nombreReal" required>
+                        
+                        <label for="nombre">Nombre de usuario</label>
+                        <input type="text" id="nombre" name="nombre" required>
+                        
+                        <label for="correo">Correo electrónico</label>
+                        <input type="correo" id="correo" name="correo" required>
+                        
+                        <label for="password">Contraseña</label>
+                        <input type="password" id="password" name="password" required>
+
+                        <p style="color: red; font-size: 14px;">El nombre de usuario ya existe. Por favor, elige otro.</p>
+                        
+                        <button type="submit">Registrarse</button>
+                    </form>
+                </main>
+            </div>
+        </body>
+        </html>
+    `;
             res.writeHead(400, { 'Content-Type': 'text/html' });
-            res.end('<h2>Ese usuario ya existe. <a href="/login">Inicia sesión aquí</a></h2>');
+            res.end(contenido);
             return;
         }
 
@@ -938,7 +1026,7 @@ function agregarAlCarrito(req, res, idProducto, redirigir = true, cookies = {}) 
 
     if (!usuario) {
         res.writeHead(401, { 'Content-Type': 'text/html' });
-        res.end('<h2>Debes iniciar sesión para agregar productos al carrito. <a href="/login">Inicia sesión aquí</a></h2>');
+        res.end(JSON.stringify({ success: false, message: 'Debes iniciar sesión para agregar productos al carrito.' }));
         return;
     }
 
