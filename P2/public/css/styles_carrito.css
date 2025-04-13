@@ -94,25 +94,23 @@ font-size: 1.5em;
 }
 
 .resumen-carrito .btn-comprar {
-    margin-top: 20px;
+    display: inline-block;
     padding: 10px 20px;
-    background-color: #007bff;
-    color: white;
-    border: none;
+    font-size: 16px;
+    font-family: 'Press Start 2P', cursive;
+    text-decoration: none;
+    border: 2px solid;
     border-radius: 5px;
     cursor: pointer;
-transition: background-color 0.3s ease;
+    transition: all 0.3s;
+    background: #00ccff;
+    border-color: #00ccff;
+    color: white;
 }
 
 .resumen-carrito .btn-comprar:hover {
-    background-color: #0056b3;
-}
-
-/* Mensaje cuando el carrito está vacío */
-.mensaje-vacio {
-    text-align: center;
-    font-size: 1.2em;
-    color: #888;
+    background: #0099cc;
+    box-shadow: 0px 0px 15px #00ccff;
 }
 
 /* Centrar el mensaje de error */

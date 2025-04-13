@@ -108,8 +108,18 @@ const server = http.createServer((req, res) => {
 
 //-- Generar Página Principal
 function generarPaginaPrincipal(res, cookies = {}) {
+    let usuario;
+
+    try {
+        usuario = cookies.usuario ? JSON.parse(cookies.usuario) : null;
+    } catch (e) {
+        console.error('Error al parsear la cookie usuario:', e);
+        usuario = null;
+    }
+
+    let nombre = usuario ? usuario.nombre : null;
+
     let tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
-    let usuario = cookies.usuario || null;
 
     let contenido = `<!DOCTYPE html>
 <html lang="es">
@@ -138,7 +148,7 @@ function generarPaginaPrincipal(res, cookies = {}) {
             </select>
             <a href="#">Inicio</a>
             ${usuario
-            ? `<span class="usuario">👤 ${usuario.nombre}</span> <a href="/logout">Log-Out</a>`
+            ? `<span class="usuario">👤 ${nombre}</span> <a href="/logout">Log-Out</a>`
             : `<a href="/login">Log-In</a>`}
             <a href="/carrito">🛒 Carrito</a>
         </div>
@@ -175,10 +185,19 @@ function generarPaginaPrincipal(res, cookies = {}) {
 
 //-- Generar Página de Producto
 function generarPaginaProducto(res, id, cookies = {}) {
-    let tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
-    let producto = tienda.productos.find(p => p.id == id);
-    let usuario = cookies.usuario || null;
+    let usuario;
 
+    try {
+        usuario = cookies.usuario ? JSON.parse(cookies.usuario) : null;
+    } catch (e) {
+        console.error('Error al parsear la cookie usuario:', e);
+        usuario = null;
+    }
+    let nombre = usuario ? usuario.nombre : null;
+
+    let tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
+
+    let producto = tienda.productos.find(p => p.id == id);
     if (!producto) {
         res.writeHead(404, { 'Content-Type': 'text/html' });
         res.end(fs.readFileSync(RUTAS.sin_producto));
@@ -212,7 +231,7 @@ function generarPaginaProducto(res, id, cookies = {}) {
             </select>
             <a href="/">Inicio</a>
              ${usuario
-            ? `<span class="usuario">👤 ${usuario.nombre}</span> <a href="/logout">Log-Out</a>`
+            ? `<span class="usuario">👤 ${nombre}</span> <a href="/logout">Log-Out</a>`
             : `<a href="/login">Log-In</a>`}
             <a href="/carrito">🛒 Carrito</a>
         </div>
@@ -260,8 +279,18 @@ function generarPaginaProducto(res, id, cookies = {}) {
 
 //-- Generar Página Filtrada (Ofertas / Novedades)
 function generarPaginaFiltrada(res, criterio, valor, cookies = {}) {
+    let usuario;
+
+    try {
+        usuario = cookies.usuario ? JSON.parse(cookies.usuario) : null;
+    } catch (e) {
+        console.error('Error al parsear la cookie usuario:', e);
+        usuario = null;
+    }
+    let nombre = usuario ? usuario.nombre : null;
+
     let tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
-    let usuario = cookies.usuario || null;
+
     let productosFiltrados = tienda.productos.filter(p => p[criterio] === valor);
 
     let contenido = `<!DOCTYPE html>
@@ -291,7 +320,7 @@ function generarPaginaFiltrada(res, criterio, valor, cookies = {}) {
             </select>
             <a href="/">Inicio</a>
             ${usuario
-            ? `<span class="usuario">👤 ${usuario.nombre}</span> <a href="/logout">Log-Out</a>`
+            ? `<span class="usuario">👤 ${nombre}</span> <a href="/logout">Log-Out</a>`
             : `<a href="/login">Log-In</a>`}
             <a href="/carrito">🛒 Carrito</a>
         </div>
@@ -671,11 +700,6 @@ function generarPaginaCarrito(res, cookies = {}) {
         usuario = null;
     }
 
-    if (usuario) {
-        console.log('Usuario:', usuario); // Depuración
-        console.log('Nombre del usuario:', usuario.nombre); // Depuración
-    }
-
     if (!usuario) {
         let contenido = `<!DOCTYPE html>
         <html lang="es">
@@ -724,6 +748,100 @@ function generarPaginaCarrito(res, cookies = {}) {
     let carrito = usuario.carrito || [];
     let tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
 
+    let nombre =  usuario.nombre;
+    // Si el carrito está vacío, mostrar el mensaje y el botón
+    if (carrito.length === 0) {
+        let contenido = `<!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Carrito - FrikiShop</title>
+        <link rel="stylesheet" href="/css/styles.css">
+        <link rel="stylesheet" href="/css/styles_carrito.css">
+        <link rel="icon" href="img/favicon.ico" type="image/x-icon">
+        <script defer src="js/script.js"></script>
+    </head>
+    <body>
+        <header class="barra-superior">
+            <div class="logo">
+                <img src="/img/logo.png" alt="Logo de FrikiShop">
+                <h1>FrikiShop</h1>
+            </div>
+            <div class="buscador">
+                <input type="text" placeholder="Buscar productos...">
+                <button>🔍</button>
+            </div>
+            <div class="acciones">
+                <select>
+                    <option>🇪🇸 ES</option>
+                    <option>🇬🇧 EN</option>
+                </select>
+                <a href="/">Inicio</a>
+                ${usuario
+                    ? `<span class="usuario">👤 ${nombre}</span> <a href="/logout">Log-Out</a>`
+                    : `<a href="/login">Log-In</a>`}
+                <a href="/carrito">🛒 Carrito</a>
+            </div>
+        </header>
+
+        <main class="carrito-vacio">
+            <div class="carrito-vacio-contenido">
+                <h1>Tu carrito está vacío</h1>
+                <p>No tienes productos en tu carrito. ¡Empieza a comprar ahora!</p>
+                <a href="/" class="btn-ir-comprar">Ir a comprar</a>
+            </div>
+        </main>
+    </body>
+    </html>
+    
+    <style>
+    body {
+        background-color: #222;
+        color: #fff;
+    }
+
+    .carrito-vacio {
+        text-align: center;
+        padding: 50px;
+    }
+
+    .carrito-vacio h1 {
+        font-size: 28px;
+        margin-bottom: 20px;
+    }
+
+    .carrito-vacio p {
+        font-size: 18px;
+        margin-bottom: 20px;
+    }
+
+    .btn-ir-comprar {
+        display: inline-block;
+        padding: 10px 20px;
+        font-size: 16px;
+        font-family: 'Press Start 2P', cursive;
+        text-decoration: none;
+        border: 2px solid;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s;
+        background: #00ccff;
+        border-color: #00ccff;
+        color: white;
+    }
+
+    .btn-ir-comprar:hover {
+        background: #0099cc;
+        box-shadow: 0px 0px 15px #00ccff;
+    }
+    </style>
+    `;
+        res.writeHead(200, { 'Content-Type': 'text/html' });
+        res.end(contenido);
+        return;
+    }
+
     // Filtrar los productos que están en el carrito
     let productosCarrito = carrito.map(item => {
         let producto = tienda.productos.find(p => p.id == item.id);
@@ -743,6 +861,8 @@ function generarPaginaCarrito(res, cookies = {}) {
     <title>Carrito - FrikiShop</title>
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="/css/styles_carrito.css">
+    <link rel="icon" href="img/favicon.ico" type="image/x-icon">
+    <script defer src="js/script.js"></script>
 </head>
 <body>
     <header class="barra-superior">
@@ -761,7 +881,7 @@ function generarPaginaCarrito(res, cookies = {}) {
             </select>
             <a href="/">Inicio</a>
             ${usuario
-                ? `<span class="usuario">👤 ${usuario.nombre}</span> <a href="/logout">Log-Out</a>`
+                ? `<span class="usuario">👤 ${nombre}</span> <a href="/logout">Log-Out</a>`
                 : `<a href="/login">Log-In</a>`}
             <a href="/carrito">🛒 Carrito</a>
         </div>
@@ -770,44 +890,34 @@ function generarPaginaCarrito(res, cookies = {}) {
     <main class="carrito-container">
         <section class="productos-carrito">
             <h1>Tu Carrito</h1>
-            ${productosCarrito.length > 0 ? productosCarrito.map(p => `
-                <div class="producto-carrito">
-                    <h2>${p.nombre}</h2>
-                    <p>Cantidad: ${p.cantidad}</p>
-                    <p>Precio: ${p.precio.toFixed(2)} €</p>
-                    <p>Subtotal: ${(p.precio * p.cantidad).toFixed(2)} €</p>
-                </div>
-            `).join('') : '<p>Tu carrito está vacío.</p>'}
-            <h2>Total: ${total.toFixed(2)} €</h2>
+            <div class="productos-grid">
+                ${productosCarrito.map(p => `
+                    <div class="producto-carrito">
+                        <div class="producto-imagen">
+                            <img src="/img/${p.imagen[0]}" alt="${p.nombre}">
+                        </div>
+                        <div class="producto-detalles">
+                            <h2>${p.nombre}</h2>
+                            <p>Cantidad: ${p.cantidad}</p>
+                            <p>Precio: ${p.precio.toFixed(2)} €</p>
+                            <p>Subtotal: ${(p.precio * p.cantidad).toFixed(2)} €</p>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
         </section>
 
-        </section>
-             <aside class="resumen-carrito">
-                 <div class="total">
-                     <h2>Total: ${total} €</h2>
-                     <form action="/finalizar-pedido" method="GET">
-                         <button type="submit" class="btn-comprar">Realizar Pedido</button>
-                     </form>
-                 </div>
-             </aside>
+        <aside class="resumen-carrito">
+            <div class="total">
+                <h2>Total: ${total.toFixed(2)} €</h2>
+                <form action="/finalizar-pedido" method="GET">
+                    <button type="submit" class="btn-comprar">Realizar Pedido</button>
+                </form>
+            </div>
+        </aside>
     </main>
 </body>
 </html>`;
-    // Remove the misplaced else block
-
-    // contenido += `
-    //         </section>
-    //         <aside class="resumen-carrito">
-    //             <div class="total">
-    //                 <h2>Total: ${total} €</h2>
-    //                 <form action="/finalizar-pedido" method="GET">
-    //                     <button type="submit" class="btn-comprar">Realizar Pedido</button>
-    //                 </form>
-    //             </div>
-    //         </aside>
-    //     </main>
-    //     </body>
-    //     </html>`;
 
     res.writeHead(200, { 'Content-Type': 'text/html' });
     res.end(contenido);
@@ -892,6 +1002,7 @@ function mostrarFormularioPedido(res, cookies = {}) {
 
     let total = productosCarrito.reduce((acc, producto) => acc + producto.precio * producto.cantidad, 0);
 
+    let nombre =  usuario.nombre;
     let contenido = `<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -900,6 +1011,8 @@ function mostrarFormularioPedido(res, cookies = {}) {
     <title>Finalizar Pedido - FrikiShop</title>
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="/css/finalizar_pedido.css">
+    <link rel="icon" href="img/favicon.ico" type="image/x-icon">
+    <script defer src="js/script.js"></script>
 </head>
 <body>
     <header class="barra-superior">
@@ -918,7 +1031,7 @@ function mostrarFormularioPedido(res, cookies = {}) {
             </select>
             <a href="/">Inicio</a>
             ${usuario
-            ? `<span class="usuario">👤 ${usuario.nombre}</span> <a href="/logout">Log-Out</a>`
+            ? `<span class="usuario">👤 ${nombre}</span> <a href="/logout">Log-Out</a>`
             : `<a href="/login">Log-In</a>`}
             <a href="/carrito">🛒 Carrito</a>
         </div>
