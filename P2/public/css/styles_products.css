@@ -91,6 +91,21 @@ body {
     box-shadow: 0px 0px 15px #ff00ff;
 }
 
+/* Botón deshabilitado (Sin stock) */
+.btn-comprar.sin-stock {
+    background: #555; /* Color gris oscuro */
+    border-color: #555;
+    color: #ccc; /* Color gris claro */
+    cursor: not-allowed; /* Cambiar el cursor a no permitido */
+    opacity: 0.6; /* Reducir la opacidad */
+    box-shadow: none; /* Eliminar sombras */
+}
+
+.btn-comprar.sin-stock:hover {
+    background: #555; /* Mantener el mismo color al pasar el cursor */
+    box-shadow: none; /* Sin efecto de sombra */
+}
+
 .btn-inicio {
     background: #00ccff;
     border-color: #00ccff;

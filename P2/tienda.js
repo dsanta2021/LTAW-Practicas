@@ -278,8 +278,11 @@ function generarPaginaProducto(res, id, cookies = {}) {
         <section class="detalles-producto">
             <h3><span>${producto.description[0]}</span></h3>
             <p><span>Tamaño:</span> ${producto.description[1]}</p>
+            <p><span>Stock disponible:</span> ${producto.stock}</p>
             <h3><span class="precio">${producto.precio} €</span></h3>
-            <button class="btn-comprar" onclick="añadirAlCarrito('${producto.id}')">Agregar al carrito</button>
+            ${producto.stock > 0
+                ? `<button class="btn-comprar" onclick="añadirAlCarrito('${producto.id}')">Agregar al carrito</button>`
+                : `<button class="btn-comprar sin-stock" disabled>Sin stock</button>`}
             <button class="btn-inicio"><a href="/">Home</a></button>
         </section>
     </main>
@@ -1292,16 +1295,14 @@ function procesarPedido(req, res, cookies = {}) {
         let { direccion, tarjeta } = querystring.parse(body);
         let usuario = cookies.usuario ? JSON.parse(cookies.usuario) : null;
 
-
-
         if (!usuario) {
-            error(res, 'Error 401 - Debes iniciar sesión para realizar tu pedido.');
+            error(res, 'Error 401 - Debes iniciar sesión para realizar tu pedido.', cookies);
             return;
         }
     
         let carrito = usuario.carrito || [];
         if (carrito.length === 0) {
-            error(res, 'Tu carrito está vacío. ¡Añade productos para realizar tu pedido!');
+            error(res, 'Tu carrito está vacío. ¡Añade productos para realizar tu pedido!', cookies);
             return;
         }
 
@@ -1309,19 +1310,33 @@ function procesarPedido(req, res, cookies = {}) {
 
         // Calcular el total del pedido y simplificar los datos de los productos
         let total = 0;
-        let productosSimplificados = carrito.map(item => {
+        let productosSimplificados = [];
+        for (let item of carrito) {
             let producto = tienda.productos.find(p => p.id == item.id);
             if (producto) {
+                if (producto.stock < item.cantidad) {
+                    error(res, `No hay suficiente stock para el producto: ${producto.nombre}`, cookies);
+                    return; // Detener el flujo inmediatamente
+                }
                 let subtotal = producto.precio * item.cantidad;
+                producto.stock -= item.cantidad; // Decrementar el stock
                 total += subtotal;
-                return {
+                productosSimplificados.push({
+                    id: producto.id,
                     nombre: producto.nombre,
-                    precio: producto.precio,
-                    cantidad: item.cantidad
-                };
+                    cantidad: item.cantidad,
+                    precio: producto.precio
+                });
             }
-            return null;
-        }).filter(p => p !== null);
+        }
+
+        if (productosSimplificados.length === 0) {
+            error(res, 'No se pudo procesar el pedido debido a problemas con el stock.', cookies);
+            return;
+        }
+
+        // Guardar los cambios en la base de datos
+        fs.writeFileSync(RUTAS.db, JSON.stringify(tienda, null, 2));
 
         // Crear el objeto del pedido
         let pedido = {
