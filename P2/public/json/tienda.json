@@ -11,6 +11,12 @@
       "nombreReal": "Natsu Dragneel",
       "correo": "natsufiredragon@example.com",
       "password": "usuario1"
+    },
+    {
+      "nombre": "davidsc",
+      "nombreReal": "David",
+      "correo": "d.santa@gmail.com",
+      "password": "04032002"
     }
   ],
   "productos": [
@@ -43,7 +49,7 @@
         "W80mm x D50mm×H224mm"
       ],
       "precio": 161.18,
-      "stock": 9,
+      "stock": 5,
       "imagen": [
         "producto2.jpg",
         "producto2_1.jpg",
@@ -61,7 +67,7 @@
         "330 ml - 8x10x12 centímetros"
       ],
       "precio": 14.95,
-      "stock": 15,
+      "stock": 14,
       "imagen": [
         "producto3.jpg",
         "producto3_1.jpg",
@@ -79,7 +85,7 @@
         "35,6l. x 15,2an. x 17,8al. cm"
       ],
       "precio": 289.99,
-      "stock": 5,
+      "stock": 4,
       "imagen": [
         "producto4.jpg",
         "producto4_1.jpg",

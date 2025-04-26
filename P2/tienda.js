@@ -81,7 +81,7 @@ const server = http.createServer((req, res) => {
             break;
 
         case url === '/logout':
-            handleLogout(res);
+            handleLogout(res, cookies);
             break;
 
         case url === '/carrito':
@@ -606,11 +606,18 @@ function handleLogin(req, res) {
         let usuario = tienda.usuarios.find(u => u.nombre === nombre && u.password === password);
 
         if (usuario) {
+            // Restaurar el carrito desde la base de datos si existe
+            let carritoRestaurado = usuario.carrito || [];
+
             // Crear un objeto usuario con un carrito vacío
             let usuarioData = {
                 nombre: usuario.nombre,
-                carrito: []
+                carrito: carritoRestaurado
             };
+
+            // Eliminar el carrito del usuario en la base de datos
+            delete usuario.carrito;
+            fs.writeFileSync(RUTAS.db, JSON.stringify(tienda, null, 2));
 
             // Guardar la cookie como un JSON válido
             res.setHeader('Set-Cookie', `usuario=${encodeURIComponent(JSON.stringify(usuarioData))}; Path=/; HttpOnly`);
@@ -727,8 +734,29 @@ function handleRegister(req, res) {
 }
 
 //-- Manejar Logout
-function handleLogout(res) {
-    // Eliminar las cookies 'usuario' y 'carrito'
+function handleLogout(res, cookies = {}) {
+    let usuario;
+
+    try {
+        usuario = cookies.usuario ? JSON.parse(cookies.usuario) : null;
+    } catch (e) {
+        console.error('Error al parsear la cookie usuario:', e);
+        usuario = null;
+    }
+
+    if (usuario) {
+        let tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
+
+        // Buscar al usuario en la base de datos
+        let usuarioDB = tienda.usuarios.find(u => u.nombre === usuario.nombre);
+        if (usuarioDB) {
+            // Crear el campo carrito si no existe y guardar el carrito actual
+            usuarioDB.carrito = usuario.carrito || [];
+            fs.writeFileSync(RUTAS.db, JSON.stringify(tienda, null, 2));
+        }
+    }
+
+    // Eliminar la cookie del usuario
     res.setHeader('Set-Cookie', 'usuario=; Max-Age=0; Path=/; HttpOnly');
 
     // Redirigir al usuario a la página principal
