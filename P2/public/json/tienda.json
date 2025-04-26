@@ -4,7 +4,8 @@
       "nombre": "root",
       "nombreReal": "Administrador",
       "correo": "admin@frikishop.com",
-      "password": "admin123"
+      "password": "admin123",
+      "carrito": []
     },
     {
       "nombre": "DragonSlayer",
@@ -16,7 +17,8 @@
       "nombre": "davidsc",
       "nombreReal": "David",
       "correo": "d.santa@gmail.com",
-      "password": "04032002"
+      "password": "04032002",
+      "carrito": []
     }
   ],
   "productos": [
@@ -49,7 +51,7 @@
         "W80mm x D50mm×H224mm"
       ],
       "precio": 161.18,
-      "stock": 4,
+      "stock": 2,
       "imagen": [
         "producto2.jpg",
         "producto2_1.jpg",
@@ -85,7 +87,7 @@
         "35,6l. x 15,2an. x 17,8al. cm"
       ],
       "precio": 289.99,
-      "stock": 3,
+      "stock": 1,
       "imagen": [
         "producto4.jpg",
         "producto4_1.jpg",
@@ -121,7 +123,7 @@
         "10l. x 10an. x 10al. cm"
       ],
       "precio": 15.99,
-      "stock": 18,
+      "stock": 17,
       "imagen": [
         "producto6.jpg",
         "producto6_1.jpg",
@@ -184,5 +186,49 @@
     }
   ],
   "pedidos": [
+    {
+      "nombre": "davidsc",
+      "direccion": "dxfhjsrdtdjjjddjgjg",
+      "tarjeta": {
+        "numero": "************1111",
+        "cvv": "111",
+        "fechaExpiracion": "2030-02"
+      },
+      "total": 322.36,
+      "productos": [
+        {
+          "id": 2,
+          "nombre": "Figura Acción Sora",
+          "cantidad": 2,
+          "precio": 161.18
+        }
+      ],
+      "fecha": "2025-04-26T22:35:21.608Z"
+    },
+    {
+      "nombre": "davidsc",
+      "direccion": "ryhaerbyaeraer",
+      "tarjeta": {
+        "numero": "************4444",
+        "cvv": "444",
+        "fechaExpiracion": "4444-04"
+      },
+      "total": 595.97,
+      "productos": [
+        {
+          "id": 4,
+          "nombre": "Figura Acción Erza Scarlet",
+          "cantidad": 2,
+          "precio": 289.99
+        },
+        {
+          "id": 6,
+          "nombre": "Funko Pop! Captain Jack Sparrow Sparrow",
+          "cantidad": 1,
+          "precio": 15.99
+        }
+      ],
+      "fecha": "2025-04-26T22:40:42.296Z"
+    }
   ]
 }

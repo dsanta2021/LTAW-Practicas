@@ -1,0 +1,68 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #222; /* Fondo oscuro */
+    color: #fff; /* Texto blanco */
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #333; /* Fondo más oscuro */
+    color: #fff;
+    text-align: center;
+    padding: 20px 0;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+    font-family: 'Press Start 2P', cursive;
+}
+
+main {
+    max-width: 600px;
+    margin: 50px auto;
+    background-color: #333; /* Fondo del formulario */
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+form label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    font-family: 'Press Start 2P', cursive;
+}
+
+form input, form textarea, form button {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #444;
+    border-radius: 5px;
+    background-color: #222; /* Fondo oscuro */
+    color: #fff;
+}
+
+form textarea {
+    resize: vertical;
+}
+
+form button {
+    background-color: #00ccff; /* Azul claro */
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Press Start 2P', cursive;
+}
+
+form button:hover {
+    background-color: #0099cc; /* Azul más oscuro */
+    box-shadow: 0px 0px 15px #00ccff;
+}

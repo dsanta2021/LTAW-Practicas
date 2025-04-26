@@ -53,6 +53,24 @@ const server = http.createServer((req, res) => {
     let cookies = parseCookies(req);
     let url = req.url;
 
+    // Verificar si el usuario es root
+    let usuario;
+    try {
+        usuario = cookies.usuario ? JSON.parse(cookies.usuario) : null;
+    } catch (e) {
+        console.error('Error al parsear la cookie usuario:', e);
+        usuario = null;
+    }
+
+    if (usuario && usuario.nombre === 'root') {
+        // Redirigir automáticamente a la página especial del root
+        if (!url.startsWith('/admin') && !url.startsWith('/css') && !url.startsWith('/img') && url !== '/logout') {
+            res.writeHead(302, { 'Location': '/admin' });
+            res.end();
+            return;
+        }
+    }
+
     switch (true) {
         case url === '/' || url === '/index.html':
             generarPaginaPrincipal(res, cookies);
@@ -127,6 +145,38 @@ const server = http.createServer((req, res) => {
             } else {
                 res.writeHead(400, { 'Content-Type': 'text/plain' });                    res.end('Solicitud inválida');
             }
+            break;
+
+        case url === '/admin':
+            if (!verificarRoot(cookies)) {
+                error(res, 'Acceso denegado. Solo el administrador puede acceder a esta página.', cookies);
+                break;
+            }
+            mostrarPaginaRoot(res);
+            break;
+        
+        case url === '/admin/pedidos':
+            if (!verificarRoot(cookies)) {
+                error(res, 'Acceso denegado. Solo el administrador puede acceder a esta página.', cookies);
+                break;
+            }
+            mostrarPedidosPendientes(res);
+            break;
+        
+        case url === '/admin/nuevo-producto' && req.method === 'GET':
+            if (!verificarRoot(cookies)) {
+                error(res, 'Acceso denegado. Solo el administrador puede acceder a esta página.', cookies);
+                break;
+            }
+            mostrarFormularioNuevoProducto(res);
+            break;
+        
+        case url === '/admin/nuevo-producto' && req.method === 'POST':
+            if (!verificarRoot(cookies)) {
+                error(res, 'Acceso denegado. Solo el administrador puede acceder a esta página.', cookies);
+                break;
+            }
+            procesarNuevoProducto(req, res);
             break;
 
         default:
@@ -607,6 +657,14 @@ function handleLogin(req, res) {
         let usuario = tienda.usuarios.find(u => u.nombre === nombre && u.password === password);
 
         if (usuario) {
+            // Si el usuario es root, redirigir al panel de administración
+            if (usuario.nombre === 'root' && usuario.password === 'admin123') {
+                res.setHeader('Set-Cookie', `usuario=${encodeURIComponent(JSON.stringify(usuario))}; Path=/; HttpOnly`);
+                res.writeHead(302, { 'Location': '/admin' });
+                res.end();
+                return;
+            }
+
             // Restaurar el carrito desde la base de datos si existe
             let carritoRestaurado = usuario.carrito || [];
 
@@ -1504,7 +1562,7 @@ function buscarProductos(res, termino) {
     res.end(JSON.stringify(productos));
 }
 
-// Función para generar la página de resultados de búsqueda
+//-- Función para generar la página de resultados de búsqueda
 function generarPaginaResultados(res, termino, cookies = {}) {
     let usuario;
 
@@ -1587,6 +1645,187 @@ function generarPaginaResultados(res, termino, cookies = {}) {
 
     res.writeHead(200, { 'Content-Type': 'text/html' });
     res.end(contenido);
+}
+
+//-- Función para verificar si el usuario es root
+function verificarRoot(cookies) {
+    let usuario;
+    try {
+        usuario = cookies.usuario ? JSON.parse(cookies.usuario) : null;
+    } catch (e) {
+        console.error('Error al parsear la cookie usuario:', e);
+        usuario = null;
+    }
+    return usuario && usuario.nombre === 'root';
+}
+
+//-- Función para mostrar la página especial del root
+function mostrarPaginaRoot(res) {
+    let contenido = `<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - FrikiShop</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/styles_root.css">
+    <link rel="icon" href="img/favicon.ico" type="image/x-icon">
+    <script defer src="js/script.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Panel de Administración</h1>
+        <a href="/logout" class="btn-logout">Cerrar Sesión</a>
+    </header>
+    <main>
+        <div class="admin-panel">
+            <button onclick="location.href='/admin/pedidos'">Ver Pedidos Pendientes</button>
+            <button onclick="location.href='/admin/nuevo-producto'">Añadir Nuevo Producto</button>
+            <button onclick="location.href='/admin/modificar-productos'">Modificar Productos</button>
+        </div>
+    </main>
+</body>
+</html>`;
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.end(contenido);
+}
+
+function mostrarPedidosPendientes(res) {
+    const tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
+    const pedidos = tienda.pedidos;
+
+    let contenido = `<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedidos Pendientes</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/styles_lista_pedidos.css">
+    <link rel="icon" href="img/favicon.ico" type="image/x-icon">
+    <script defer src="js/script.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Pedidos Pendientes</h1>
+    </header>
+    <main>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Dirección</th>
+                    <th>Productos</th>
+                    <th>Total</th>
+                    <th>Fecha</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${pedidos.map(pedido => `
+                    <tr>
+                        <td>${pedido.nombre}</td>
+                        <td>${pedido.direccion}</td>
+                        <td>
+                            <ul>
+                                ${pedido.productos.map(producto => `
+                                    <li>${producto.nombre} - Cantidad: ${producto.cantidad}</li>
+                                `).join('')}
+                            </ul>
+                        </td>
+                        <td>${pedido.total} €</td>
+                        <td>${pedido.fecha}</td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+    </main>
+</body>
+</html>`;
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.end(contenido);
+}
+
+function mostrarFormularioNuevoProducto(res) {
+    let contenido = `<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Añadir Nuevo Producto</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/styles_new_product.css">
+    <link rel="icon" href="img/favicon.ico" type="image/x-icon">
+    <script defer src="js/script.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Añadir Nuevo Producto</h1>
+    </header>
+    <main>
+        <form action="/admin/nuevo-producto" method="POST">
+            <label for="nombre">Nombre:</label>
+            <input type="text" id="nombre" name="nombre" required>
+            
+            <label for="miniDescripcion">Mini Descripción:</label>
+            <input type="text" id="miniDescripcion" name="miniDescripcion" required>
+            
+            <label for="oferta">Oferta (Si/No):</label>
+            <input type="text" id="oferta" name="oferta" required>
+            
+            <label for="novedad">Novedad (Si/No):</label>
+            <input type="text" id="novedad" name="novedad" required>
+            
+            <label for="description">Descripción:</label>
+            <textarea id="description" name="description" required></textarea>
+            
+            <label for="precio">Precio:</label>
+            <input type="number" id="precio" name="precio" step="0.01" required>
+            
+            <label for="stock">Stock:</label>
+            <input type="number" id="stock" name="stock" required>
+            
+            <label for="imagen">Imágenes (separadas por comas):</label>
+            <input type="text" id="imagen" name="imagen" required>
+            
+            <button type="submit">Añadir Producto</button>
+        </form>
+    </main>
+</body>
+</html>`;
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.end(contenido);
+}
+
+function procesarNuevoProducto(req, res) {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+        const nuevoProducto = querystring.parse(body);
+        const tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
+
+        // Generar un nuevo ID
+        const nuevoId = tienda.productos.length > 0 ? tienda.productos[tienda.productos.length - 1].id + 1 : 1;
+
+        // Crear el nuevo producto
+        const producto = {
+            id: nuevoId,
+            nombre: nuevoProducto.nombre,
+            miniDescripcion: nuevoProducto.miniDescripcion,
+            Oferta: nuevoProducto.oferta,
+            Novedad: nuevoProducto.novedad,
+            description: nuevoProducto.description.split('\n'),
+            precio: parseFloat(nuevoProducto.precio),
+            stock: parseInt(nuevoProducto.stock),
+            imagen: nuevoProducto.imagen.split(',')
+        };
+
+        // Guardar el producto en la base de datos
+        tienda.productos.push(producto);
+        fs.writeFileSync(RUTAS.db, JSON.stringify(tienda, null, 2));
+
+        res.writeHead(302, { Location: '/admin' });
+        res.end();
+    });
 }
 
 server.listen(8001, () => {
