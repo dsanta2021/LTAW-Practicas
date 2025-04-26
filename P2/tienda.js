@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const url = require('url');
 const querystring = require('querystring');
+const validator = require('validator');
 
 //-- Rutas
 const PUBLIC_DIR = path.join(__dirname, 'public');
@@ -102,7 +103,7 @@ const server = http.createServer((req, res) => {
             if (req.method === 'POST') {
                 procesarPedido(req, res, cookies);
             } else if (req.method === 'GET') {
-                mostrarFormularioPedido(res, cookies);
+                mostrarFormularioPedido(res, cookies, {});
             }
             break;
 
@@ -1211,7 +1212,7 @@ function modificarCarrito(req, res, idProducto, accion, cookies = {}) {
 }
 
 //-- Mostrar Formulario de Pedido
-function mostrarFormularioPedido(res, cookies = {}) {
+function mostrarFormularioPedido(res, cookies = {}, errores = {}) {
     let usuario;
 
     try {
@@ -1282,7 +1283,7 @@ function mostrarFormularioPedido(res, cookies = {}) {
     </header>
 
     <main>
-        <form action="/finalizar-pedido" method="POST" class="auth-form">
+        <form action="/finalizar-pedido" method="POST" class="auth-form" onsubmit="return validarFormulario()">
             <h2>Finalizar Pedido</h2>
             <section class="productos-pedido">
                 ${productosCarrito.map(producto => `
@@ -1301,11 +1302,35 @@ function mostrarFormularioPedido(res, cookies = {}) {
                 <h3>Total: ${total.toFixed(2)} €</h3>
             </section>
             <label for="direccion">Dirección de envío:</label>
-            <input type="text" id="direccion" name="direccion" required>
-                
+            <input type="text" id="direccion" name="direccion" required 
+                title="Introduce una dirección válida (mínimo 10 caracteres)."
+                placeholder="Introduce tu dirección. Ejemplo: Calle Falsa 123, Ciudad, País">
+                ${errores.direccion ? `<p class="error">${errores.direccion}</p>` : ''}
+            
             <label for="tarjeta">Número de tarjeta:</label>
-            <input type="text" id="tarjeta" name="tarjeta" required>
-                
+            <input type="text" id="tarjeta" name="tarjeta" required 
+                pattern="^\\d{16}$" 
+                title="Introduce un número de tarjeta válido de 16 dígitos."
+                placeholder="Introduce el número de tarjeta (16 dígitos). Ejemplo: 1234567812345678"
+                maxlength="16">
+                ${errores.tarjeta ? `<p class="error">${errores.tarjeta}</p>` : ''}
+            
+            <label for="cvv">CVV:</label>
+            <input type="text" id="cvv" name="cvv" required 
+                pattern="^\\d{3}$" 
+                title="Introduce un CVV válido de 3 dígitos."
+                placeholder="Introduce el CVV de tu tarjeta. Ejemplo: 123"
+                maxlength="3">
+                ${errores.cvv ? `<p class="error">${errores.cvv}</p>` : ''}
+            
+            <label for="fecha-expiracion">Fecha de expiración:</label>
+            <input type="month" id="fecha-expiracion" name="fechaExpiracion" required
+                placeholder="MM/AAAA">
+            ${errores.fechaExpiracion ? `<p class="error">${errores.fechaExpiracion}</p>` : ''}
+
+            ${errores.global ? `<p class="error global">${errores.global}</p>` : ''}
+    
+        
             <button type="submit">Confirmar Pedido</button>
         </form>
     </main>
@@ -1320,14 +1345,50 @@ function procesarPedido(req, res, cookies = {}) {
     let body = '';
     req.on('data', chunk => { body += chunk; });
     req.on('end', () => {
-        let { direccion, tarjeta } = querystring.parse(body);
+        let { direccion, tarjeta, cvv, fechaExpiracion } = querystring.parse(body);
         let usuario = cookies.usuario ? JSON.parse(cookies.usuario) : null;
 
         if (!usuario) {
             error(res, 'Error 401 - Debes iniciar sesión para realizar tu pedido.', cookies);
             return;
         }
-    
+
+        let errores = {};
+
+        // Validar dirección
+        if (!direccion || direccion.length < 10 || direccion.length > 100) {
+            errores.direccion = 'La dirección debe tener entre 10 y 100 caracteres.';
+        }
+
+        // Validar número de tarjeta
+        if (!tarjeta || tarjeta.length < 16 || !validator.isNumeric(tarjeta)) {
+            errores.tarjeta = 'El número de tarjeta debe tener exactamente 16 dígitos.';
+        }
+
+        // Validar CVV (3 dígitos)
+        if (!cvv || cvv.length < 3 || !validator.isNumeric(cvv)) {
+            errores.cvv = 'El CVV debe tener exactamente 3 dígitos.';
+        }
+
+        // Validar fecha de expiración
+        if (!fechaExpiracion) {
+            errores.fechaExpiracion = 'La fecha de expiración es obligatoria.';
+        } else {
+            const [anio, mes] = fechaExpiracion.split('-');
+            const fechaIngresada = new Date(anio, mes - 1); // Meses en JavaScript van de 0 a 11
+            const fechaActual = new Date();
+
+            if (fechaIngresada < fechaActual) {
+                errores.fechaExpiracion = 'La fecha de expiración debe ser posterior a la fecha actual.';
+            }
+        }
+
+        // Si hay errores, renderizar el formulario con los mensajes de error
+        if (Object.keys(errores).length > 0) {
+            return mostrarFormularioPedido(res, cookies, errores);
+        }
+        
+        // Validar que el carrito no esté vacío
         let carrito = usuario.carrito || [];
         if (carrito.length === 0) {
             error(res, 'Tu carrito está vacío. ¡Añade productos para realizar tu pedido!', cookies);
@@ -1370,7 +1431,11 @@ function procesarPedido(req, res, cookies = {}) {
         let pedido = {
             nombre: usuario.nombre,
             direccion,
-            tarjeta: tarjeta.replace(/\d(?=\d{4})/g, '*'), // Enmascarar el número de tarjeta
+            tarjeta: {
+                numero: tarjeta.replace(/\d(?=\d{4})/g, '*'), // Enmascarar el número de tarjeta
+                cvv: cvv, // Guardar el CVV
+                fechaExpiracion: fechaExpiracion // Guardar la fecha de expiración
+            },
             total,
             productos: productosSimplificados,
             fecha: new Date().toISOString()

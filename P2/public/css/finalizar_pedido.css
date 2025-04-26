@@ -148,3 +148,14 @@ nav a:hover {
     color: #fff;
     margin-top: 20px;
 }
+
+.error {
+    color: red;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+.error.global {
+    margin-top: 10px;
+    font-weight: bold;
+}
