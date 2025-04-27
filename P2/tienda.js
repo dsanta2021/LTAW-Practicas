@@ -2104,24 +2104,34 @@ function guardarCambiosProducto(req, res, idProducto) {
         producto.stock = parseInt(fields.stock);
 
         // Procesar imágenes si se subieron nuevas
-        if (files.imagen && files.imagen.size > 0) {
+        if (files.imagen) {
             const imagenes = [];
             if (Array.isArray(files.imagen)) {
                 files.imagen.forEach(file => {
-                    const nuevoNombre = `${Date.now()}_${file.originalFilename}`;
-                    const nuevaRuta = path.join(form.uploadDir, nuevoNombre);
-                    fs.renameSync(file.filepath, nuevaRuta);
-                    imagenes.push(nuevoNombre);
+                    if (file.size > 0) { // Verificar si el archivo tiene contenido
+                        const nuevoNombre = `${Date.now()}_${file.originalFilename}`;
+                        const nuevaRuta = path.join(form.uploadDir, nuevoNombre);
+                        fs.renameSync(file.filepath, nuevaRuta);
+                        imagenes.push(nuevoNombre);
+                    } else {
+                        // Eliminar archivos vacíos
+                        fs.unlinkSync(file.filepath);
+                    }
                 });
-            } else {
+            } else if (files.imagen.size > 0) { // Verificar si el archivo tiene contenido
                 const nuevoNombre = `${Date.now()}_${files.imagen.originalFilename}`;
                 const nuevaRuta = path.join(form.uploadDir, nuevoNombre);
                 fs.renameSync(files.imagen.filepath, nuevaRuta);
                 imagenes.push(nuevoNombre);
+            } else {
+                // Eliminar archivo vacío
+                fs.unlinkSync(files.imagen.filepath);
             }
-            producto.imagen = imagenes;
-        }
 
+            if (imagenes.length > 0) {
+                producto.imagen = imagenes; // Actualizar las imágenes solo si se subieron nuevas
+            }
+        }
         // Guardar los cambios en la base de datos
         fs.writeFileSync(RUTAS.db, JSON.stringify(tienda, null, 2));
 
