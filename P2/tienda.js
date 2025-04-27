@@ -3,8 +3,6 @@ const fs = require('fs');
 const path = require('path');
 const url = require('url');
 const querystring = require('querystring');
-
-//-- Módulos nuevos que hay que explicar en la documentación
 const validator = require('validator');
 const formidable = require('formidable');
 
@@ -27,29 +25,6 @@ const mimeTypes = {
     '.gif': 'image/gif',
     '.ico': 'image/x-icon'
 };
-
-//-- Parsear Cookies
-function parseCookies(req) {
-    let list = {};
-    let cookieHeader = req.headers.cookie;
-
-    if (cookieHeader) {
-        cookieHeader.split(';').forEach(cookie => {
-            let [name, ...rest] = cookie.split('=');
-            name = name.trim();
-            let value = rest.join('=').trim();
-            if (value) {
-                try {
-                    list[name] = decodeURIComponent(value); // Decodificar el valor de la cookie
-                } catch (e) {
-                    console.error(`Error al decodificar la cookie ${name}:`, e);
-                }
-            }
-        });
-    }
-
-    return list;
-}
 
 //-- Servidor HTTP
 const server = http.createServer((req, res) => {
@@ -75,51 +50,62 @@ const server = http.createServer((req, res) => {
     }
 
     switch (true) {
+        //-- Página principal de la tienda
         case url === '/' || url === '/index.html':
             generarPaginaPrincipal(res, cookies);
             break;
-
+        
+        //-- Página de producto
         case url.startsWith('/producto/'):
             let idProducto = url.split('/').pop();
             generarPaginaProducto(res, idProducto, cookies);
             break;
 
+        //-- Página de ofertas 
         case url === '/ofertas':
             generarPaginaFiltrada(res, 'Oferta', 'Si', cookies);
             break;
 
+        //-- Página de novedades
         case url === '/novedades':
             generarPaginaFiltrada(res, 'Novedad', 'Si', cookies);
             break;
 
+        //-- Página de Login
         case url === '/login':
             if (req.method === 'POST') handleLogin(req, res);
             else mostrarLogin(res);
             break;
 
+        //-- Página de registro
         case url === '/register':
             if (req.method === 'POST') handleRegister(req, res);
             else mostrarRegistro(res);
             break;
 
+        //-- Realizar Logout
         case url === '/logout':
             handleLogout(res, cookies);
             break;
 
+        //-- Página de carrito 
         case url === '/carrito':
             generarPaginaCarrito(res, cookies);
             break;
 
+        //-- Modificar carrito
         case url.startsWith('/modificar-carrito/') && req.method === 'POST':
             let [_, __, idProductoModificar, accion] = url.split('/');
             modificarCarrito(req, res, idProductoModificar, accion, cookies);
             break;
 
+        //-- Agregar producto al carrito
         case url.startsWith('/agregar/') && req.method === 'POST':
             let idProductoAgregar = url.split('/').pop();
             agregarAlCarrito(req, res, idProductoAgregar, false, cookies);  //No redirigir a la página de carrito
             break;
 
+        //-- Mostrar formulario de pedido o procesar pedido
         case url === '/finalizar-pedido' || url === '/finalizar-pedido?':
             if (req.method === 'POST') {
                 procesarPedido(req, res, cookies);
@@ -127,7 +113,8 @@ const server = http.createServer((req, res) => {
                 mostrarFormularioPedido(res, cookies, {});
             }
             break;
-
+        
+        //-- Resultados de búsqueda (lista autocompletada o página de resultados)
         case url.startsWith('/buscar-autocompletado'):
             const queryAuto = new URLSearchParams(url.split('?')[1]);
             const terminoAuto = queryAuto.get('termino');
@@ -139,6 +126,7 @@ const server = http.createServer((req, res) => {
             }
             break;
 
+        //-- Página de resultados de búsqueda
         case url.startsWith('/buscar'):
             const queryBuscar = new URLSearchParams(url.split('?')[1]);
             const terminoBuscar = queryBuscar.get('termino');
@@ -150,6 +138,7 @@ const server = http.createServer((req, res) => {
             }
             break;
 
+        //-- Página de administración
         case url === '/admin':
             if (!verificarRoot(cookies)) {
                 error(res, 'Acceso denegado. Solo el administrador puede acceder a esta página.', cookies);
@@ -158,6 +147,7 @@ const server = http.createServer((req, res) => {
             mostrarPaginaRoot(res);
             break;
 
+        //-- Página de lista de pedidos
         case url === '/admin/pedidos':
             if (!verificarRoot(cookies)) {
                 error(res, 'Acceso denegado. Solo el administrador puede acceder a esta página.', cookies);
@@ -166,6 +156,7 @@ const server = http.createServer((req, res) => {
             mostrarPedidosPendientes(res);
             break;
 
+        //-- Página del formulario para agregar un nuevo producto
         case url === '/admin/nuevo-producto' && req.method === 'GET':
             if (!verificarRoot(cookies)) {
                 error(res, 'Acceso denegado. Solo el administrador puede acceder a esta página.', cookies);
@@ -174,6 +165,7 @@ const server = http.createServer((req, res) => {
             mostrarFormularioNuevoProducto(res);
             break;
 
+        //-- Procesar el formulario para agregar un nuevo producto
         case url === '/admin/nuevo-producto' && req.method === 'POST':
             if (!verificarRoot(cookies)) {
                 error(res, 'Acceso denegado. Solo el administrador puede acceder a esta página.', cookies);
@@ -182,6 +174,7 @@ const server = http.createServer((req, res) => {
             procesarNuevoProducto(req, res);
             break;
 
+        //-- Página de modificación de productos
         case url === '/admin/modificar-productos':
             if (!verificarRoot(cookies)) {
                 error(res, 'Acceso denegado. Solo el administrador puede acceder a esta página.', cookies);
@@ -190,6 +183,7 @@ const server = http.createServer((req, res) => {
             mostrarPaginaModificarProductos(res);
             break;
 
+        //-- Eliminar producto
         case url.startsWith('/admin/eliminar-producto/') && req.method === 'POST':
             if (!verificarRoot(cookies)) {
                 error(res, 'Acceso denegado. Solo el administrador puede acceder a esta página.', cookies);
@@ -199,6 +193,7 @@ const server = http.createServer((req, res) => {
             eliminarProducto(req, res, idEliminar);
             break;
 
+        //-- Mostrar formulario de edición de producto
         case url.startsWith('/admin/editar-producto/') && req.method === 'GET':
             if (!verificarRoot(cookies)) {
                 error(res, 'Acceso denegado. Solo el administrador puede acceder a esta página.', cookies);
@@ -208,6 +203,7 @@ const server = http.createServer((req, res) => {
             mostrarFormularioEditarProducto(res, idEditar);
             break;
 
+        //-- Procesar formulario de edición de producto
         case url.startsWith('/admin/editar-producto/') && req.method === 'POST':
             if (!verificarRoot(cookies)) {
                 error(res, 'Acceso denegado. Solo el administrador puede acceder a esta página.', cookies);
@@ -222,10 +218,61 @@ const server = http.createServer((req, res) => {
     }
 });
 
+//-- Parsear Cookies: Convierte las cookies de la cabecera en un objeto clave-valor.
+function parseCookies(req) {
+    let list = {};
+    let cookieHeader = req.headers.cookie;  // Obtener la cabecera de cookies de la solicitud.
+
+    // Verificar si la cabecera de cookies existe.
+    if (cookieHeader) {
+        // Dividir las cookies en pares clave-valor separados por ';'.
+        cookieHeader.split(';').forEach(cookie => {
+            // Dividir cada cookie en nombre y valor.
+            let [name, ...rest] = cookie.split('=');
+            name = name.trim();     // Eliminar espacios en blanco del nombre.
+            let value = rest.join('=').trim();  // Reconstruir y limpiar el valor.
+
+            // Si el valor no está vacío, intentar decodificarlo y almacenarlo.
+            if (value) {
+                try {
+                    list[name] = decodeURIComponent(value); // Decodificar el valor de la cookie
+                } catch (e) {
+                    console.error(`Error al decodificar la cookie ${name}:`, e);
+                }
+            }
+        });
+    }
+
+    return list;
+}
+
+//-- Servir Archivos Estáticos
+function servirArchivoEstatico(req, res, cookie = {}) {
+    let filePath = path.join(PUBLIC_DIR, req.url);
+    let ext = path.extname(filePath);   // Obtener la extensión del archivo solicitado.
+    let contentType = mimeTypes[ext] || 'application/octet-stream';
+
+    // Leer el archivo solicitado desde el sistema de archivos.
+    fs.readFile(filePath, (err, data) => {
+        if (err) {
+            // Si ocurre un error (por ejemplo, el archivo no existe), mostrar un error 404.
+            error(res, 'Error 404 - Página no encontrada', cookie);
+        } else {
+            // Si el archivo se encuentra, enviar una respuesta con el contenido del archivo.
+            res.writeHead(200, { 'Content-Type': contentType });
+            res.end(data);
+        }
+    });
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////// -- Funciones para Generar Páginas de Productos -- ////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //-- Generar Página Principal
 function generarPaginaPrincipal(res, cookies = {}) {
     let usuario;
 
+    // Intentar obtener y parsear la cookie del usuario.
     try {
         usuario = cookies.usuario ? JSON.parse(cookies.usuario) : null;
     } catch (e) {
@@ -233,10 +280,13 @@ function generarPaginaPrincipal(res, cookies = {}) {
         usuario = null;
     }
 
+    // Obtener el nombre del usuario si está autenticado.
     let nombre = usuario ? usuario.nombre : null;
 
+    // Leer la base de datos de productos desde el archivo JSON.
     let tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
 
+    // Generar el contenido HTML de la página principal.
     let contenido = `<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -275,6 +325,7 @@ function generarPaginaPrincipal(res, cookies = {}) {
     <main>
         <section class="productos">`;
 
+    // Iterar sobre los productos y generar el HTML para cada uno.
     tienda.productos.forEach(producto => {
         contenido += `
             <div class="producto">
@@ -299,16 +350,21 @@ function generarPaginaPrincipal(res, cookies = {}) {
 function generarPaginaProducto(res, id, cookies = {}) {
     let usuario;
 
+    // Intentar obtener y parsear la cookie del usuario.
     try {
         usuario = cookies.usuario ? JSON.parse(cookies.usuario) : null;
     } catch (e) {
         console.error('Error al parsear la cookie usuario:', e);
         usuario = null;
     }
+
+    // Obtener el nombre del usuario si está autenticado.
     let nombre = usuario ? usuario.nombre : null;
 
+    // Leer la base de datos de productos desde el archivo JSON.
     let tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
 
+    // Buscar el producto por ID.
     let producto = tienda.productos.find(p => p.id == id);
     if (!producto) {
         res.writeHead(404, { 'Content-Type': 'text/html' });
@@ -316,6 +372,7 @@ function generarPaginaProducto(res, id, cookies = {}) {
         return;
     }
 
+    // Construir el contenido HTML de la página del producto.
     let contenido = `<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -441,18 +498,24 @@ function generarPaginaProducto(res, id, cookies = {}) {
 function generarPaginaFiltrada(res, criterio, valor, cookies = {}) {
     let usuario;
 
+    // Intentar obtener y parsear la cookie del usuario.
     try {
         usuario = cookies.usuario ? JSON.parse(cookies.usuario) : null;
     } catch (e) {
         console.error('Error al parsear la cookie usuario:', e);
         usuario = null;
     }
+
+    // Obtener el nombre del usuario si está autenticado.
     let nombre = usuario ? usuario.nombre : null;
 
+    // Leer la base de datos de productos desde el archivo JSON.
     let tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
 
+    // Filtrar los productos según el criterio y valor proporcionados.
     let productosFiltrados = tienda.productos.filter(p => p[criterio] === valor);
 
+    // Construir el contenido HTML de la página.
     let contenido = `<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -516,18 +579,25 @@ function generarPaginaFiltrada(res, criterio, valor, cookies = {}) {
     res.end(contenido);
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////// -- Funciones para Generar Páginas de Error -- ////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //-- Generar Página de Error
 function error(res, mensaje = 'Error 404 - Página no encontrada', cookies = {}) {
     let usuario;
 
+    // Intentar obtener y parsear la cookie del usuario.
     try {
         usuario = cookies.usuario ? JSON.parse(cookies.usuario) : null;
     } catch (e) {
         console.error('Error al parsear la cookie usuario:', e);
         usuario = null;
     }
+
+    // Obtener el nombre del usuario si está autenticado.
     let nombre = usuario ? usuario.nombre : null;
 
+    // Construir el contenido HTML de la página de error.
     let contenido = `<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -642,26 +712,57 @@ function productoNoEncontrado(res) {
     res.end(contenido);
 }
 
-//-- Servir Archivos Estáticos
-function servirArchivoEstatico(req, res, cookie = {}) {
-    let filePath = path.join(PUBLIC_DIR, req.url);
-    let ext = path.extname(filePath);
-    let contentType = mimeTypes[ext] || 'application/octet-stream';
-
-    fs.readFile(filePath, (err, data) => {
-        if (err) {
-            error(res, 'Error 404 - Página no encontrada', cookie); // Usar la función dinámica para el error
-        } else {
-            res.writeHead(200, { 'Content-Type': contentType });
-            res.end(data);
-        }
-    });
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////// -- Funciones para Generar Páginas de Login y registro -- ////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//-- Mostrar Formulario de Login
+function mostrarLogin(res) {
+    let contenido = `
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Login - FrikiShop</title>
+            <link rel="icon" href="/img/favicon.ico" type="image/x-icon">
+            <link rel="stylesheet" href="/css/styles_login_register.css">
+        </head>
+        <body>
+            <div class="container">
+                <header>
+                    <img src="/img/logo.png" alt="FrikiShop" class="logo">
+                    <h1>FrikiShop</h1>
+                </header>
+                <nav>
+                    <a href="index.html">Inicio</a>
+                    <a href="register">Registrarse</a>
+                </nav>
+                <main>
+                    <form action="/login" method="post" class="auth-form">
+                        <h2>Iniciar Sesión</h2>
+                        <label for="nombre">Nombre de usuario</label>
+                        <input type="text" id="nombre" name="nombre" required>
+                        
+                        <label for="password">Contraseña</label>
+                        <input type="password" id="password" name="password" required>
+                        
+                        <button type="submit">Iniciar Sesión</button>
+                    </form>
+                </main>
+            </div>
+        </body>
+        </html>
+    `;
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.end(contenido);
 }
 
 //-- Manejar Login
 function handleLogin(req, res) {
     let body = '';
+    // Escuchar los datos enviados en el cuerpo de la solicitud.
     req.on('data', chunk => { body += chunk; });
+
+    // Cuando se hayan recibido todos los datos.
     req.on('end', () => {
         let { nombre, password } = querystring.parse(body);
         let tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
@@ -739,15 +840,71 @@ function handleLogin(req, res) {
     });
 }
 
+//-- Mostrar Formulario de Registro
+function mostrarRegistro(res) {
+    let contenido = `
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Registro - FrikiShop</title>
+            <link rel="icon" href="/img/favicon.ico" type="image/x-icon">
+            <link rel="stylesheet" href="/css/styles_login_register.css">
+        </head>
+        <body>
+            <div class="container">
+                <header>
+                    <img src="/img/logo.png" alt="FrikiShop" class="logo">
+                    <h1>FrikiShop</h1>
+                </header>
+                <nav>
+                    <a href="index.html">Inicio</a>
+                    <a href="login">Log-In</a>
+                </nav>
+                <main>
+                    <form action="/register" method="post" class="auth-form">
+                        <h2>Registrarse</h2>
+                        <label for="nombreReal">Nombre real</label>
+                        <input type="text" id="nombreReal" name="nombreReal" required>
+                        
+                        <label for="nombre">Nombre de usuario</label>
+                        <input type="text" id="nombre" name="nombre" required>
+                        
+                        <label for="correo">Correo electrónico</label>
+                        <input type="correo" id="correo" name="correo" required>
+                        
+                        <label for="password">Contraseña</label>
+                        <input type="password" id="password" name="password" required>
+                        
+                        <button type="submit">Registrarse</button>
+                    </form>
+                </main>
+            </div>
+        </body>
+        </html>
+    `;
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.end(contenido);
+}
+
 //-- Manejar Registro
 function handleRegister(req, res) {
     let body = '';
+
+    // Escuchar los datos enviados en el cuerpo de la solicitud.
     req.on('data', chunk => { body += chunk; });
+
+    // Cuando se hayan recibido todos los datos.
     req.on('end', () => {
+        // Parsear los datos del formulario enviados en el cuerpo de la solicitud.
         let { nombre, nombreReal, correo, password } = querystring.parse(body);
+
+        // Leer la base de datos de usuarios desde el archivo JSON.
         let tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
 
+        // Verificar si el nombre de usuario ya existe en la base de datos.
         if (tienda.usuarios.some(u => u.nombre === nombre)) {
+            // Si el nombre de usuario ya existe, generar una página de error.
             let contenido = `
         <html lang="es">
         <head>
@@ -755,7 +912,7 @@ function handleRegister(req, res) {
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Registro - FrikiShop</title>
             <link rel="icon" href="/img/favicon.ico" type="image/x-icon">
-            <link rel="stylesheet" href="/css/login_register.css">
+            <link rel="stylesheet" href="/css/styles_login_register.css">
         </head>
         <body>
             <div class="container">
@@ -796,8 +953,11 @@ function handleRegister(req, res) {
             return;
         }
 
+        // Si el nombre de usuario no existe, agregar el nuevo usuario a la base de datos.
         tienda.usuarios.push({ nombre, nombreReal, correo, password });
-        fs.writeFileSync(RUTAS.db, JSON.stringify(tienda, null, 2));
+        fs.writeFileSync(RUTAS.db, JSON.stringify(tienda, null, 2)); // Guardar los cambios en el archivo JSON.
+
+        // Redirigir al usuario a la página de inicio de sesión.
         res.writeHead(302, { 'Location': '/login' });
         res.end();
     });
@@ -807,6 +967,7 @@ function handleRegister(req, res) {
 function handleLogout(res, cookies = {}) {
     let usuario;
 
+    // Intentar obtener y parsear la cookie del usuario.
     try {
         usuario = cookies.usuario ? JSON.parse(cookies.usuario) : null;
     } catch (e) {
@@ -814,7 +975,9 @@ function handleLogout(res, cookies = {}) {
         usuario = null;
     }
 
+    // Si el usuario está autenticado.
     if (usuario) {
+        // Leer la base de datos desde el archivo JSON.
         let tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
 
         // Buscar al usuario en la base de datos
@@ -822,6 +985,7 @@ function handleLogout(res, cookies = {}) {
         if (usuarioDB) {
             // Crear el campo carrito si no existe y guardar el carrito actual
             usuarioDB.carrito = usuario.carrito || [];
+            // Guardar los cambios en la base de datos.
             fs.writeFileSync(RUTAS.db, JSON.stringify(tienda, null, 2));
         }
     }
@@ -834,98 +998,14 @@ function handleLogout(res, cookies = {}) {
     res.end();
 }
 
-//-- Mostrar Formulario de Login
-function mostrarLogin(res) {
-    let contenido = `
-        <html lang="es">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Login - FrikiShop</title>
-            <link rel="icon" href="/img/favicon.ico" type="image/x-icon">
-            <link rel="stylesheet" href="/css/login_register.css">
-        </head>
-        <body>
-            <div class="container">
-                <header>
-                    <img src="/img/logo.png" alt="FrikiShop" class="logo">
-                    <h1>FrikiShop</h1>
-                </header>
-                <nav>
-                    <a href="index.html">Inicio</a>
-                    <a href="register">Registrarse</a>
-                </nav>
-                <main>
-                    <form action="/login" method="post" class="auth-form">
-                        <h2>Iniciar Sesión</h2>
-                        <label for="nombre">Nombre de usuario</label>
-                        <input type="text" id="nombre" name="nombre" required>
-                        
-                        <label for="password">Contraseña</label>
-                        <input type="password" id="password" name="password" required>
-                        
-                        <button type="submit">Iniciar Sesión</button>
-                    </form>
-                </main>
-            </div>
-        </body>
-        </html>
-    `;
-    res.writeHead(200, { 'Content-Type': 'text/html' });
-    res.end(contenido);
-}
-
-//-- Mostrar Formulario de Registro
-function mostrarRegistro(res) {
-    let contenido = `
-        <html lang="es">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Registro - FrikiShop</title>
-            <link rel="icon" href="/img/favicon.ico" type="image/x-icon">
-            <link rel="stylesheet" href="/css/login_register.css">
-        </head>
-        <body>
-            <div class="container">
-                <header>
-                    <img src="/img/logo.png" alt="FrikiShop" class="logo">
-                    <h1>FrikiShop</h1>
-                </header>
-                <nav>
-                    <a href="index.html">Inicio</a>
-                    <a href="login">Log-In</a>
-                </nav>
-                <main>
-                    <form action="/register" method="post" class="auth-form">
-                        <h2>Registrarse</h2>
-                        <label for="nombreReal">Nombre real</label>
-                        <input type="text" id="nombreReal" name="nombreReal" required>
-                        
-                        <label for="nombre">Nombre de usuario</label>
-                        <input type="text" id="nombre" name="nombre" required>
-                        
-                        <label for="correo">Correo electrónico</label>
-                        <input type="correo" id="correo" name="correo" required>
-                        
-                        <label for="password">Contraseña</label>
-                        <input type="password" id="password" name="password" required>
-                        
-                        <button type="submit">Registrarse</button>
-                    </form>
-                </main>
-            </div>
-        </body>
-        </html>
-    `;
-    res.writeHead(200, { 'Content-Type': 'text/html' });
-    res.end(contenido);
-}
-
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////// -- Funciones para Generar Páginas de Carrito y Compra -- ////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //-- Generar Página del Carrito
 function generarPaginaCarrito(res, cookies = {}) {
     let usuario;
 
+    // Intentar obtener y parsear la cookie del usuario.
     try {
         usuario = cookies.usuario ? JSON.parse(cookies.usuario) : null;
     } catch (e) {
@@ -935,6 +1015,7 @@ function generarPaginaCarrito(res, cookies = {}) {
         usuario = null;
     }
 
+    // Si el usuario no está autenticado, generar página de carrito vacía con mensaje de error.
     if (!usuario) {
         let contenido = `<!DOCTYPE html>
         <html lang="es">
@@ -979,6 +1060,7 @@ function generarPaginaCarrito(res, cookies = {}) {
         return;
     }
 
+    // Si el usuario está autenticado, continuar con la generación de la página del carrito.
     let carrito = usuario.carrito || [];
     let tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
 
@@ -1086,8 +1168,10 @@ function generarPaginaCarrito(res, cookies = {}) {
         return null;
     }).filter(p => p !== null); // Eliminar productos no encontrados
 
+    // Calcular el total del carrito
     let total = productosCarrito.reduce((acc, producto) => acc + producto.precio * producto.cantidad, 0);
 
+    // Generar el contenido HTML de la página del carrito
     let contenido = `<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -1183,6 +1267,7 @@ function agregarAlCarrito(req, res, idProducto, redirigir = true, cookies = {}) 
     // Inicializar el carrito como un array vacío si no existe
     let usuario;
 
+    // Intentar obtener y parsear la cookie del usuario.
     try {
         usuario = cookies.usuario ? JSON.parse(cookies.usuario) : null;
     } catch (e) {
@@ -1192,6 +1277,7 @@ function agregarAlCarrito(req, res, idProducto, redirigir = true, cookies = {}) 
         usuario = null;
     }
 
+    // Si el usuario no está autenticado, mensaje de error
     if (!usuario) {
         res.writeHead(401, { 'Content-Type': 'text/html' });
         res.end(JSON.stringify({ success: false, message: 'Debes iniciar sesión para agregar productos al carrito.' }));
@@ -1226,6 +1312,7 @@ function agregarAlCarrito(req, res, idProducto, redirigir = true, cookies = {}) 
 function modificarCarrito(req, res, idProducto, accion, cookies = {}) {
     let usuario;
 
+    // Intentar obtener y parsear la cookie del usuario.
     try {
         usuario = cookies.usuario ? JSON.parse(cookies.usuario) : null;
     } catch (e) {
@@ -1234,6 +1321,7 @@ function modificarCarrito(req, res, idProducto, accion, cookies = {}) {
         usuario = null;
     }
 
+    // Si el usuario no está autenticado, mensaje de error
     if (!usuario) {
         res.writeHead(401, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: false, message: 'Debes iniciar sesión para modificar el carrito.' }));
@@ -1243,12 +1331,14 @@ function modificarCarrito(req, res, idProducto, accion, cookies = {}) {
     let carrito = usuario.carrito || [];
     let productoEnCarrito = carrito.find(p => p.id === idProducto);
 
+    // Si el producto no está en el carrito, mensaje de error
     if (!productoEnCarrito) {
         res.writeHead(404, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: false, message: 'Producto no encontrado en el carrito.' }));
         return;
     }
 
+    // Modificar la cantidad del producto según la acción
     switch (accion) {
         case 'aumentar':
             productoEnCarrito.cantidad += 1;
@@ -1268,6 +1358,7 @@ function modificarCarrito(req, res, idProducto, accion, cookies = {}) {
             return;
     }
 
+    // Actualizar el carrito del usuario
     usuario.carrito = carrito;
     res.setHeader('Set-Cookie', `usuario=${encodeURIComponent(JSON.stringify(usuario))}; Path=/; HttpOnly`);
     res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -1278,6 +1369,7 @@ function modificarCarrito(req, res, idProducto, accion, cookies = {}) {
 function mostrarFormularioPedido(res, cookies = {}, errores = {}) {
     let usuario;
 
+    // Intentar obtener y parsear la cookie del usuario.
     try {
         usuario = cookies.usuario ? JSON.parse(cookies.usuario) : null;
     } catch (e) {
@@ -1285,11 +1377,14 @@ function mostrarFormularioPedido(res, cookies = {}, errores = {}) {
         usuario = null;
     }
 
+    // Si el usuario no está autenticado, mensaje de error
     if (!usuario) {
         error(res, 'Error 401 - Debes iniciar sesión para realizar tu pedido.', cookies);
         return;
     }
 
+    // Si el usuario está autenticado, continuar con la generación del formulario de pedido
+    // Verificar si el carrito está vacío
     let carrito = usuario.carrito || [];
     if (carrito.length === 0) {
         error(res, 'Tu carrito está vacío. ¡Añade productos para realizar tu pedido!', cookies);
@@ -1307,8 +1402,10 @@ function mostrarFormularioPedido(res, cookies = {}, errores = {}) {
         return null;
     }).filter(p => p !== null);
 
+    // Calcular el total del carrito
     let total = productosCarrito.reduce((acc, producto) => acc + producto.precio * producto.cantidad, 0);
 
+    // Generar el contenido HTML del formulario de pedido
     let nombre = usuario.nombre;
     let contenido = `<!DOCTYPE html>
 <html lang="es">
@@ -1402,11 +1499,15 @@ function mostrarFormularioPedido(res, cookies = {}, errores = {}) {
 //-- Manejar Pedido
 function procesarPedido(req, res, cookies = {}) {
     let body = '';
+    // Escuchar los datos enviados en el cuerpo de la solicitud.
     req.on('data', chunk => { body += chunk; });
+
+    // Cuando se hayan recibido todos los datos.
     req.on('end', () => {
         let { direccion, tarjeta, cvv, fechaExpiracion } = querystring.parse(body);
         let usuario = cookies.usuario ? JSON.parse(cookies.usuario) : null;
 
+        // Intentar obtener y parsear la cookie del usuario.
         if (!usuario) {
             error(res, 'Error 401 - Debes iniciar sesión para realizar tu pedido.', cookies);
             return;
@@ -1459,6 +1560,7 @@ function procesarPedido(req, res, cookies = {}) {
         // Calcular el total del pedido y simplificar los datos de los productos
         let total = 0;
         let productosSimplificados = [];
+        // Verificar el stock de cada producto
         for (let item of carrito) {
             let producto = tienda.productos.find(p => p.id == item.id);
             if (producto) {
@@ -1478,6 +1580,7 @@ function procesarPedido(req, res, cookies = {}) {
             }
         }
 
+        // Si no hay productos simplificados, mostrar error
         if (productosSimplificados.length === 0) {
             error(res, 'No se pudo procesar el pedido debido a problemas con el stock.', cookies);
             return;
@@ -1510,7 +1613,7 @@ function procesarPedido(req, res, cookies = {}) {
         res.setHeader('Set-Cookie', `usuario=${encodeURIComponent(JSON.stringify(usuario))}; Path=/; HttpOnly`);
         console.log('Carrito del usuario eliminado.');
 
-        // Confirmar el pedido al usuario
+        // Contenido de la página
         let contenido = `<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -1548,9 +1651,14 @@ function procesarPedido(req, res, cookies = {}) {
     });
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////// -- Funciones para la Lógica del Buscador -- /////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //-- Función para manejar la búsqueda de productos
 function buscarProductos(res, termino) {
     let tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
+
+    // Filtrar los productos que coinciden con el término de búsqueda
     const productos = tienda.productos.filter(producto =>
         producto.nombre.toLowerCase().includes(termino.toLowerCase())
     );
@@ -1563,25 +1671,30 @@ function buscarProductos(res, termino) {
 function generarPaginaResultados(res, termino, cookies = {}) {
     let usuario;
 
+    // Intentar obtener y parsear la cookie del usuario.
     try {
         usuario = cookies.usuario ? JSON.parse(cookies.usuario) : null;
     } catch (e) {
         console.error('Error al parsear la cookie usuario:', e);
         usuario = null;
     }
+
     let nombre = usuario ? usuario.nombre : null;
 
     let tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
+    // Filtrar los productos que coinciden con el término de búsqueda
     const productosFiltrados = tienda.productos.filter(producto =>
         producto.nombre.toLowerCase().includes(termino.toLowerCase())
     );
 
+    // Si no hay productos, redirigir a la página de error
     if (productosFiltrados.length === 0) {
         // Si no hay productos, redirigir a la página de error
         productoNoEncontrado(res);
         return;
     }
 
+    // Generar el contenido HTML de la página de resultados
     let contenido = `<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -1639,9 +1752,14 @@ function generarPaginaResultados(res, termino, cookies = {}) {
     res.end(contenido);
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////// -- Funciones para la parte Administrativa -- ////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //-- Función para verificar si el usuario es root
 function verificarRoot(cookies) {
     let usuario;
+
+    // Intentar obtener y parsear la cookie del usuario.
     try {
         usuario = cookies.usuario ? JSON.parse(cookies.usuario) : null;
     } catch (e) {
@@ -1681,6 +1799,7 @@ function mostrarPaginaRoot(res) {
     res.end(contenido);
 }
 
+//-- Función para mostrar los pedidos pendientes
 function mostrarPedidosPendientes(res) {
     const tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
     const pedidos = tienda.pedidos;
@@ -1737,6 +1856,7 @@ function mostrarPedidosPendientes(res) {
     res.end(contenido);
 }
 
+//-- Función para mostrar el formulario de nuevo producto
 function mostrarFormularioNuevoProducto(res) {
     let contenido = `<!DOCTYPE html>
 <html lang="es">
@@ -1792,12 +1912,14 @@ function mostrarFormularioNuevoProducto(res) {
     res.end(contenido);
 }
 
+//-- Función para procesar el nuevo producto
 function procesarNuevoProducto(req, res) {
     const form = new formidable.IncomingForm();
     form.multiples = true;
     form.uploadDir = path.join(PUBLIC_DIR, 'img'); // Carpeta donde se guardarán las imágenes
     form.keepExtensions = true; // Mantener las extensiones de los archivos
 
+    // Parsear el formulario
     form.parse(req, (err, fields, files) => {
         if (err) {
             console.error('Error al procesar el formulario:', err);
@@ -1866,6 +1988,7 @@ function procesarNuevoProducto(req, res) {
     });
 }
 
+//-- Función para mostrar la página de modificación de productos
 function mostrarPaginaModificarProductos(res) {
     const tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
     const productos = tienda.productos;
@@ -1938,10 +2061,14 @@ function mostrarPaginaModificarProductos(res) {
     res.end(contenido);
 }
 
+//-- Función para eliminar un producto
 function eliminarProducto(req, res, idProducto) {
     const tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
+
+    // Index del producto a eliminar
     const index = tienda.productos.findIndex(producto => producto.id === parseInt(idProducto));
 
+    // Si el producto existe, eliminarlo
     if (index !== -1) {
         tienda.productos.splice(index, 1); // Eliminar el producto
         fs.writeFileSync(RUTAS.db, JSON.stringify(tienda, null, 2));
@@ -1953,15 +2080,18 @@ function eliminarProducto(req, res, idProducto) {
     }
 }
 
+//-- Función para mostrar el formulario de edición de producto
 function mostrarFormularioEditarProducto(res, idProducto) {
     const tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
     const producto = tienda.productos.find(p => p.id === parseInt(idProducto));
 
+    // Si el producto no existe, mostrar error
     if (!producto) {
         error(res, 'Producto no encontrado');
         return;
     }
 
+    // Generar el contenido HTML del formulario de edición
     let contenido = `<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -2022,6 +2152,7 @@ function mostrarFormularioEditarProducto(res, idProducto) {
     res.end(contenido);
 }
 
+//-- Función para guardar los cambios del producto editado
 function guardarCambiosProducto(req, res, idProducto) {
     const form = new formidable.IncomingForm();
     form.multiples = true;
@@ -2030,6 +2161,7 @@ function guardarCambiosProducto(req, res, idProducto) {
     form.options.allowEmptyFiles = true; // Permitir archivos vacíos
     form.options.minFileSize = 0; // Permitir archivos de tamaño 0
 
+    // Parsear el formulario
     form.parse(req, (err, fields, files) => {
         if (err) {
             console.error('Error al procesar el formulario:', err);
@@ -2041,6 +2173,7 @@ function guardarCambiosProducto(req, res, idProducto) {
         const tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
         const producto = tienda.productos.find(p => p.id === parseInt(idProducto));
 
+        // Si el producto no existe, mostrar error
         if (!producto) {
             res.writeHead(404, { 'Content-Type': 'text/plain' });
             res.end('Producto no encontrado');
@@ -2094,6 +2227,7 @@ function guardarCambiosProducto(req, res, idProducto) {
     });
 }
 
+
 server.listen(8001, () => {
-    console.log('Servidor corriendo en http://localhost:8001');
+    console.log('🚀 Servidor en marcha en http://localhost:8001');
 });
