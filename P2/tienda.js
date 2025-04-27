@@ -259,10 +259,6 @@ function generarPaginaPrincipal(res, cookies = {}) {
             <div id="sugerencias" class="sugerencias"></div>
         </div>
         <div class="acciones">
-            <select>
-                <option>🇪🇸 ES</option>
-                <option>🇬🇧 EN</option>
-            </select>
             <a href="#">Inicio</a>
             ${usuario
             ? `<span class="usuario">👤 ${nombre}</span> <a href="/logout">Log-Out</a>`
@@ -272,7 +268,6 @@ function generarPaginaPrincipal(res, cookies = {}) {
     </header>
     
     <nav class="barra-navegacion">
-        <button class="menu">☰ Menú</button>
         <a href="/ofertas">🔥 Ofertas</a>
         <a href="/novedades">🆕 Últimas novedades</a>
     </nav>
@@ -343,10 +338,6 @@ function generarPaginaProducto(res, id, cookies = {}) {
             <div id="sugerencias" class="sugerencias"></div>
         </div>
         <div class="acciones">
-            <select>
-                <option>🇪🇸 ES</option>
-                <option>🇬🇧 EN</option>
-            </select>
             <a href="/">Inicio</a>
              ${usuario
             ? `<span class="usuario">👤 ${nombre}</span> <a href="/logout">Log-Out</a>`
@@ -355,7 +346,6 @@ function generarPaginaProducto(res, id, cookies = {}) {
         </div>
     </header>
     <nav class="barra-navegacion">
-        <button class="menu">☰ Menú</button>
         <a href="/ofertas">🔥 Ofertas</a>
         <a href="/novedades">🆕 Últimas novedades</a>
     </nav>
@@ -485,10 +475,6 @@ function generarPaginaFiltrada(res, criterio, valor, cookies = {}) {
             <div id="sugerencias" class="sugerencias"></div>
         </div>
         <div class="acciones">
-            <select>
-                <option>🇪🇸 ES</option>
-                <option>🇬🇧 EN</option>
-            </select>
             <a href="/">Inicio</a>
             ${usuario
             ? `<span class="usuario">👤 ${nombre}</span> <a href="/logout">Log-Out</a>`
@@ -498,7 +484,6 @@ function generarPaginaFiltrada(res, criterio, valor, cookies = {}) {
     </header>
 
     <nav class="barra-navegacion">
-        <button class="menu">☰ Menú</button>
         <a href="/ofertas">🔥 Ofertas</a>
         <a href="/novedades">🆕 Últimas novedades</a>
     </nav>
@@ -567,10 +552,6 @@ function error(res, mensaje = 'Error 404 - Página no encontrada', cookies = {})
             <div id="sugerencias" class="sugerencias"></div>
         </div>
         <div class="acciones">
-            <select>
-                <option>🇪🇸 ES</option>
-                <option>🇬🇧 EN</option>
-            </select>
             <a href="/">Inicio</a>
             ${usuario
             ? `<span class="usuario">👤 ${nombre}</span> <a href="/logout">Log-Out</a>`
@@ -581,7 +562,6 @@ function error(res, mensaje = 'Error 404 - Página no encontrada', cookies = {})
 
     <!-- Segunda barra -->
     <nav class="barra-navegacion">
-        <button class="menu">☰ Menú</button>
         <a href="/ofertas">🔥 Ofertas</a>
         <a href="/novedades">🆕 Últimas novedades</a>
     </nav>
@@ -632,10 +612,6 @@ function productoNoEncontrado(res) {
             <div id="sugerencias" class="sugerencias"></div>
         </div>
         <div class="acciones">
-            <select>
-                <option>🇪🇸 ES</option>
-                <option>🇬🇧 EN</option>
-            </select>
             <a href="/">Inicio</a>
             <a href="/carrito">🛒 Carrito</a>
         </div>
@@ -643,7 +619,6 @@ function productoNoEncontrado(res) {
 
     <!-- Segunda barra -->
     <nav class="barra-navegacion">
-        <button class="menu">☰ Menú</button>
         <a href="/ofertas">🔥 Ofertas</a>
         <a href="/novedades">🆕 Últimas novedades</a>
     </nav>
@@ -739,7 +714,6 @@ function handleLogin(req, res) {
                 </header>
                 <nav>
                     <a href="index.html">Inicio</a>
-                    <a href="#" id="change-language">Idioma</a>
                     <a href="register">Registrarse</a>
                 </nav>
                 <main>
@@ -791,7 +765,6 @@ function handleRegister(req, res) {
                 </header>
                 <nav>
                     <a href="index.html">Inicio</a>
-                    <a href="#" id="change-language">Idioma</a>
                     <a href="login">Log-In</a>
                 </nav>
                 <main>
@@ -880,7 +853,6 @@ function mostrarLogin(res) {
                 </header>
                 <nav>
                     <a href="index.html">Inicio</a>
-                    <a href="#" id="change-language">Idioma</a>
                     <a href="register">Registrarse</a>
                 </nav>
                 <main>
@@ -922,7 +894,6 @@ function mostrarRegistro(res) {
                 </header>
                 <nav>
                     <a href="index.html">Inicio</a>
-                    <a href="#" id="change-language">Idioma</a>
                     <a href="login">Log-In</a>
                 </nav>
                 <main>
@@ -988,10 +959,6 @@ function generarPaginaCarrito(res, cookies = {}) {
                     <div id="sugerencias" class="sugerencias"></div>
                 </div>
                 <div class="acciones">
-                    <select>
-                        <option>🇪🇸 ES</option>
-                        <option>🇬🇧 EN</option>
-                    </select>
                     <a href="/">Inicio</a>
                     <a href="/login">Log-In</a>
                     <a href="/carrito">🛒 Carrito</a>
@@ -1366,10 +1333,6 @@ function mostrarFormularioPedido(res, cookies = {}, errores = {}) {
             <div id="sugerencias" class="sugerencias"></div>
         </div>
         <div class="acciones">
-            <select>
-                <option>🇪🇸 ES</option>
-                <option>🇬🇧 EN</option>
-            </select>
             <a href="/">Inicio</a>
             ${usuario
             ? `<span class="usuario">👤 ${nombre}</span> <a href="/logout">Log-Out</a>`
@@ -1565,10 +1528,6 @@ function procesarPedido(req, res, cookies = {}) {
             <h1>FrikiShop</h1>
         </div>
         <div class="acciones">
-            <select>
-                <option>🇪🇸 ES</option>
-                <option>🇬🇧 EN</option>
-            </select>
             <a href="/">Inicio</a>
             <a href="/carrito">🛒 Carrito</a>
         </div>
@@ -1645,10 +1604,6 @@ function generarPaginaResultados(res, termino, cookies = {}) {
             <div id="sugerencias" class="sugerencias"></div>
         </div>
         <div class="acciones">
-            <select>
-                <option>🇪🇸 ES</option>
-                <option>🇬🇧 EN</option>
-            </select>
             <a href="/">Inicio</a>
             ${usuario
             ? `<span class="usuario">👤 ${nombre}</span> <a href="/logout">Log-Out</a>`
@@ -1658,7 +1613,6 @@ function generarPaginaResultados(res, termino, cookies = {}) {
     </header>
 
     <nav class="barra-navegacion">
-        <button class="menu">☰ Menú</button>
         <a href="/ofertas">🔥 Ofertas</a>
         <a href="/novedades">🆕 Últimas novedades</a>
     </nav>
