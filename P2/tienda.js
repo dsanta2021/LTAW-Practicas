@@ -131,22 +131,22 @@ const server = http.createServer((req, res) => {
         case url.startsWith('/buscar-autocompletado'):
             const queryAuto = new URLSearchParams(url.split('?')[1]);
             const terminoAuto = queryAuto.get('termino');
-            
+
             if (req.method === 'GET' && terminoAuto) {
                 buscarProductos(res, terminoAuto); // Devuelve JSON para autocompletado
             } else {
-                res.writeHead(400, { 'Content-Type': 'text/plain' });                    res.end('Solicitud inválida');
+                res.writeHead(400, { 'Content-Type': 'text/plain' }); res.end('Solicitud inválida');
             }
             break;
-            
+
         case url.startsWith('/buscar'):
             const queryBuscar = new URLSearchParams(url.split('?')[1]);
             const terminoBuscar = queryBuscar.get('termino');
-            
+
             if (req.method === 'GET' && terminoBuscar) {
                 generarPaginaResultados(res, terminoBuscar, cookies); // Genera la página de resultados
             } else {
-                res.writeHead(400, { 'Content-Type': 'text/plain' });                    res.end('Solicitud inválida');
+                res.writeHead(400, { 'Content-Type': 'text/plain' }); res.end('Solicitud inválida');
             }
             break;
 
@@ -157,7 +157,7 @@ const server = http.createServer((req, res) => {
             }
             mostrarPaginaRoot(res);
             break;
-        
+
         case url === '/admin/pedidos':
             if (!verificarRoot(cookies)) {
                 error(res, 'Acceso denegado. Solo el administrador puede acceder a esta página.', cookies);
@@ -165,7 +165,7 @@ const server = http.createServer((req, res) => {
             }
             mostrarPedidosPendientes(res);
             break;
-        
+
         case url === '/admin/nuevo-producto' && req.method === 'GET':
             if (!verificarRoot(cookies)) {
                 error(res, 'Acceso denegado. Solo el administrador puede acceder a esta página.', cookies);
@@ -173,13 +173,48 @@ const server = http.createServer((req, res) => {
             }
             mostrarFormularioNuevoProducto(res);
             break;
-        
+
         case url === '/admin/nuevo-producto' && req.method === 'POST':
             if (!verificarRoot(cookies)) {
                 error(res, 'Acceso denegado. Solo el administrador puede acceder a esta página.', cookies);
                 break;
             }
             procesarNuevoProducto(req, res);
+            break;
+
+        case url === '/admin/modificar-productos':
+            if (!verificarRoot(cookies)) {
+                error(res, 'Acceso denegado. Solo el administrador puede acceder a esta página.', cookies);
+                break;
+            }
+            mostrarPaginaModificarProductos(res);
+            break;
+
+        case url.startsWith('/admin/eliminar-producto/') && req.method === 'POST':
+            if (!verificarRoot(cookies)) {
+                error(res, 'Acceso denegado. Solo el administrador puede acceder a esta página.', cookies);
+                break;
+            }
+            const idEliminar = url.split('/').pop();
+            eliminarProducto(req, res, idEliminar);
+            break;
+
+        case url.startsWith('/admin/editar-producto/') && req.method === 'GET':
+            if (!verificarRoot(cookies)) {
+                error(res, 'Acceso denegado. Solo el administrador puede acceder a esta página.', cookies);
+                break;
+            }
+            const idEditar = url.split('/').pop();
+            mostrarFormularioEditarProducto(res, idEditar);
+            break;
+
+        case url.startsWith('/admin/editar-producto/') && req.method === 'POST':
+            if (!verificarRoot(cookies)) {
+                error(res, 'Acceso denegado. Solo el administrador puede acceder a esta página.', cookies);
+                break;
+            }
+            const idGuardar = url.split('/').pop();
+            guardarCambiosProducto(req, res, idGuardar);
             break;
 
         default:
@@ -335,8 +370,8 @@ function generarPaginaProducto(res, id, cookies = {}) {
             <p><span>Stock disponible:</span> ${producto.stock}</p>
             <h3><span class="precio">${producto.precio} €</span></h3>
             ${producto.stock > 0
-                ? `<button class="btn-comprar" onclick="añadirAlCarrito('${producto.id}')">Agregar al carrito</button>`
-                : `<button class="btn-comprar sin-stock" disabled>Sin stock</button>`}
+            ? `<button class="btn-comprar" onclick="añadirAlCarrito('${producto.id}')">Agregar al carrito</button>`
+            : `<button class="btn-comprar sin-stock" disabled>Sin stock</button>`}
             <button class="btn-inicio"><a href="/">Home</a></button>
         </section>
     </main>
@@ -980,7 +1015,7 @@ function generarPaginaCarrito(res, cookies = {}) {
     let carrito = usuario.carrito || [];
     let tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
 
-    let nombre =  usuario.nombre;
+    let nombre = usuario.nombre;
     // Si el carrito está vacío, mostrar el mensaje y el botón
     if (carrito.length === 0) {
         let contenido = `<!DOCTYPE html>
@@ -1012,8 +1047,8 @@ function generarPaginaCarrito(res, cookies = {}) {
                 </select>
                 <a href="/">Inicio</a>
                 ${usuario
-                    ? `<span class="usuario">👤 ${nombre}</span> <a href="/logout">Log-Out</a>`
-                    : `<a href="/login">Log-In</a>`}
+                ? `<span class="usuario">👤 ${nombre}</span> <a href="/logout">Log-Out</a>`
+                : `<a href="/login">Log-In</a>`}
                 <a href="/carrito">🛒 Carrito</a>
             </div>
         </header>
@@ -1115,8 +1150,8 @@ function generarPaginaCarrito(res, cookies = {}) {
             </select>
             <a href="/">Inicio</a>
             ${usuario
-                ? `<span class="usuario">👤 ${nombre}</span> <a href="/logout">Log-Out</a>`
-                : `<a href="/login">Log-In</a>`}
+            ? `<span class="usuario">👤 ${nombre}</span> <a href="/logout">Log-Out</a>`
+            : `<a href="/login">Log-In</a>`}
             <a href="/carrito">🛒 Carrito</a>
         </div>
     </header>
@@ -1307,7 +1342,7 @@ function mostrarFormularioPedido(res, cookies = {}, errores = {}) {
 
     let total = productosCarrito.reduce((acc, producto) => acc + producto.precio * producto.cantidad, 0);
 
-    let nombre =  usuario.nombre;
+    let nombre = usuario.nombre;
     let contenido = `<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -1448,7 +1483,7 @@ function procesarPedido(req, res, cookies = {}) {
         if (Object.keys(errores).length > 0) {
             return mostrarFormularioPedido(res, cookies, errores);
         }
-        
+
         // Validar que el carrito no esté vacío
         let carrito = usuario.carrito || [];
         if (carrito.length === 0) {
@@ -1673,7 +1708,6 @@ function mostrarPaginaRoot(res) {
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="/css/styles_root.css">
     <link rel="icon" href="img/favicon.ico" type="image/x-icon">
-    <script defer src="js/script.js"></script>
 </head>
 <body>
     <header>
@@ -1706,11 +1740,12 @@ function mostrarPedidosPendientes(res) {
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="/css/styles_lista_pedidos.css">
     <link rel="icon" href="img/favicon.ico" type="image/x-icon">
-    <script defer src="js/script.js"></script>
 </head>
 <body>
     <header>
+        <a href="/admin" class="btn-volver">Home</a>
         <h1>Pedidos Pendientes</h1>
+        <a href="/logout" class="btn-logout">Cerrar Sesión</a>
     </header>
     <main>
         <table>
@@ -1758,11 +1793,12 @@ function mostrarFormularioNuevoProducto(res) {
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="/css/styles_new_product.css">
     <link rel="icon" href="img/favicon.ico" type="image/x-icon">
-    <script defer src="js/script.js"></script>
 </head>
 <body>
     <header>
+        <a href="/admin" class="btn-volver">Home</a>
         <h1>Añadir Nuevo Producto</h1>
+        <a href="/logout" class="btn-logout">Cerrar Sesión</a>
     </header>
     <main>
         <form action="/admin/nuevo-producto" method="POST" enctype="multipart/form-data">
@@ -1872,6 +1908,224 @@ function procesarNuevoProducto(req, res) {
         fs.writeFileSync(RUTAS.db, JSON.stringify(tienda, null, 2));
 
         res.writeHead(302, { Location: '/admin' });
+        res.end();
+    });
+}
+
+function mostrarPaginaModificarProductos(res) {
+    const tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
+    const productos = tienda.productos;
+
+    let contenido = `<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modificar Productos</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/styles_modificar_productos.css">
+    <link rel="icon" href="img/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <header>
+        <a href="/admin" class="btn-volver">Home</a>
+        <h1>Modificar Productos</h1>
+        <a href="/logout" class="btn-logout">Cerrar Sesión</a>
+    </header>
+    <main>
+        <table>
+            <thead>
+                <tr>
+                    <th>Imagen</th>
+                    <th>Nombre</th>
+                    <th>Mini Descripción</th>
+                    <th>Stock</th>
+                    <th>Precio</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${productos.map(producto => `
+                    <tr>
+                        <td><img src="/img/${producto.imagen[0]}" alt="${producto.nombre}" class="producto-imagen"></td>
+                        <td>${producto.nombre}</td>
+                        <td>${producto.miniDescripcion}</td>
+                        <td>${producto.stock}</td>
+                        <td>${producto.precio.toFixed(2)} €</td>
+                        <td>
+                            <button class="btn-eliminar" onclick="eliminarProducto(${producto.id})">❌</button>
+                            <button class="btn-editar" onclick="location.href='/admin/editar-producto/${producto.id}'">✏️</button>
+                        </td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+        <button class="btn-agregar" onclick="location.href='/admin/nuevo-producto'">➕ Añadir Producto</button>
+    </main>
+    <script>
+        function eliminarProducto(id) {
+            if (confirm('¿Estás seguro de que deseas eliminar este producto?')) {
+                fetch('/admin/eliminar-producto/' + id, { method: 'POST' })
+                    .then(response => {
+                        if (response.ok) {
+                            alert('Producto eliminado correctamente');
+                            location.reload();
+                        } else {
+                            alert('Error al eliminar el producto');
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+        }
+    </script>
+</body>
+</html>`;
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.end(contenido);
+}
+
+function eliminarProducto(req, res, idProducto) {
+    const tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
+    const index = tienda.productos.findIndex(producto => producto.id === parseInt(idProducto));
+
+    if (index !== -1) {
+        tienda.productos.splice(index, 1); // Eliminar el producto
+        fs.writeFileSync(RUTAS.db, JSON.stringify(tienda, null, 2));
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, message: 'Producto eliminado correctamente' }));
+    } else {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, message: 'Producto no encontrado' }));
+    }
+}
+
+function mostrarFormularioEditarProducto(res, idProducto) {
+    const tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
+    const producto = tienda.productos.find(p => p.id === parseInt(idProducto));
+
+    if (!producto) {
+        error(res, 'Producto no encontrado');
+        return;
+    }
+
+    let contenido = `<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Producto</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/styles_editar_producto.css">
+    <link rel="icon" href="img/favicon.ico" type="image/x-icon">
+
+    <script>
+        function confirmarCambios() {
+            return confirm('¿Estás seguro de que deseas guardar los cambios?');
+        }
+
+        function confirmarCancelar() {
+            return confirm('¿Estás seguro de que deseas cancelar? Los cambios no guardados se perderán.');
+        }
+    </script>
+
+</head>
+<body>
+    <header>
+        <h1>Editar Producto</h1>
+    </header>
+    <main>
+        <form action="/admin/editar-producto/${producto.id}" method="POST" enctype="multipart/form-data" onsubmit="return confirmarCambios()">
+            <label for="nombre">Nombre:</label>
+            <input type="text" id="nombre" name="nombre" value="${producto.nombre}" required>
+            
+            <label for="miniDescripcion">Mini Descripción:</label>
+            <input type="text" id="miniDescripcion" name="miniDescripcion" value="${producto.miniDescripcion}" required>
+            
+            <label for="description">Descripción:</label>
+            <textarea id="description" name="description" required>${producto.description[0]}</textarea>
+            
+            <label for="size">Tamaño:</label>
+            <input type="text" id="size" name="size" value="${producto.description[1] || ''}">
+            
+            <label for="precio">Precio:</label>
+            <input type="number" id="precio" name="precio" step="0.01" value="${producto.precio}" required>
+            
+            <label for="stock">Stock:</label>
+            <input type="number" id="stock" name="stock" value="${producto.stock}" required>
+            
+            <label for="imagen">Imágenes:</label>
+            <input type="file" id="imagen" name="imagen" multiple>
+            
+            <div class="form-buttons">
+                <button type="submit">Guardar Cambios</button>
+                <button type="button" class="btn-cancelar" onclick="if(confirmarCancelar()) location.href='/admin/modificar-productos';">Cancelar</button>
+            </div>
+        </form>
+    </main>
+</body>
+</html>`;
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.end(contenido);
+}
+
+function guardarCambiosProducto(req, res, idProducto) {
+    const form = new formidable.IncomingForm();
+    form.multiples = true;
+    form.uploadDir = path.join(PUBLIC_DIR, 'img');
+    form.keepExtensions = true;
+    form.options.allowEmptyFiles = true; // Permitir archivos vacíos
+    form.options.minFileSize = 0; // Permitir archivos de tamaño 0
+
+    form.parse(req, (err, fields, files) => {
+        if (err) {
+            console.error('Error al procesar el formulario:', err);
+            res.writeHead(500, { 'Content-Type': 'text/plain' });
+            res.end('Error al procesar el formulario');
+            return;
+        }
+
+        const tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
+        const producto = tienda.productos.find(p => p.id === parseInt(idProducto));
+
+        if (!producto) {
+            res.writeHead(404, { 'Content-Type': 'text/plain' });
+            res.end('Producto no encontrado');
+            return;
+        }
+
+        // Actualizar los campos del producto
+        producto.nombre = Array.isArray(fields.nombre) ? fields.nombre[0].trim() : fields.nombre.trim();
+        producto.miniDescripcion = Array.isArray(fields.miniDescripcion) ? fields.miniDescripcion[0].trim() : fields.miniDescripcion.trim();
+        producto.description = [
+            Array.isArray(fields.description) ? fields.description[0].trim() : fields.description.trim(),
+            Array.isArray(fields.size) ? fields.size[0].trim() : fields.size.trim()
+        ];
+        producto.precio = parseFloat(fields.precio);
+        producto.stock = parseInt(fields.stock);
+
+        // Procesar imágenes si se subieron nuevas
+        if (files.imagen && files.imagen.size > 0) {
+            const imagenes = [];
+            if (Array.isArray(files.imagen)) {
+                files.imagen.forEach(file => {
+                    const nuevoNombre = `${Date.now()}_${file.originalFilename}`;
+                    const nuevaRuta = path.join(form.uploadDir, nuevoNombre);
+                    fs.renameSync(file.filepath, nuevaRuta);
+                    imagenes.push(nuevoNombre);
+                });
+            } else {
+                const nuevoNombre = `${Date.now()}_${files.imagen.originalFilename}`;
+                const nuevaRuta = path.join(form.uploadDir, nuevoNombre);
+                fs.renameSync(files.imagen.filepath, nuevaRuta);
+                imagenes.push(nuevoNombre);
+            }
+            producto.imagen = imagenes;
+        }
+
+        // Guardar los cambios en la base de datos
+        fs.writeFileSync(RUTAS.db, JSON.stringify(tienda, null, 2));
+
+        res.writeHead(302, { Location: '/admin/modificar-productos' });
         res.end();
     });
 }

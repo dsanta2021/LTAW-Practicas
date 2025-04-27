@@ -1,0 +1,114 @@
+/* General */
+body {
+    font-family: 'Press Start 2P', cursive;
+    background-color: #222;
+    color: #fff;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    text-align: center;
+    padding: 20px;
+    background-color: #333;
+    color: #fff;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 24px;
+}
+
+/* Formulario */
+form {
+    width: 80%;
+    margin: 20px auto;
+    background-color: #333;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+form label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #fff;
+}
+
+form input, form textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #555;
+    border-radius: 5px;
+    background-color: #444;
+    color: #fff;
+    font-size: 14px;
+}
+
+form textarea {
+    resize: none;
+    height: 100px;
+}
+
+form button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    background-color: #00ccff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+}
+
+form button:hover {
+    background-color: #0099cc;
+}
+
+/* Imágenes */
+form input[type="file"] {
+    padding: 5px;
+    background-color: #444;
+    color: #fff;
+    border: 1px solid #555;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Botones del formulario */
+.form-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button[type="submit"] {
+    background-color: #00ccff; /* Azul */
+    color: #fff;
+}
+
+button[type="submit"]:hover {
+    background-color: #0099cc;
+}
+
+.btn-cancelar {
+    background-color: #f44336; /* Rojo */
+    color: #fff;
+}
+
+.btn-cancelar:hover {
+    background-color: #d32f2f;
+    box-shadow: 0 0 10px #f44336;
+}

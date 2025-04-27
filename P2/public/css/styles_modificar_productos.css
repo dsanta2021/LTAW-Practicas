@@ -1,0 +1,136 @@
+/* General */
+body {
+    font-family: 'Press Start 2P', cursive;
+    background-color: #222;
+    color: #fff;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: #333;
+    color: #fff;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 24px;
+    text-align: center;
+    flex-grow: 1;
+}
+
+
+/* Botones de navegación */
+.btn-volver {
+    background-color: #4caf50; 
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 14px;
+    position: absolute;
+    top: 20px;
+    left: 20px;
+}
+
+.btn-volver:hover {
+    background-color: #388e3c; 
+    box-shadow: 0 0 10px #4caf50;
+}
+
+.btn-logout {
+    background-color: #f44336; 
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 14px;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+.btn-logout:hover {
+    background-color: #d32f2f; 
+    box-shadow: 0 0 10px #f44336;
+}
+
+/* Tabla de productos */
+table {
+    width: 90%;
+    margin: 20px auto;
+    border-collapse: collapse;
+    background-color: #333;
+    color: #fff;
+    text-align: left;
+}
+
+thead {
+    background-color: #444;
+}
+
+th, td {
+    padding: 10px;
+    border: 1px solid #555;
+}
+
+th {
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+td img {
+    width: 80px;
+    height: auto;
+    border-radius: 5px;
+}
+
+td button {
+    background-color: #f44336;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+td button:hover {
+    background-color: #d32f2f;
+}
+
+.btn-editar {
+    background-color: #00ccff;
+    margin-left: 5px;
+}
+
+.btn-editar:hover {
+    background-color: #0099cc;
+}
+
+/* Botón para añadir productos */
+.btn-agregar {
+    display: block;
+    margin: 20px auto;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #00ccff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+}
+
+.btn-agregar:hover {
+    background-color: #0099cc;
+}

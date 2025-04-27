@@ -66,3 +66,42 @@ form button:hover {
     background-color: #0099cc; /* Azul más oscuro */
     box-shadow: 0px 0px 15px #00ccff;
 }
+
+/* Botones de navegación */
+.btn-volver {
+    background-color: #4caf50; 
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 14px;
+    position: absolute;
+    top: 20px;
+    left: 20px;
+}
+
+.btn-volver:hover {
+    background-color: #388e3c; 
+    box-shadow: 0 0 10px #4caf50;
+}
+
+.btn-logout {
+    background-color: #f44336; 
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 14px;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+.btn-logout:hover {
+    background-color: #d32f2f; 
+    box-shadow: 0 0 10px #f44336;
+}
