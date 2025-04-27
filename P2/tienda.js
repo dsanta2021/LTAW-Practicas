@@ -704,7 +704,7 @@ function handleLogin(req, res) {
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Login - FrikiShop</title>
             <link rel="icon" href="/img/favicon.ico" type="image/x-icon">
-            <link rel="stylesheet" href="/css/login_register.css">
+            <link rel="stylesheet" href="/css/styles_login_register.css">
         </head>
         <body>
             <div class="container">
@@ -1317,7 +1317,7 @@ function mostrarFormularioPedido(res, cookies = {}, errores = {}) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Finalizar Pedido - FrikiShop</title>
     <link rel="stylesheet" href="/css/styles.css">
-    <link rel="stylesheet" href="/css/finalizar_pedido.css">
+    <link rel="stylesheet" href="/css/styles_finalizar_pedido.css">
     <link rel="icon" href="img/favicon.ico" type="image/x-icon">
     <script defer src="js/script.js"></script>
 </head>
