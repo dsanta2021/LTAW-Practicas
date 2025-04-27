@@ -183,6 +183,17 @@
         "producto9_1.jpg",
         "producto9_2.jpg"
       ]
+    },
+    {
+      "id": 10,
+      "nombre": "LTAW",
+      "miniDescripcion": "Prueba",
+      "Oferta": "No",
+      "Novedad": "No",
+      "description": "",
+      "precio": 0,
+      "stock": 11,
+      "imagen": []
     }
   ],
   "pedidos": [

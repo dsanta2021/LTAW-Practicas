@@ -3,7 +3,10 @@ const fs = require('fs');
 const path = require('path');
 const url = require('url');
 const querystring = require('querystring');
+
+//-- Módulos nuevos que hay que explicar en la documentación
 const validator = require('validator');
+const formidable = require('formidable');
 
 //-- Rutas
 const PUBLIC_DIR = path.join(__dirname, 'public');
@@ -1777,15 +1780,15 @@ function mostrarFormularioNuevoProducto(res) {
             
             <label for="description">Descripción:</label>
             <textarea id="description" name="description" required></textarea>
-            
+
             <label for="precio">Precio:</label>
             <input type="number" id="precio" name="precio" step="0.01" required>
             
             <label for="stock">Stock:</label>
             <input type="number" id="stock" name="stock" required>
             
-            <label for="imagen">Imágenes (separadas por comas):</label>
-            <input type="text" id="imagen" name="imagen" required>
+            <label for="imagen">Imágenes:</label>
+            <input type="file" id="imagen" name="imagen" multiple required>
             
             <button type="submit">Añadir Producto</button>
         </form>
@@ -1797,26 +1800,64 @@ function mostrarFormularioNuevoProducto(res) {
 }
 
 function procesarNuevoProducto(req, res) {
-    let body = '';
-    req.on('data', chunk => { body += chunk; });
-    req.on('end', () => {
-        const nuevoProducto = querystring.parse(body);
+    const form = new formidable.IncomingForm();
+    form.multiples = true;
+    form.uploadDir = path.join(PUBLIC_DIR, 'img'); // Carpeta donde se guardarán las imágenes
+    form.keepExtensions = true; // Mantener las extensiones de los archivos
+
+    form.parse(req, (err, fields, files) => {
+        if (err) {
+            console.error('Error al procesar el formulario:', err);
+            res.writeHead(500, { 'Content-Type': 'text/plain' });
+            res.end('Error al procesar el formulario');
+            return;
+        }
+
         const tienda = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
 
         // Generar un nuevo ID
         const nuevoId = tienda.productos.length > 0 ? tienda.productos[tienda.productos.length - 1].id + 1 : 1;
 
+        // Verificar y procesar los campos
+        const nombre = Array.isArray(fields.nombre) ? fields.nombre[0] : fields.nombre;
+        const miniDescripcion = Array.isArray(fields.miniDescripcion) ? fields.miniDescripcion[0] : fields.miniDescripcion;
+        const oferta = Array.isArray(fields.oferta) ? fields.oferta[0] : fields.oferta;
+        const novedad = Array.isArray(fields.novedad) ? fields.novedad[0] : fields.novedad;
+        let description = fields.description;
+
+        if (typeof description !== 'string') {
+            description = ''; // Asignar un valor predeterminado si no es una cadena
+        } else {
+            description = description.split('\n'); // Dividir en líneas si es una cadena
+        }
+
+        // Procesar las imágenes subidas
+        const imagenes = [];
+        if (Array.isArray(files.imagen)) {
+            files.imagen.forEach(file => {
+                const nuevoNombre = `${Date.now()}_${file.name}`;
+                const nuevaRuta = path.join(form.uploadDir, nuevoNombre);
+                fs.renameSync(file.path, nuevaRuta); // Mover el archivo a la carpeta final
+                imagenes.push(nuevoNombre);
+            });
+        } else if (files.imagen) {
+            const nuevoNombre = `${Date.now()}_${files.imagen.name}`;
+            const nuevaRuta = path.join(form.uploadDir, nuevoNombre);
+            fs.renameSync(files.imagen.path, nuevaRuta);
+            imagenes.push(nuevoNombre);
+        }
+
         // Crear el nuevo producto
         const producto = {
             id: nuevoId,
-            nombre: nuevoProducto.nombre,
-            miniDescripcion: nuevoProducto.miniDescripcion,
-            Oferta: nuevoProducto.oferta,
-            Novedad: nuevoProducto.novedad,
-            description: nuevoProducto.description.split('\n'),
-            precio: parseFloat(nuevoProducto.precio),
-            stock: parseInt(nuevoProducto.stock),
-            imagen: nuevoProducto.imagen.split(',')
+            nombre: nombre.trim(),
+            miniDescripcion: miniDescripcion.trim(),
+            Oferta: oferta.trim(),
+            Novedad: novedad.trim(),
+            description: description,
+            precio: parseFloat(fields.precio),
+            stock: parseInt(fields.stock),
+            imagen: imagenes
         };
 
         // Guardar el producto en la base de datos
