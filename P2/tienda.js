@@ -331,7 +331,7 @@ function generarPaginaProducto(res, id, cookies = {}) {
     <main class="producto-container">
         <section class="detalles-producto">
             <h3><span>${producto.description[0]}</span></h3>
-            <p><span>Tamaño:</span> ${producto.description[1]}</p>
+            ${producto.description[1] ? `<p><strong>Tamaño:</strong> ${producto.description[1]}</p>` : ''}
             <p><span>Stock disponible:</span> ${producto.stock}</p>
             <h3><span class="precio">${producto.precio} €</span></h3>
             ${producto.stock > 0
@@ -1765,7 +1765,7 @@ function mostrarFormularioNuevoProducto(res) {
         <h1>Añadir Nuevo Producto</h1>
     </header>
     <main>
-        <form action="/admin/nuevo-producto" method="POST">
+        <form action="/admin/nuevo-producto" method="POST" enctype="multipart/form-data">
             <label for="nombre">Nombre:</label>
             <input type="text" id="nombre" name="nombre" required>
             
@@ -1780,6 +1780,9 @@ function mostrarFormularioNuevoProducto(res) {
             
             <label for="description">Descripción:</label>
             <textarea id="description" name="description" required></textarea>
+
+            <label for="size">Tamaño:</label>
+            <input type="text" id="size" name="size" placeholder="Ejemplo: 10l. x 10an. x 15al. cm">
 
             <label for="precio">Precio:</label>
             <input type="number" id="precio" name="precio" step="0.01" required>
@@ -1823,27 +1826,31 @@ function procesarNuevoProducto(req, res) {
         const miniDescripcion = Array.isArray(fields.miniDescripcion) ? fields.miniDescripcion[0] : fields.miniDescripcion;
         const oferta = Array.isArray(fields.oferta) ? fields.oferta[0] : fields.oferta;
         const novedad = Array.isArray(fields.novedad) ? fields.novedad[0] : fields.novedad;
-        let description = fields.description;
-
-        if (typeof description !== 'string') {
+        const size = Array.isArray(fields.size) ? fields.size[0] : fields.size;
+        let description = Array.isArray(fields.description) ? fields.description[0] : fields.description;
+        if (typeof description.trim() !== 'string') {
             description = ''; // Asignar un valor predeterminado si no es una cadena
-        } else {
-            description = description.split('\n'); // Dividir en líneas si es una cadena
+        }
+
+        // Combinar descripción y tamaño
+        const descriptionArray = [description.trim()];
+        if (size && typeof size === 'string' && size.trim() !== '') {
+            descriptionArray.push(size.trim());
         }
 
         // Procesar las imágenes subidas
         const imagenes = [];
         if (Array.isArray(files.imagen)) {
             files.imagen.forEach(file => {
-                const nuevoNombre = `${Date.now()}_${file.name}`;
+                const nuevoNombre = `${Date.now()}_${file.originalFilename}`;
                 const nuevaRuta = path.join(form.uploadDir, nuevoNombre);
-                fs.renameSync(file.path, nuevaRuta); // Mover el archivo a la carpeta final
+                fs.renameSync(file.filepath, nuevaRuta); // Mover el archivo a la carpeta final
                 imagenes.push(nuevoNombre);
             });
         } else if (files.imagen) {
-            const nuevoNombre = `${Date.now()}_${files.imagen.name}`;
+            const nuevoNombre = `${Date.now()}_${files.imagen.originalFilename}`;
             const nuevaRuta = path.join(form.uploadDir, nuevoNombre);
-            fs.renameSync(files.imagen.path, nuevaRuta);
+            fs.renameSync(files.imagen.filepath, nuevaRuta);
             imagenes.push(nuevoNombre);
         }
 
@@ -1854,7 +1861,7 @@ function procesarNuevoProducto(req, res) {
             miniDescripcion: miniDescripcion.trim(),
             Oferta: oferta.trim(),
             Novedad: novedad.trim(),
-            description: description,
+            description: descriptionArray,
             precio: parseFloat(fields.precio),
             stock: parseInt(fields.stock),
             imagen: imagenes
