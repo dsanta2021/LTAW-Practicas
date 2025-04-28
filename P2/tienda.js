@@ -367,8 +367,7 @@ function generarPaginaProducto(res, id, cookies = {}) {
     // Buscar el producto por ID.
     let producto = tienda.productos.find(p => p.id == id);
     if (!producto) {
-        res.writeHead(404, { 'Content-Type': 'text/html' });
-        res.end(fs.readFileSync(RUTAS.sin_producto));
+        productoNoEncontrado(res); // Si no se encuentra el producto, mostrar error.
         return;
     }
 
