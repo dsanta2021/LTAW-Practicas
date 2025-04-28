@@ -9,8 +9,8 @@ const formidable = require('formidable');
 //-- Rutas
 const PUBLIC_DIR = path.join(__dirname, 'public');
 const RUTAS = {
-    error: path.join(PUBLIC_DIR, 'error.html'),
-    sin_producto: path.join(PUBLIC_DIR, 'producto_no_encontrado.html'),
+    //error: path.join(PUBLIC_DIR, 'error.html'),
+    //sin_producto: path.join(PUBLIC_DIR, 'producto_no_encontrado.html'),
     db: path.join(PUBLIC_DIR, 'json', 'tienda.json')
 };
 
@@ -381,6 +381,7 @@ function generarPaginaProducto(res, id, cookies = {}) {
     <title>${producto.nombre}</title>
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="/css/styles_products.css">
+    <link rel="icon" href="img/favicon.ico" type="image/x-icon">
     <script defer src="/js/script.js"></script>
 </head>
 <body>
@@ -1090,10 +1091,6 @@ function generarPaginaCarrito(res, cookies = {}) {
                 <div id="sugerencias" class="sugerencias"></div>
             </div>
             <div class="acciones">
-                <select>
-                    <option>🇪🇸 ES</option>
-                    <option>🇬🇧 EN</option>
-                </select>
                 <a href="/">Inicio</a>
                 ${usuario
                 ? `<span class="usuario">👤 ${nombre}</span> <a href="/logout">Log-Out</a>`
@@ -1195,10 +1192,6 @@ function generarPaginaCarrito(res, cookies = {}) {
             <div id="sugerencias" class="sugerencias"></div>
         </div>
         <div class="acciones">
-            <select>
-                <option>🇪🇸 ES</option>
-                <option>🇬🇧 EN</option>
-            </select>
             <a href="/">Inicio</a>
             ${usuario
             ? `<span class="usuario">👤 ${nombre}</span> <a href="/logout">Log-Out</a>`
@@ -1632,6 +1625,9 @@ function procesarPedido(req, res, cookies = {}) {
         </div>
         <div class="acciones">
             <a href="/">Inicio</a>
+            ${usuario
+            ? `<span class="usuario">👤 ${usuario.nombre}</span> <a href="/logout">Log-Out</a>`
+            : `<a href="/login">Log-In</a>`}
             <a href="/carrito">🛒 Carrito</a>
         </div>
     </header>
