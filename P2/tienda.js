@@ -9,8 +9,6 @@ const formidable = require('formidable');
 //-- Rutas
 const PUBLIC_DIR = path.join(__dirname, 'public');
 const RUTAS = {
-    //error: path.join(PUBLIC_DIR, 'error.html'),
-    //sin_producto: path.join(PUBLIC_DIR, 'producto_no_encontrado.html'),
     db: path.join(PUBLIC_DIR, 'json', 'tienda.json')
 };
 
