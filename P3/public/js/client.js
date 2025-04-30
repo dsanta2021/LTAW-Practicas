@@ -5,19 +5,24 @@ const msg_entry = document.getElementById("msg_entry");
 //-- Crear un websocket. Se establece la conexión con el servidor
 const socket = io();
 
+//-- Usar el nombre de usuario desde window.username
+if (window.username) {
+  socket.emit("setUsername", window.username); // Enviar el nombre de usuario al servidor
+} else {
+  console.error("No se proporcionó un nombre de usuario.");
+}
+
 //-- Recibir mensajes del servidor
 socket.on("message", (msg) => {
   display.innerHTML += `<p class="message other">${msg}</p>`;
   display.scrollTop = display.scrollHeight; // Desplazar hacia abajo automáticamente
 });
 
-//-- Recibir mensajes del servidor
 socket.on("serverMessage", (msg) => {
   display.innerHTML += `<p class="message server">${msg}</p>`;
   display.scrollTop = display.scrollHeight; // Desplazar hacia abajo automáticamente
 });
 
-//-- Recibir mensajes propios
 socket.on("ownMessage", (msg) => {
   display.innerHTML += `<p class="message own">${msg}</p>`;
   display.scrollTop = display.scrollHeight; // Desplazar hacia abajo automáticamente
