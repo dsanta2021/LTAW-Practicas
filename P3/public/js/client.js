@@ -1,6 +1,6 @@
 //-- Elementos del interfaz
-const display = document.getElementById("display");
-const msg_entry = document.getElementById("msg_entry");
+const display = document.getElementById("chatDisplay"); // Zona de mensajes
+const msg_entry = document.getElementById("msgEntry"); // Entrada de texto
 
 //-- Crear un websocket. Se establece la conexión con el servidor
 const socket = io();
@@ -12,20 +12,25 @@ if (window.username) {
   console.error("No se proporcionó un nombre de usuario.");
 }
 
+//-- Función para hacer scroll al último mensaje
+function scrollToBottom() {
+  display.scrollTop = display.scrollHeight;
+}
+
 //-- Recibir mensajes del servidor
 socket.on("message", (msg) => {
   display.innerHTML += `<p class="message other">${msg}</p>`;
-  display.scrollTop = display.scrollHeight; // Desplazar hacia abajo automáticamente
+  scrollToBottom(); // Desplazar hacia el último mensaje
 });
 
 socket.on("serverMessage", (msg) => {
   display.innerHTML += `<p class="message server">${msg}</p>`;
-  display.scrollTop = display.scrollHeight; // Desplazar hacia abajo automáticamente
+  scrollToBottom(); // Desplazar hacia el último mensaje
 });
 
 socket.on("ownMessage", (msg) => {
   display.innerHTML += `<p class="message own">${msg}</p>`;
-  display.scrollTop = display.scrollHeight; // Desplazar hacia abajo automáticamente
+  scrollToBottom(); // Desplazar hacia el último mensaje
 });
 
 //-- Al apretar Enter en el campo de entrada, se envía un mensaje al servidor

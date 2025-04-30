@@ -1,45 +1,55 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat</title>
-    <link rel="stylesheet" href="css/styles_chat.css">
-
-    <!-- Cargar la biblioteca Socket.IO. Nos la debe entregar el servidor -->
-    <script src="/socket.io/socket.io.js"></script>
-
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat Galáctico</title>
+  <link rel="stylesheet" href="css/styles_chat.css">
+  <script src="/socket.io/socket.io.js"></script>
 </head>
-
 <body>
-    <div id="userMenu">
-        <span id="usernameDisplay"></span>
-        <div id="dropdown">
-            <button id="logoutButton">Cerrar sesión</button>
-        </div>
+  <div id="app">
+    <div id="menuTop">
+      <span id="usernameDisplay"></span>
+      <button id="logoutButton">Cerrar sesión</button>
     </div>
-    <h2>Chat en Tiempo Real</h2>
-    <div id="display"></div>
-    <input type="text" placeholder="Escribe aquí los mensajes y presiona Enter..." autocomplete="off" id="msg_entry">
 
-    <!-- Definir el nombre de usuario antes de cargar client.js -->
-    <script>
-        // Obtener el nombre de usuario de la URL
-        const params = new URLSearchParams(window.location.search);
-        const username = params.get('username');
+    <div id="chatWindow">
+      <div id="sidebar">
+        <!-- Aquí irían los usuarios o las conversaciones -->
+        <h3>Chats</h3>
+        <ul id="chatList">
+          <!-- Lista de chats -->
+        </ul>
+      </div>
 
-        if (!username) {
-            alert('No se proporcionó un nombre de usuario. Redirigiendo...');
-            window.location.href = '/';
-        } else {
-            document.getElementById('usernameDisplay').textContent = username;
-            window.username = username; // Definir el nombre de usuario en window
-        }
-    </script>
+      <div id="chatArea">
+        <div id="chatDisplay">
+          <!-- Aquí se mostrarán los mensajes -->
+        </div>
+        
+        <div id="inputArea">
+          <input type="text" id="msgEntry" placeholder="Escribe tu mensaje..." autocomplete="off">
+          <button id="sendButton">Enviar</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-    <!-- Cliente que usa los Sockets.io -->
-    <script src="js/client.js" defer></script>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const username = params.get('username');
+
+    if (!username) {
+      alert('No se proporcionó un nombre de usuario. Redirigiendo...');
+      window.location.href = '/';
+    } else {
+      document.getElementById('usernameDisplay').textContent = username;
+      window.username = username;
+    }
+  </script>
+
+  <script src="js/client.js" defer></script>
 </body>
 </html>
