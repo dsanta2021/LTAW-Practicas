@@ -1,24 +1,25 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ejemplo 9</title>
+    <title>Chat</title>
+    <link rel="stylesheet" href="styles_chat.css">
 
     <!-- Cargar la biblioteca Socket.IO. Nos la debe entregar el servidor -->
     <script src="/socket.io/socket.io.js"></script>
 
     <!-- Cliente que usa los Sockets.io-->
     <script src="client.js" defer></script>
+    
 </head>
 
 <body>
-    <h2>Ejemplo 9: Mini-chat</h2>
-    <input type="text" placeholder="Escribe aquí los mensajes..." autocomplete="off" id="msg_entry">
-    <h3>Mensajes recibidos</h3>
-    <p id="display"></p>
+    <h2>Chat en Tiempo Real</h2>
+    <div id="display"></div>
+    <input type="text" placeholder="Escribe aquí los mensajes y presiona Enter..." autocomplete="off" id="msg_entry">
 </body>
 
 </html>
