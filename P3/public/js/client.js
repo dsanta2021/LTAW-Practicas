@@ -73,11 +73,13 @@ socket.on('message', ({ username, message, room }) => {
   if (!messageHistory[room]) {
     messageHistory[room] = [];
   }
-  messageHistory[room].push({ msg: `${username}: ${message}`, tipo });
+
+  const msgContent = tipo === 'own' ? message : `${username}: ${message}`;
+  messageHistory[room].push({ msg: msgContent, tipo });
 
   //-- Mostrar el mensaje solo si está en la sala activa
   if (currentRoom === room) {
-    añadirMensaje(`${username}: ${message}`, tipo);
+    añadirMensaje(msgContent, tipo);
   }
 });
 
@@ -102,17 +104,25 @@ socket.on('serverMessage', ({ msg, room }) => {
 chatList.addEventListener('click', (event) => {
   const room = event.target.dataset.room;
   if (room) {
-    //-- Resaltar la sala activa
+    // Actualizar la sala actual
+    currentRoom = room;
+    mostrarMensajesDeSala(room);
+
+    // Resaltar el chat activo
     document.querySelectorAll('#chatList li').forEach((li) => li.classList.remove('active'));
     event.target.classList.add('active');
 
-    //-- Cambiar de sala
-    currentRoom = room;
-    mostrarMensajesDeSala(room); // Mostrar los mensajes de la sala seleccionada
+    // Emitir evento para iniciar chat privado si no es el general
     if (room !== 'general') {
-      socket.emit('startPrivateChat', room); // Notificar al servidor para iniciar el chat privado
+      socket.emit('startPrivateChat', room);
     }
   }
+});
+
+//-- Recibir notificación de creación de sala privada
+socket.on('privateRoomCreated', ({ room }) => {
+  currentRoom = room;
+  mostrarMensajesDeSala(room);
 });
 
 //-- Al apretar Enter en el campo de entrada, se envía un mensaje al servidor

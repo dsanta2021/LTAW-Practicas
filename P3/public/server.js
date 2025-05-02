@@ -230,10 +230,10 @@ io.on('connect', (socket) => {
       io.to(targetSocketId).socketsJoin(privateRoom);
 
       //-- Notificar al usuario que inicia el chat privado
-      socket.emit('serverMessage', { msg: `Estás en un chat privado con ${targetUsername}.`, room: privateRoom });
+      socket.emit('serverMessage', { msg: `Acabas de entrar al chat privado con ${targetUsername}.`, room: privateRoom });
 
-      //-- Notificar al destinatario del chat privado
-      io.to(targetSocketId).emit('serverMessage', { msg: `Estás en un chat privado con ${currentUsername}.`, room: privateRoom });
+      //-- Notificar al cliente el ID de la sala privada
+      socket.emit('privateRoomCreated', { room: privateRoom });
     } else {
       socket.emit('serverMessage', { msg: `El usuario ${targetUsername} no está disponible.`, room: 'general' });
     }
