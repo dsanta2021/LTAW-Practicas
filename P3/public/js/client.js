@@ -5,6 +5,7 @@ const chatList = document.getElementById("chatList"); // Lista de chats en la ba
 
 let currentRoom = 'general'; // Sala actual
 const messageHistory = {}; // Historial de mensajes por sala
+let unreadMessages = {}; // Objeto para llevar el control de mensajes no leídos
 
 //-- Crear un websocket. Se establece la conexión con el servidor
 const socket = io({ query: { username: window.username } });
@@ -77,6 +78,12 @@ socket.on('message', ({ username, message, room }) => {
   const msgContent = tipo === 'own' ? message : `${username}: ${message}`;
   messageHistory[room].push({ msg: msgContent, tipo });
 
+  //-- Incrementar el contador de mensajes no leídos si no está en la sala activa
+  if (currentRoom !== room) {
+    unreadMessages[room] = (unreadMessages[room] || 0) + 1;
+    actualizarContadorMensajes(room);
+  }
+
   //-- Mostrar el mensaje solo si está en la sala activa
   if (currentRoom === room) {
     añadirMensaje(msgContent, tipo);
@@ -108,6 +115,10 @@ chatList.addEventListener('click', (event) => {
     currentRoom = room;
     mostrarMensajesDeSala(room);
 
+    // Reiniciar el contador de mensajes no leídos para la sala activa
+    unreadMessages[room] = 0;
+    actualizarContadorMensajes(room);
+
     // Resaltar el chat activo
     document.querySelectorAll('#chatList li').forEach((li) => li.classList.remove('active'));
     event.target.classList.add('active');
@@ -123,6 +134,10 @@ chatList.addEventListener('click', (event) => {
 socket.on('privateRoomCreated', ({ room }) => {
   currentRoom = room;
   mostrarMensajesDeSala(room);
+
+  // Reiniciar el contador de mensajes no leídos para la sala activa
+  unreadMessages[room] = 0;
+  actualizarContadorMensajes(room);
 });
 
 //-- Al apretar Enter en el campo de entrada, se envía un mensaje al servidor
@@ -133,10 +148,22 @@ msg_entry.addEventListener('keypress', (event) => {
   }
 });
 
-//-- Mostrar mensajes de una sala
-function mostrarMensajesDeSala(room) {
-  display.innerHTML = ''; // Limpiar el área de mensajes
-  if (messageHistory[room]) {
-    messageHistory[room].forEach(({ msg, tipo }) => añadirMensaje(msg, tipo));
+//-- Función para actualizar el contador de mensajes no leídos en la interfaz
+function actualizarContadorMensajes(room) {
+  const chatItem = document.querySelector(`#chatList li[data-room="${room}"]`);
+  if (chatItem) {
+    const unreadCount = unreadMessages[room] || 0;
+    let badge = chatItem.querySelector('.unread-badge');
+
+    if (unreadCount > 0) {
+      if (!badge) {
+        badge = document.createElement('span');
+        badge.classList.add('unread-badge');
+        chatItem.appendChild(badge);
+      }
+      badge.textContent = unreadCount;
+    } else if (badge) {
+      badge.remove();
+    }
   }
 }
