@@ -3,12 +3,10 @@ const display = document.getElementById("chatDisplay"); // Zona de mensajes
 const msg_entry = document.getElementById("msgEntry"); // Entrada de texto
 
 //-- Crear un websocket. Se establece la conexión con el servidor
-const socket = io();
+const socket = io({ query: { username: window.username } });
 
-//-- Usar el nombre de usuario desde window.username
-if (window.username) {
-  socket.emit("setUsername", window.username); // Enviar el nombre de usuario al servidor
-} else {
+//-- Verificar si el nombre de usuario está disponible
+if (!window.username) {
   console.error("No se proporcionó un nombre de usuario.");
 }
 

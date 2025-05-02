@@ -166,25 +166,32 @@ app.post('/register-username', (req, res) => {
 const users = {}; // Objeto para asociar socket.id con nombres de usuario
 
 io.on('connect', (socket) => {
-  connectedUsers++; //-- Incrementar el contador de usuarios conectados
-  console.log('** NUEVA CONEXIÓN **'.yellow);
+  const username = socket.handshake.query.username; // Obtener el nombre de usuario al conectar
 
-  //-- Asociar el nombre de usuario con el socket
-  socket.on('setUsername', (username) => {
-    users[socket.id] = username;
+  if (username) {
+    users[socket.id] = username; // Asociar el nombre de usuario al socket.id
+    connectedUsers++; //-- Incrementar el contador de usuarios conectados
+    console.log(`** NUEVA CONEXIÓN: ${username} **`.yellow);
 
     //-- Enviar mensaje de bienvenida al cliente que se conecta
     socket.emit('serverMessage', `${username}, Bienvenido al chat! Usa /help para ver los comandos disponibles.`);
 
     //-- Notificar a todos los demás usuarios que alguien se ha conectado
     socket.broadcast.emit('serverMessage', `${username} se ha unido al chat.`);
-  });
+  } else {
+    console.log('** Conexión sin nombre de usuario **'.red);
+  }
 
   //-- Evento de desconexión
   socket.on('disconnect', () => {
-    const username = users[socket.id];
+    const username = users[socket.id]; // Obtener el nombre de usuario antes de eliminarlo
 
     if (username) {
+      console.log(`** ${username} se ha desconectado **`.red);
+
+      // Notificar a todos los demás usuarios que alguien se ha desconectado
+      socket.broadcast.emit('serverMessage', `${username} ha salido del chat.`);
+
       // Eliminar al usuario de la lista de usuarios registrados
       delete registeredUsers[username];
       fs.writeFileSync(RUTAS.db, JSON.stringify(registeredUsers, null, 2));
@@ -192,15 +199,9 @@ io.on('connect', (socket) => {
       // Eliminar al usuario de la lista de usuarios conectados
       delete users[socket.id];
       connectedUsers--; //-- Decrementar el contador de usuarios conectados
-
-      console.log(`** ${username} se ha desconectado **`.red);
-
-      // Notificar a todos los demás usuarios que alguien se ha desconectado
-      socket.broadcast.emit('serverMessage', `${username} ha salido del chat.`);
-  }
-
-    //-- Notificar a todos los demás usuarios que alguien se ha desconectado
-    socket.broadcast.emit('serverMessage', `${username} ha salido del chat.`);
+    } else {
+      console.log('** Un usuario desconocido se ha desconectado **'.red);
+    }
   });
 
   //-- Mensaje recibido: Procesar comandos o reenviar mensajes
