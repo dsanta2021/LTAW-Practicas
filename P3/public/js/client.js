@@ -121,6 +121,12 @@ socket.on('serverMessage', ({ msg, room }) => {
   }
 });
 
+//-- Recibir mensajes de error
+socket.on('errorMessage', ({ msg }) => {
+  alert(msg); // Mostrar el mensaje de error al usuario
+  window.location.href = '/'; // Redirigir a la página de inicio
+});
+
 //-- Cambiar de sala al hacer clic en un chat de la barra lateral
 chatList.addEventListener('click', (event) => {
   const room = event.target.dataset.room;

@@ -108,6 +108,12 @@ app.get('/', (req, res) => {
         form.addEventListener('submit', async (event) => {
             event.preventDefault();
             const username = document.getElementById('username').value.trim();
+
+            if (!username) {
+              alert('Por favor, introduce un nombre de usuario.');
+              return;
+            }
+              
             if (username) {
                 try {
                     // Comprobar si el nombre de usuario ya está registrado
