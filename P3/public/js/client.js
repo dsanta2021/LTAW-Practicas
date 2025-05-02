@@ -12,25 +12,32 @@ if (window.username) {
   console.error("No se proporcionó un nombre de usuario.");
 }
 
-//-- Función para hacer scroll al último mensaje
-function scrollToBottom() {
-  display.scrollTop = display.scrollHeight;
+//-- Función para crear y añadir mensajes al DOM
+function añadirMensaje(msg, tipo) {
+  const p = document.createElement("p");
+  p.classList.add("message", tipo);
+  p.textContent = msg;
+  display.appendChild(p);
+
+  // Hacer scroll automáticamente al último mensaje
+  setTimeout(() => {
+    display.scrollTop = display.scrollHeight; // Desplazar al final del contenedor
+  }, 50); // Asegurar que el DOM se actualice antes de ajustar el scroll
 }
 
-//-- Recibir mensajes del servidor
+//-- Recibir mensajes de un usuario
 socket.on("message", (msg) => {
-  display.innerHTML += `<p class="message other">${msg}</p>`;
-  scrollToBottom(); // Desplazar hacia el último mensaje
+  añadirMensaje(msg, "other");
 });
 
+//-- Recibir mensajes del servidor
 socket.on("serverMessage", (msg) => {
-  display.innerHTML += `<p class="message server">${msg}</p>`;
-  scrollToBottom(); // Desplazar hacia el último mensaje
+  añadirMensaje(msg, "server");
 });
 
+//-- Recibir mensajes propios
 socket.on("ownMessage", (msg) => {
-  display.innerHTML += `<p class="message own">${msg}</p>`;
-  scrollToBottom(); // Desplazar hacia el último mensaje
+  añadirMensaje(msg, "own");
 });
 
 //-- Al apretar Enter en el campo de entrada, se envía un mensaje al servidor

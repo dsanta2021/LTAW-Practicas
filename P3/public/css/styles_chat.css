@@ -16,6 +16,7 @@ body {
   color: #fff;
 }
 
+/* Área principal del chat */
 #app {
   width: 90%;
   max-width: 1200px;
@@ -31,7 +32,7 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Menu superior */
+/* Menú superior */
 #menuTop {
   height: 60px;
   background: linear-gradient(90deg, #8e2de2, #4a00e0);
@@ -42,6 +43,7 @@ body {
   font-size: 20px;
   font-weight: bold;
   color: #ffffff;
+  flex-shrink: 0; /* Fijo en altura */
 }
 
 #logoutButton {
@@ -59,10 +61,11 @@ body {
   background: linear-gradient(90deg, #ff4b2b, #ff416c);
 }
 
-/* Zona principal */
+/* Contenedor principal del chat */
 #chatWindow {
   flex: 1;
   display: flex;
+  overflow: hidden; /* Evitar que los elementos internos se desborden */
 }
 
 /* Barra lateral */
@@ -73,6 +76,7 @@ body {
   padding: 20px;
   border-right: 1px solid rgba(255, 255, 255, 0.15);
   overflow-y: auto;
+  flex-shrink: 0; /* Fijo en ancho */
 }
 
 #sidebar h3 {
@@ -107,16 +111,16 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   background: rgba(255, 255, 255, 0.03);
   height: 100%;
   overflow: hidden;
+  position: relative;
 }
 
 /* Zona donde se muestran los mensajes */
 #chatDisplay {
-  flex: 1;
-  overflow-y: auto;
+  flex: 1; /* Ocupa todo el espacio disponible */
+  overflow-y: auto; /* Habilitar scroll interno */
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -136,6 +140,17 @@ body {
 
 #chatDisplay::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.4);
+}
+
+/* Zona de entrada de mensajes */
+#inputArea {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  flex-shrink: 0; /* Fijo en altura */
+  gap: 10px;
 }
 
 /* Mensajes */
@@ -195,18 +210,6 @@ body {
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-
-/* Zona de entrada de mensajes */
-#inputArea {
-  display: flex;
-  align-items: center;
-  padding: 10px 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.05);
-  flex-shrink: 0;
-  gap: 10px;
 }
 
 #msgEntry {
