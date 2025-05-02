@@ -14,6 +14,16 @@ notificationSound.preload = 'auto';
 const sendMessageSound = new Audio('/sounds/send_message.mp3');
 sendMessageSound.preload = 'auto';
 
+// Elemento para mostrar el estado de escritura
+const typingIndicator = document.createElement('div');
+typingIndicator.id = 'typingIndicator';
+typingIndicator.style.display = 'none';
+typingIndicator.textContent = '';
+document.getElementById('chatArea').appendChild(typingIndicator);
+
+// Estado para rastrear usuarios que están escribiendo
+const typingUsers = new Set();
+
 //-- Crear un websocket. Se establece la conexión con el servidor
 const socket = io({ query: { username: window.username } });
 
@@ -166,6 +176,9 @@ msg_entry.addEventListener('keypress', (event) => {
     // Emitir mensaje al servidor
     socket.emit('message', { room: currentRoom, message: msg_entry.value.trim() });
 
+    // Emitir que el usuario dejó de escribir
+    socket.emit('typing', { room: currentRoom, isTyping: false });
+
     // Reproducir el sonido de envío de mensaje
     sendMessageSound.play().catch(err => {
       console.warn('Error al reproducir sonido de envío:', err);
@@ -173,6 +186,35 @@ msg_entry.addEventListener('keypress', (event) => {
 
     // Borrar el mensaje actual
     msg_entry.value = "";
+  }
+});
+
+// Emitir evento "typing" al escribir en el campo de entrada
+let typingTimeout;
+msg_entry.addEventListener('input', () => {
+  const isTyping = msg_entry.value.trim().length > 0;
+  socket.emit('typing', { room: currentRoom, isTyping });
+});
+
+// Escuchar el evento "userTyping" para mostrar el indicador
+socket.on('userTyping', ({ username, isTyping }) => {
+  if (isTyping) {
+    typingUsers.add(username); // Añadir el usuario al conjunto
+  } else {
+    typingUsers.delete(username); // Eliminar el usuario del conjunto
+  }
+
+  // Actualizar el mensaje del indicador
+  if (typingUsers.size > 0) {
+    const usersArray = Array.from(typingUsers);
+    if (usersArray.length === 1) {
+      typingIndicator.textContent = `${usersArray[0]} está escribiendo...`;
+    } else {
+      typingIndicator.textContent = `${usersArray.join(', ')} están escribiendo...`;
+    }
+    typingIndicator.style.display = 'block';
+  } else {
+    typingIndicator.style.display = 'none';
   }
 });
 

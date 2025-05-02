@@ -245,6 +245,14 @@ io.on('connect', (socket) => {
     }
   });
 
+  //-- Evento: Usuario está escribiendo
+  socket.on('typing', ({ room, isTyping }) => {
+    const username = users[socket.id];
+    if (username) {
+      socket.broadcast.to(room).emit('userTyping', { username, isTyping });
+    }
+  });
+
   //-- Mensaje recibido: Procesar comandos o reenviar mensajes
   socket.on('message', ({ room, message }) => {
     const username = users[socket.id]; // Obtener el nombre de usuario del remitente

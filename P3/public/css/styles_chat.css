@@ -159,6 +159,16 @@ body {
   gap: 10px;
 }
 
+/* Indicador de escritura */
+#typingIndicator {
+  font-style: italic;
+  color: #ccc;
+  margin: 5px 20px;
+  position: absolute;
+  bottom: 60px; /* Justo encima del área de entrada */
+  left: 20px;
+}
+
 /* Mensajes */
 .message {
   max-width: 60%;
