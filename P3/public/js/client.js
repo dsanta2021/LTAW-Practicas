@@ -7,6 +7,13 @@ let currentRoom = 'general'; // Sala actual
 const messageHistory = {}; // Historial de mensajes por sala
 let unreadMessages = {}; // Objeto para llevar el control de mensajes no leídos
 
+// Audios de notificación
+const notificationSound = new Audio('/sounds/new_message.mp3');
+notificationSound.preload = 'auto';
+
+const sendMessageSound = new Audio('/sounds/send_message.mp3');
+sendMessageSound.preload = 'auto';
+
 //-- Crear un websocket. Se establece la conexión con el servidor
 const socket = io({ query: { username: window.username } });
 
@@ -88,6 +95,13 @@ socket.on('message', ({ username, message, room }) => {
   if (currentRoom === room) {
     añadirMensaje(msgContent, tipo);
   }
+
+  //-- Reproducir el sonido de notificación solo si el mensaje no es propio
+  if (tipo === 'other') {
+    notificationSound.play().catch(err => {
+      console.warn('Error al reproducir sonido:', err);
+    });
+  }
 });
 
 //-- Recibir mensajes del servidor
@@ -143,8 +157,16 @@ socket.on('privateRoomCreated', ({ room }) => {
 //-- Al apretar Enter en el campo de entrada, se envía un mensaje al servidor
 msg_entry.addEventListener('keypress', (event) => {
   if (event.key === "Enter" && msg_entry.value.trim() !== "") {
-    socket.emit('message', { room: currentRoom, message: msg_entry.value.trim() }); // Emitir mensaje al servidor
-    msg_entry.value = ""; // Borrar el mensaje actual
+    // Emitir mensaje al servidor
+    socket.emit('message', { room: currentRoom, message: msg_entry.value.trim() });
+
+    // Reproducir el sonido de envío de mensaje
+    sendMessageSound.play().catch(err => {
+      console.warn('Error al reproducir sonido de envío:', err);
+    });
+
+    // Borrar el mensaje actual
+    msg_entry.value = "";
   }
 });
 
