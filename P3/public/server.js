@@ -4,14 +4,14 @@ const http = require('http');
 const express = require('express');
 const path = require('path');
 const colors = require('colors');
-const fs = require('fs'); 
+const fs = require('fs');
 
 const PUERTO = 8082;
 let connectedUsers = 0;
 
 //-- Rutas 
 const RUTAS = {
-    db: path.join(__dirname, 'json', 'users.json')
+  db: path.join(__dirname, 'json', 'users.json')
 };
 
 //-- Comprobar si el archivo JSON existe, si no, crearlo vacío
@@ -164,20 +164,29 @@ app.post('/register-username', (req, res) => {
 
 //------------------- GESTION SOCKETS IO -------------------\\
 const users = {}; // Objeto para asociar socket.id con nombres de usuario
+const userSockets = {}; // Objeto para asociar nombres de usuario con socket.id
 
 io.on('connect', (socket) => {
   const username = socket.handshake.query.username; // Obtener el nombre de usuario al conectar
 
   if (username) {
     users[socket.id] = username; // Asociar el nombre de usuario al socket.id
+    userSockets[username] = socket.id; // Asociar el nombre de usuario con socket.id
     connectedUsers++; //-- Incrementar el contador de usuarios conectados
+
     console.log(`** NUEVA CONEXIÓN: ${username} **`.yellow);
 
+    //-- Unir al usuario a la sala general
+    socket.join('general');
+
     //-- Enviar mensaje de bienvenida al cliente que se conecta
-    socket.emit('serverMessage', `${username}, Bienvenido al chat! Usa /help para ver los comandos disponibles.`);
+    socket.emit('serverMessage', { msg: `${username}, Bienvenido al chat general! Usa /help para ver los comandos disponibles.`, room: 'general' });
 
     //-- Notificar a todos los demás usuarios que alguien se ha conectado
-    socket.broadcast.emit('serverMessage', `${username} se ha unido al chat.`);
+    socket.broadcast.to('general').emit('serverMessage', { msg: `${username} se ha unido al chat.`, room: 'general' });
+
+    //-- Actualizar la lista de usuarios conectados
+    io.to('general').emit('updateUserList', Object.values(users));
   } else {
     console.log('** Conexión sin nombre de usuario **'.red);
   }
@@ -190,44 +199,73 @@ io.on('connect', (socket) => {
       console.log(`** ${username} se ha desconectado **`.red);
 
       // Notificar a todos los demás usuarios que alguien se ha desconectado
-      socket.broadcast.emit('serverMessage', `${username} ha salido del chat.`);
-
-      // Eliminar al usuario de la lista de usuarios registrados
-      delete registeredUsers[username];
-      fs.writeFileSync(RUTAS.db, JSON.stringify(registeredUsers, null, 2));
+      socket.broadcast.to('general').emit('serverMessage', { msg: `${username} ha salido del chat.`, room: 'general' });
 
       // Eliminar al usuario de la lista de usuarios conectados
       delete users[socket.id];
+      delete userSockets[username];
       connectedUsers--; //-- Decrementar el contador de usuarios conectados
+
+      //-- Liberar el nombre de usuario
+      delete registeredUsers[username];
+      fs.writeFileSync(RUTAS.db, JSON.stringify(registeredUsers, null, 2));
+
+      //-- Actualizar la lista de usuarios conectados
+      io.to('general').emit('updateUserList', Object.values(users));
     } else {
       console.log('** Un usuario desconocido se ha desconectado **'.red);
     }
   });
 
-  //-- Mensaje recibido: Procesar comandos o reenviar mensajes
-  socket.on('message', (msg) => {
-    const username = users[socket.id];
-    console.log(`Mensaje de ${username}: ${msg}`.blue);
+  //-- Evento para iniciar un chat privado
+  socket.on('startPrivateChat', (targetUsername) => {
+    const targetSocketId = userSockets[targetUsername];
+    const currentUsername = users[socket.id];
 
-    if (msg.startsWith('/')) {
+    if (targetSocketId) {
+      const privateRoom = [socket.id, targetSocketId].sort().join('-'); // Crear un ID único para la sala privada
+
+      //-- Unir a ambos usuarios a la sala privada
+      socket.join(privateRoom);
+      io.to(targetSocketId).socketsJoin(privateRoom);
+
+      //-- Notificar al usuario que inicia el chat privado
+      socket.emit('serverMessage', { msg: `Estás en un chat privado con ${targetUsername}.`, room: privateRoom });
+
+      //-- Notificar al destinatario del chat privado
+      io.to(targetSocketId).emit('serverMessage', { msg: `Estás en un chat privado con ${currentUsername}.`, room: privateRoom });
+    } else {
+      socket.emit('serverMessage', { msg: `El usuario ${targetUsername} no está disponible.`, room: 'general' });
+    }
+  });
+
+  //-- Mensaje recibido: Procesar comandos o reenviar mensajes
+  socket.on('message', ({ room, message }) => {
+    const username = users[socket.id]; // Obtener el nombre de usuario del remitente
+
+    if (!username) {
+      console.log('** Mensaje de un usuario desconocido **'.red);
+      return;
+    }
+
+    console.log(`Mensaje de ${username} en sala ${room}: ${message}`.blue);
+
+    if (message.startsWith('/')) {
       //-- Procesar comandos
-      if (msg === '/help') {
-        socket.emit('serverMessage', 'Comandos disponibles:\n/help - Lista de comandos\n/list - Número de usuarios conectados\n/hello - Saludo del servidor\n/date - Fecha actual');
-      } else if (msg === '/list') {
-        socket.emit('serverMessage', `Usuarios conectados: ${connectedUsers}`);
-      } else if (msg === '/hello') {
-        socket.emit('serverMessage', `¡Hola ${username}! ¡Aquí el Server! ¿Cómo estás?`);
-      } else if (msg === '/date') {
-        socket.emit('serverMessage', `Fecha actual: ${new Date().toLocaleString()}`);
+      if (message === '/help') {
+        socket.emit('serverMessage', { msg: 'Comandos disponibles:\n/help - Lista de comandos\n/list - Número de usuarios conectados\n/hello - Saludo del servidor\n/date - Fecha actual', room });
+      } else if (message === '/list') {
+        socket.emit('serverMessage', { msg: `Usuarios conectados: ${connectedUsers}`, room });
+      } else if (message === '/hello') {
+        socket.emit('serverMessage', { msg: `¡Hola ${username}! ¡Aquí el Server! ¿Cómo estás?`, room });
+      } else if (message === '/date') {
+        socket.emit('serverMessage', { msg: `Fecha actual: ${new Date().toLocaleString()}`, room });
       } else {
-        socket.emit('serverMessage', 'Comando no reconocido. Usa /help para ver los comandos disponibles.');
+        socket.emit('serverMessage', { msg: 'Comando no reconocido. Usa /help para ver los comandos disponibles.', room });
       }
     } else {
-      //-- Enviar mensaje propio al cliente que lo envió
-      socket.emit('ownMessage', `${msg}`);
-
-      //-- Enviar mensaje a todos los demás clientes conectados
-      socket.broadcast.emit('message', `${username}: ${msg}`);
+      //-- Reenviar el mensaje a la sala correspondiente
+      io.to(room).emit('message', { username, message, room });
     }
   });
 });

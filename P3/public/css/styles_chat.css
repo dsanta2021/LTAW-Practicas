@@ -106,6 +106,12 @@ body {
   transform: scale(1.05);
 }
 
+#chatList li.active {
+  background: linear-gradient(135deg, #00ff99, #00ccff);
+  color: white;
+  font-weight: bold;
+}
+
 /* Área del chat */
 #chatArea {
   flex: 1;
