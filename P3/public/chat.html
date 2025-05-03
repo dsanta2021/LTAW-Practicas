@@ -4,16 +4,24 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chat Galáctico</title>
+  <title>GalactiChat</title>
   <link rel="stylesheet" href="css/styles_chat.css">
+  <link rel="icon" href="img/favicon.ico" type="image/x-icon">
   <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
   <div id="app">
     <div id="menuTop">
-      <span id="usernameDisplay"></span>
-      <span id="chatName">Chat Galáctico</span>
-      <button id="logoutButton">Cerrar sesión</button>
+      <div id="logoContainer">
+        <img id="chatLogo" src="img/chat.png" alt="Logo del Chat Galáctico">
+        <span id="chatName">GalactiChat</span>
+      </div>
+      <div id="usernameContainer">
+        <span id="usernameDisplay"></span>
+      </div>
+      <div id="userContainer">
+        <button id="logoutButton">Cerrar sesión</button>
+      </div>
     </div>
 
     <div id="chatWindow">

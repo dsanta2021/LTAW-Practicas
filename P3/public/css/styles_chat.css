@@ -1,5 +1,3 @@
-/* css/styles_chat.css */
-
 * {
   margin: 0;
   padding: 0;
@@ -43,9 +41,61 @@ body {
   font-size: 20px;
   font-weight: bold;
   color: #ffffff;
-  flex-shrink: 0; /* Fijo en altura */
+  flex-shrink: 0; 
+  position: relative; 
 }
 
+/* Contenedor del logo y el nombre del chat */
+#logoContainer {
+  display: flex;
+  align-items: center;
+  gap: 10px; 
+}
+
+/* Contenedor del nombre de usuario */
+#usernameContainer {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+}
+
+/* Contenedor del nombre de usuario y el botón de cerrar sesión */
+#userContainer {
+  display: flex;
+  align-items: center;
+  gap: 15px; 
+}
+
+/* Logo del chat */
+#chatLogo {
+  height: 50px; 
+}
+
+/* Nombre del chat */
+#chatName {
+  font-size: 24px;
+  font-weight: bold;
+  background: linear-gradient(90deg, #00dbde, #fc00ff, #8e2de2, #4a00e0);
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: galaxyEffect 3s linear infinite;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Nombre de usuario */
+#usernameDisplay {
+  font-size: 20px;
+  font-weight: bold;
+  color: #ffffff;
+  text-shadow: 0 0 5px #00ffcc, 0 0 10px #00ffcc, 0 0 15px #00ffcc;
+  background: linear-gradient(90deg, #00ffcc, #00ccff);
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: glowEffect 2s ease-in-out infinite alternate;
+}
+
+/* Botón de cerrar sesión */
 #logoutButton {
   background: linear-gradient(90deg, #ff416c, #ff4b2b);
   border: none;
@@ -60,8 +110,8 @@ body {
 }
 
 #logoutButton:hover {
-  background-position: right center; /* Cambia el gradiente al pasar el ratón */
-  transform: scale(1.1); /* Aumenta ligeramente el tamaño */
+  background-position: right center; 
+  transform: scale(1.1); 
   box-shadow: 0 0 15px rgba(255, 75, 43, 0.7), 0 0 30px rgba(255, 65, 108, 0.5);
 }
 
@@ -69,7 +119,7 @@ body {
 #chatWindow {
   flex: 1;
   display: flex;
-  overflow: hidden; /* Evitar que los elementos internos se desborden */
+  overflow: hidden; 
 }
 
 /* Barra lateral */
@@ -80,7 +130,7 @@ body {
   padding: 20px;
   border-right: 1px solid rgba(255, 255, 255, 0.15);
   overflow-y: auto;
-  flex-shrink: 0; /* Fijo en ancho */
+  flex-shrink: 0;
 }
 
 #sidebar h3 {
@@ -129,8 +179,8 @@ body {
 
 /* Zona donde se muestran los mensajes */
 #chatDisplay {
-  flex: 1; /* Ocupa todo el espacio disponible */
-  overflow-y: auto; /* Habilitar scroll interno */
+  flex: 1; 
+  overflow-y: auto; 
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -159,7 +209,7 @@ body {
   padding: 10px 20px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(255, 255, 255, 0.05);
-  flex-shrink: 0; /* Fijo en altura */
+  flex-shrink: 0; 
   gap: 10px;
 }
 
@@ -169,7 +219,7 @@ body {
   color: #ccc;
   margin: 5px 20px;
   position: absolute;
-  bottom: 60px; /* Justo encima del área de entrada */
+  bottom: 60px; 
   left: 20px;
 }
 
@@ -297,7 +347,7 @@ body {
 
 /* Display de nombre del chat */
 #chatName {
-  font-size: 28px;
+  font-size: 24px;
   font-weight: bold;
   background: linear-gradient(90deg, #00dbde, #fc00ff, #8e2de2, #4a00e0);
   -webkit-background-clip: text;

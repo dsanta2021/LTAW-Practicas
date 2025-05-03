@@ -45,63 +45,23 @@ app.get('/', (req, res) => {
 <html lang="es">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bienvenida</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f4f4f9;
-        }
-
-        h1 {
-            margin-bottom: 20px;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        input[type="text"] {
-            padding: 10px;
-            font-size: 16px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            width: 300px;
-        }
-
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #4caf50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #45a049;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bienvenida - GalactiChat</title>
+  <link rel="icon" href="img/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="css/styles_main.css">
 </head>
 
 <body>
-    <h1>Bienvenido al Chat</h1>
+  <div id="welcomeContainer">
+    <img id="chatLogo" src="img/chat.png" alt="Logo del Chat Galáctico">
+    <h1>Bienvenido a GalactiChat</h1>
     <form id="welcomeForm">
-        <input type="text" id="username" placeholder="Introduce tu nombre de usuario" required>
-        <button type="submit">Entrar</button>
+      <input type="text" id="username" placeholder="Introduce tu nombre de usuario" required>
+      <button type="submit">Entrar</button>
     </form>
+  </div>
 
     <script>
         const form = document.getElementById('welcomeForm');
