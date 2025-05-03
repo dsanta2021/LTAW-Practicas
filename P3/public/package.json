@@ -1,0 +1,16 @@
+{
+  "name": "GalactiChat",
+  "description": "Un proyecto de chat en tiempo real con Node.js, Express y Socket.IO",
+  "version": "1.0.0",
+  "author": "David Santa Cruz",
+  "main": "server.js",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "colors": "^1.4.0",
+    "express": "^4.18.2",
+    "socket.io": "^4.5.4"
+  },
+  "scripts": {
+    "start": "node server.js"
+  }
+}
