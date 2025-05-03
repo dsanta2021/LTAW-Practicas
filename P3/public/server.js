@@ -1,4 +1,4 @@
-//-- Cargar las dependencias
+//-- Cargar las dependencias necesarias
 const socket = require('socket.io');
 const http = require('http');
 const express = require('express');
@@ -6,12 +6,13 @@ const path = require('path');
 const colors = require('colors');
 const fs = require('fs');
 
+//-- Configuración del puerto
 const PUERTO = 8082;
-let connectedUsers = 0;
+let connectedUsers = 0; // Contador de usuarios conectados
 
-//-- Rutas 
+//-- Rutas para archivos y datos 
 const RUTAS = {
-  db: path.join(__dirname, 'json', 'users.json')
+  db: path.join(__dirname, 'json', 'users.json') // Ruta al archivo JSON de usuarios registrados
 };
 
 //-- Comprobar si el archivo JSON existe, si no, crearlo vacío
@@ -19,18 +20,19 @@ if (!fs.existsSync(RUTAS.db)) {
   fs.writeFileSync(RUTAS.db, JSON.stringify({}, null, 2));
 }
 
+//-- Cargar los usuarios registrados desde el archivo JSON
 let registeredUsers = JSON.parse(fs.readFileSync(RUTAS.db, 'utf-8'));
 
-//-- Crear una nueva aplciacion web
+//-- Crear una nueva aplicación web
 const app = express();
 
-// Middleware para manejar JSON en solicitudes POST
+//-- Middleware para manejar JSON en solicitudes POST
 app.use(express.json());
 
-//-- Crear un servidor, asosiaco a la App de express
+//-- Crear un servidor HTTP asociado a la aplicación de Express
 const server = http.Server(app);
 
-//-- Crear el servidor de websockets, asociado al servidor http
+//-- Crear el servidor de WebSockets asociado al servidor HTTP
 const io = socket(server);
 
 //-- Esto es necesario para que el servidor le envíe al cliente la
@@ -38,8 +40,9 @@ const io = socket(server);
 //-- El directorio publico contiene ficheros estáticos
 app.use(express.static(path.join(__dirname)));
 
-//-------- PUNTOS DE ENTRADA DE LA APLICACION WEB
-//-- Definir el punto de entrada principal de mi aplicación web
+//-------- PUNTOS DE ENTRADA DE LA APLICACIÓN WEB --------
+
+//-- Página principal de bienvenida
 app.get('/', (req, res) => {
   let html = `<!DOCTYPE html>
 <html lang="es">
@@ -123,32 +126,35 @@ app.post('/check-username', (req, res) => {
 //-- Registrar el nombre de usuario
 app.post('/register-username', (req, res) => {
   const { username } = req.body;
-  registeredUsers[username] = true;
-  fs.writeFileSync(RUTAS.db, JSON.stringify(registeredUsers, null, 2));
+  registeredUsers[username] = true; // Registrar el usuario
+  fs.writeFileSync(RUTAS.db, JSON.stringify(registeredUsers, null, 2)); // Guardar en el archivo JSON
   res.json({ success: true, redirectUrl: `/chat.html?username=${encodeURIComponent(username)}` });
 });
 
-//------------------- GESTION SOCKETS IO -------------------\\
-const users = {}; // Objeto para asociar socket.id con nombres de usuario
-const userSockets = {}; // Objeto para asociar nombres de usuario con socket.id
+//------------------- GESTIÓN DE SOCKET.IO -------------------\\
 
+//-- Objetos para gestionar usuarios conectados
+const users = {}; // Relación socket.id -> nombre de usuario
+const userSockets = {}; // Relación nombre de usuario -> socket.id
+
+//-- Manejar conexiones de WebSocket
 io.on('connect', (socket) => {
   const username = socket.handshake.query.username; // Obtener el nombre de usuario al conectar
 
   if (username) {
     users[socket.id] = username; // Asociar el nombre de usuario al socket.id
     userSockets[username] = socket.id; // Asociar el nombre de usuario con socket.id
-    connectedUsers++; //-- Incrementar el contador de usuarios conectados
+    connectedUsers++; // Incrementar el contador de usuarios conectados
 
     console.log(`** NUEVA CONEXIÓN: ${username} **`.yellow);
 
     //-- Unir al usuario a la sala general
     socket.join('general');
 
-    //-- Enviar mensaje de bienvenida al cliente que se conecta
+    //-- Enviar mensaje de bienvenida al usuario conectado
     socket.emit('serverMessage', { msg: `${username}, Bienvenido al chat general! Usa /help para ver los comandos disponibles.`, room: 'general' });
 
-    //-- Notificar a todos los demás usuarios que alguien se ha conectado
+    //-- Notificar a los demás usuarios que alguien se ha conectado
     socket.broadcast.to('general').emit('serverMessage', { msg: `${username} se ha unido al chat.`, room: 'general' });
 
     //-- Actualizar la lista de usuarios conectados
@@ -157,20 +163,20 @@ io.on('connect', (socket) => {
     console.log('** Conexión sin nombre de usuario **'.red);
   }
 
-  //-- Evento de desconexión
+  //-- Manejar desconexiones
   socket.on('disconnect', () => {
     const username = users[socket.id]; // Obtener el nombre de usuario antes de eliminarlo
 
     if (username) {
       console.log(`** ${username} se ha desconectado **`.red);
 
-      // Notificar a todos los demás usuarios que alguien se ha desconectado
+      //-- Notificar a los demás usuarios que alguien se ha desconectado
       socket.broadcast.to('general').emit('serverMessage', { msg: `${username} ha salido del chat.`, room: 'general' });
 
-      // Eliminar al usuario de la lista de usuarios conectados
+      //-- Eliminar al usuario de las listas
       delete users[socket.id];
       delete userSockets[username];
-      connectedUsers--; //-- Decrementar el contador de usuarios conectados
+      connectedUsers--; // Decrementar el contador de usuarios conectados
 
       //-- Liberar el nombre de usuario
       delete registeredUsers[username];
@@ -209,12 +215,12 @@ io.on('connect', (socket) => {
   socket.on('typing', ({ room, isTyping }) => {
     const username = users[socket.id];
     if (username && socket.rooms.has(room)) { // Verificar que el usuario está en la sala
-      // Emitir solo a los usuarios de la sala correspondiente
-      socket.to(room).emit('userTyping', { username, isTyping, room });
+            //-- Emitir solo a los usuarios de la sala correspondiente
+   socket.to(room).emit('userTyping', { username, isTyping, room });
     }
   });
 
-  //-- Mensaje recibido: Procesar comandos o reenviar mensajes
+  //-- Manejar mensajes enviados por los usuarios
   socket.on('message', ({ room, message }) => {
     const username = users[socket.id]; // Obtener el nombre de usuario del remitente
 
@@ -243,31 +249,9 @@ io.on('connect', (socket) => {
       io.to(room).emit('message', { username, message, room });
     }
   });
-
-  //-- Evento para cerrar sesión
-  socket.on('logout', ({ username }) => {
-    if (registeredUsers[username]) {
-      // Eliminar al usuario de la base de datos
-      delete registeredUsers[username];
-      fs.writeFileSync(RUTAS.db, JSON.stringify(registeredUsers, null, 2));
-
-      console.log(`** ${username} ha cerrado sesión **`.yellow);
-
-      // Eliminar al usuario de la lista de usuarios conectados
-      delete users[socket.id];
-      delete userSockets[username];
-      connectedUsers--;
-
-      // Notificar a los demás usuarios en la sala general
-      socket.broadcast.to('general').emit('serverMessage', { msg: `${username} ha salido del chat.`, room: 'general' });
-
-      // Actualizar la lista de usuarios conectados
-      io.to('general').emit('updateUserList', Object.values(users));
-    }
-  });
 });
 
 //-- Lanzar el servidor HTTP
-//-- ¡Que empiecen los juegos de los WebSockets!
-server.listen(PUERTO);
-console.log("Escuchando en puerto: " + PUERTO);
+server.listen(PUERTO, () => {
+  console.log(`🚀 Servidor en marcha en http://localhost:${PUERTO}`);
+});

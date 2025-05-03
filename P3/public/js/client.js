@@ -7,22 +7,24 @@ let currentRoom = 'general'; // Sala actual
 const messageHistory = {}; // Historial de mensajes por sala
 let unreadMessages = {}; // Objeto para llevar el control de mensajes no leídos
 
-// Audios de notificación
+//-- Audios de notificación
+//-- Sonido de nuevo mensaje recibido
 const notificationSound = new Audio('/sounds/new_message.mp3');
 notificationSound.preload = 'auto';
 
+//-- Sonido de nuevo mensaje enviado
 const sendMessageSound = new Audio('/sounds/send_message.mp3');
 sendMessageSound.preload = 'auto';
 
-// Elemento para mostrar el estado de escritura
-const typingIndicator = document.createElement('div');
+//-- Elemento para mostrar el estado de escritura
+const typingIndicator = document.createElement('div');  // Elemento para mostrar "X está escribiendo..."
 typingIndicator.id = 'typingIndicator';
 typingIndicator.style.display = 'none';
 typingIndicator.textContent = '';
 document.getElementById('chatArea').appendChild(typingIndicator);
 
-// Estado para rastrear usuarios que están escribiendo
-const typingUsers = new Set();
+//-- Estado para rastrear usuarios que están escribiendo
+const typingUsers = new Set(); // Conjunto de usuarios que están escribiendo
 
 //-- Crear un websocket. Se establece la conexión con el servidor
 const socket = io({ query: { username: window.username } });
@@ -35,7 +37,7 @@ if (!window.username) {
 //-- Función para crear y añadir mensajes al DOM
 function añadirMensaje(msg, tipo) {
   const p = document.createElement("p");
-  p.classList.add("message", tipo);
+  p.classList.add("message", tipo); // Añadir clase según el tipo de mensaje (propio, de otro usuario, del servidor)
   p.textContent = msg;
   display.appendChild(p);
 
@@ -66,7 +68,7 @@ socket.on('updateUserList', (userList) => {
   chatList.innerHTML = '<li data-room="general">Chat General</li>'; // Reiniciar la lista con el chat general
 
   userList.forEach((user) => {
-    if (user !== window.username) {
+    if (user !== window.username) { // No incluir al usuario actual en la lista
       const li = document.createElement('li');
       li.textContent = user;
       li.dataset.room = user; // Usar el nombre del usuario como identificador de la sala
@@ -116,8 +118,7 @@ socket.on('message', ({ username, message, room }) => {
 
 //-- Recibir mensajes del servidor
 socket.on('serverMessage', ({ msg, room }) => {
-  //-- Si no se especifica una sala, asume que es para la sala general
-  const targetRoom = room || 'general';
+  const targetRoom = room || 'general'; // Si no se especifica una sala, asume que es para la sala general
 
   //-- Guardar el mensaje en el historial de la sala correspondiente
   if (!messageHistory[targetRoom]) {
@@ -141,23 +142,22 @@ socket.on('errorMessage', ({ msg }) => {
 chatList.addEventListener('click', (event) => {
   const room = event.target.dataset.room;
   if (room) {
-    // Actualizar la sala actual
-    currentRoom = room;
-    mostrarMensajesDeSala(room);
+    currentRoom = room; // Actualizar la sala actual
+    mostrarMensajesDeSala(room); // Mostrar mensajes de la sala seleccionada
 
-    // Reiniciar el contador de mensajes no leídos para la sala activa
+    //-- Reiniciar el contador de mensajes no leídos para la sala activa
     unreadMessages[room] = 0;
     actualizarContadorMensajes(room);
 
-    // Limpiar el estado de usuarios escribiendo
+    //-- Limpiar el estado de usuarios escribiendo
     typingUsers.clear();
     typingIndicator.style.display = 'none';
 
-    // Resaltar el chat activo
+    //-- Resaltar el chat activo
     document.querySelectorAll('#chatList li').forEach((li) => li.classList.remove('active'));
     event.target.classList.add('active');
 
-    // Emitir evento para iniciar chat privado si no es el general
+    //-- Emitir evento para iniciar chat privado si no es el general
     if (room !== 'general') {
       socket.emit('startPrivateChat', room);
     }
@@ -169,38 +169,36 @@ socket.on('privateRoomCreated', ({ room }) => {
   currentRoom = room;
   mostrarMensajesDeSala(room);
 
-  // Reiniciar el contador de mensajes no leídos para la sala activa
-  unreadMessages[room] = 0;
+  unreadMessages[room] = 0; // Reiniciar el contador de mensajes no leídos para la sala activa
   actualizarContadorMensajes(room);
 });
 
 //-- Al apretar Enter en el campo de entrada, se envía un mensaje al servidor
 msg_entry.addEventListener('keypress', (event) => {
   if (event.key === "Enter" && msg_entry.value.trim() !== "") {
-    // Emitir mensaje al servidor
+    //-- Emitir mensaje al servidor
     socket.emit('message', { room: currentRoom, message: msg_entry.value.trim() });
 
-    // Emitir que el usuario dejó de escribir
+    //-- Emitir que el usuario dejó de escribir
     socket.emit('typing', { room: currentRoom, isTyping: false });
 
-    // Reproducir el sonido de envío de mensaje
+    //-- Reproducir el sonido de envío de mensaje
     sendMessageSound.play().catch(err => {
       console.warn('Error al reproducir sonido de envío:', err);
     });
 
-    // Borrar el mensaje actual
-    msg_entry.value = "";
+    msg_entry.value = ""; // Borrar el mensaje actual
   }
 });
 
-// Emitir evento "typing" al escribir en el campo de entrada
+//-- Emitir evento "typing" al escribir en el campo de entrada
 let typingTimeout;
 msg_entry.addEventListener('input', () => {
   const isTyping = msg_entry.value.trim().length > 0;
   socket.emit('typing', { room: currentRoom, isTyping });
 });
 
-// Escuchar el evento "userTyping" para mostrar el indicador
+//-- Escuchar el evento "userTyping" para mostrar el indicador
 socket.on('userTyping', ({ username, isTyping, room }) => {
   if (room === currentRoom) { // Mostrar solo si el evento corresponde a la sala activa
     if (isTyping) {
@@ -209,12 +207,12 @@ socket.on('userTyping', ({ username, isTyping, room }) => {
       typingUsers.delete(username); // Eliminar el usuario del conjunto
     }
 
-    // Actualizar el mensaje del indicador
-    if (typingUsers.size > 0) {
-      const usersArray = Array.from(typingUsers);
-      if (usersArray.length === 1) {
+    //-- Actualizar el mensaje del indicador
+    if (typingUsers.size > 0) { // Si hay usuarios escribiendo
+      const usersArray = Array.from(typingUsers); // Convertir el conjunto a un array
+      if (usersArray.length === 1) { // Mostrar el mensaje para un solo usuario
         typingIndicator.textContent = `${usersArray[0]} está escribiendo...`;
-      } else {
+      } else { // Mostrar el mensaje para múltiples usuarios
         typingIndicator.textContent = `${usersArray.join(', ')} están escribiendo...`;
       }
       typingIndicator.style.display = 'block';
@@ -226,20 +224,25 @@ socket.on('userTyping', ({ username, isTyping, room }) => {
 
 //-- Función para actualizar el contador de mensajes no leídos en la interfaz
 function actualizarContadorMensajes(room) {
+  //-- Buscar el elemento de la lista de chats que corresponde a la sala especificada
   const chatItem = document.querySelector(`#chatList li[data-room="${room}"]`);
+
   if (chatItem) {
+    //-- Obtener el número de mensajes no leídos para la sala, o 0 si no hay ninguno
     const unreadCount = unreadMessages[room] || 0;
+
+    // Buscar el indicador de mensajes no leídos dentro del elemento del chat
     let badge = chatItem.querySelector('.unread-badge');
 
-    if (unreadCount > 0) {
-      if (!badge) {
+    if (unreadCount > 0) { // Si hay mensajes no leídos
+      if (!badge) { // Si el badge no existe, crearlo
         badge = document.createElement('span');
         badge.classList.add('unread-badge');
         chatItem.appendChild(badge);
       }
-      badge.textContent = unreadCount;
-    } else if (badge) {
-      badge.remove();
+      badge.textContent = unreadCount; // Actualizar el texto con el número de mensajes no leídos
+    } else if (badge) { // Si no hay mensajes no leídos pero el badge existe
+      badge.remove(); // Eliminar el badge del DOM
     }
   }
 }
@@ -248,9 +251,8 @@ function actualizarContadorMensajes(room) {
 const logoutButton = document.getElementById('logoutButton');
 
 logoutButton.addEventListener('click', () => {
-  // Emitir un evento al servidor para eliminar al usuario
+  //-- Emitir un evento al servidor para eliminar al usuario
   socket.emit('logout', { username: window.username });
 
-  // Redirigir al usuario a la página inicial
-  window.location.href = '/';
+  window.location.href = '/'; // Redirigir al usuario a la página inicial
 });
