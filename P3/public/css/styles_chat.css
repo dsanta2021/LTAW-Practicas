@@ -55,10 +55,14 @@ body {
   cursor: pointer;
   font-weight: bold;
   transition: all 0.3s ease;
+  background-size: 200% auto;
+  box-shadow: 0 0 10px rgba(255, 75, 43, 0.5), 0 0 20px rgba(255, 65, 108, 0.3);
 }
 
 #logoutButton:hover {
-  background: linear-gradient(90deg, #ff4b2b, #ff416c);
+  background-position: right center; /* Cambia el gradiente al pasar el ratón */
+  transform: scale(1.1); /* Aumenta ligeramente el tamaño */
+  box-shadow: 0 0 15px rgba(255, 75, 43, 0.7), 0 0 30px rgba(255, 65, 108, 0.5);
 }
 
 /* Contenedor principal del chat */
@@ -268,4 +272,45 @@ body {
   padding: 2px 6px;
   margin-left: 8px;
   vertical-align: middle;
+}
+
+/* Display de nombre de usuario */
+#usernameDisplay {
+  font-size: 20px;
+  font-weight: bold;
+  color: #ffffff;
+  text-shadow: 0 0 5px #00ffcc, 0 0 10px #00ffcc, 0 0 15px #00ffcc;
+  background: linear-gradient(90deg, #00ffcc, #00ccff);
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: glowEffect 2s ease-in-out infinite alternate;
+}
+
+@keyframes glowEffect {
+  from {
+    text-shadow: 0 0 5px #00ffcc, 0 0 10px #00ffcc, 0 0 15px #00ffcc;
+  }
+  to {
+    text-shadow: 0 0 10px #00ccff, 0 0 20px #00ccff, 0 0 30px #00ccff;
+  }
+}
+
+/* Display de nombre del chat */
+#chatName {
+  font-size: 28px;
+  font-weight: bold;
+  background: linear-gradient(90deg, #00dbde, #fc00ff, #8e2de2, #4a00e0);
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: galaxyEffect 3s linear infinite;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3); 
+}
+
+@keyframes galaxyEffect {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
 }

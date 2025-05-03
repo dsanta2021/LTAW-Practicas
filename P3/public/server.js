@@ -283,6 +283,28 @@ io.on('connect', (socket) => {
       io.to(room).emit('message', { username, message, room });
     }
   });
+
+  //-- Evento para cerrar sesión
+  socket.on('logout', ({ username }) => {
+    if (registeredUsers[username]) {
+      // Eliminar al usuario de la base de datos
+      delete registeredUsers[username];
+      fs.writeFileSync(RUTAS.db, JSON.stringify(registeredUsers, null, 2));
+
+      console.log(`** ${username} ha cerrado sesión **`.yellow);
+
+      // Eliminar al usuario de la lista de usuarios conectados
+      delete users[socket.id];
+      delete userSockets[username];
+      connectedUsers--;
+
+      // Notificar a los demás usuarios en la sala general
+      socket.broadcast.to('general').emit('serverMessage', { msg: `${username} ha salido del chat.`, room: 'general' });
+
+      // Actualizar la lista de usuarios conectados
+      io.to('general').emit('updateUserList', Object.values(users));
+    }
+  });
 });
 
 //-- Lanzar el servidor HTTP

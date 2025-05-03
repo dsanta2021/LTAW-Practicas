@@ -243,3 +243,14 @@ function actualizarContadorMensajes(room) {
     }
   }
 }
+
+//-- Botón de cierre de sesión
+const logoutButton = document.getElementById('logoutButton');
+
+logoutButton.addEventListener('click', () => {
+  // Emitir un evento al servidor para eliminar al usuario
+  socket.emit('logout', { username: window.username });
+
+  // Redirigir al usuario a la página inicial
+  window.location.href = '/';
+});
