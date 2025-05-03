@@ -149,6 +149,10 @@ chatList.addEventListener('click', (event) => {
     unreadMessages[room] = 0;
     actualizarContadorMensajes(room);
 
+    // Limpiar el estado de usuarios escribiendo
+    typingUsers.clear();
+    typingIndicator.style.display = 'none';
+
     // Resaltar el chat activo
     document.querySelectorAll('#chatList li').forEach((li) => li.classList.remove('active'));
     event.target.classList.add('active');
@@ -197,24 +201,26 @@ msg_entry.addEventListener('input', () => {
 });
 
 // Escuchar el evento "userTyping" para mostrar el indicador
-socket.on('userTyping', ({ username, isTyping }) => {
-  if (isTyping) {
-    typingUsers.add(username); // Añadir el usuario al conjunto
-  } else {
-    typingUsers.delete(username); // Eliminar el usuario del conjunto
-  }
-
-  // Actualizar el mensaje del indicador
-  if (typingUsers.size > 0) {
-    const usersArray = Array.from(typingUsers);
-    if (usersArray.length === 1) {
-      typingIndicator.textContent = `${usersArray[0]} está escribiendo...`;
+socket.on('userTyping', ({ username, isTyping, room }) => {
+  if (room === currentRoom) { // Mostrar solo si el evento corresponde a la sala activa
+    if (isTyping) {
+      typingUsers.add(username); // Añadir el usuario al conjunto
     } else {
-      typingIndicator.textContent = `${usersArray.join(', ')} están escribiendo...`;
+      typingUsers.delete(username); // Eliminar el usuario del conjunto
     }
-    typingIndicator.style.display = 'block';
-  } else {
-    typingIndicator.style.display = 'none';
+
+    // Actualizar el mensaje del indicador
+    if (typingUsers.size > 0) {
+      const usersArray = Array.from(typingUsers);
+      if (usersArray.length === 1) {
+        typingIndicator.textContent = `${usersArray[0]} está escribiendo...`;
+      } else {
+        typingIndicator.textContent = `${usersArray.join(', ')} están escribiendo...`;
+      }
+      typingIndicator.style.display = 'block';
+    } else {
+      typingIndicator.style.display = 'none';
+    }
   }
 });
 

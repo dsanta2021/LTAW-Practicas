@@ -248,8 +248,9 @@ io.on('connect', (socket) => {
   //-- Evento: Usuario está escribiendo
   socket.on('typing', ({ room, isTyping }) => {
     const username = users[socket.id];
-    if (username) {
-      socket.broadcast.to(room).emit('userTyping', { username, isTyping });
+    if (username && socket.rooms.has(room)) { // Verificar que el usuario está en la sala
+      // Emitir solo a los usuarios de la sala correspondiente
+      socket.to(room).emit('userTyping', { username, isTyping, room });
     }
   });
 
