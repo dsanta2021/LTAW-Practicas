@@ -173,9 +173,9 @@ socket.on('privateRoomCreated', ({ room }) => {
   actualizarContadorMensajes(room);
 });
 
-//-- Al apretar Enter en el campo de entrada, se envía un mensaje al servidor
-msg_entry.addEventListener('keypress', (event) => {
-  if (event.key === "Enter" && msg_entry.value.trim() !== "") {
+//-- Función para enviar el mensaje
+function enviarMensaje() {
+  if (msg_entry.value.trim() !== "") {
     //-- Emitir mensaje al servidor
     socket.emit('message', { room: currentRoom, message: msg_entry.value.trim() });
 
@@ -189,7 +189,20 @@ msg_entry.addEventListener('keypress', (event) => {
 
     msg_entry.value = ""; // Borrar el mensaje actual
   }
+}
+
+//-- Al apretar Enter en el campo de entrada, se envía un mensaje al servidor
+msg_entry.addEventListener('keypress', (event) => {
+  if (event.key === "Enter") {
+    enviarMensaje();
+  }
 });
+
+//-- Obtener el botón de enviar
+const sendButton = document.getElementById('sendButton');
+
+//-- Evento para enviar el mensaje al hacer clic en el botón "Enviar"
+sendButton.addEventListener('click', enviarMensaje);
 
 //-- Emitir evento "typing" al escribir en el campo de entrada
 let typingTimeout;
