@@ -21,6 +21,16 @@ ipcRenderer.on('server-data', (event, data) => {
   }
 });
 
+ipcRenderer.on('qr', (event, dataUrl) => {
+  const qrImg = document.getElementById('qr-img');
+  const qrLabel = document.getElementById('qr-label');
+  if (qrImg && dataUrl) {
+    qrImg.src = dataUrl;
+    qrImg.style.display = 'block';
+    if (qrLabel) qrLabel.style.display = 'block';
+  }
+});
+
 document.getElementById('testBtn').onclick = () => {
   ipcRenderer.send('send-test-message');
 };

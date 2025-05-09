@@ -37,19 +37,19 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 20px;
+  padding: 0 24px;
   font-size: 20px;
   font-weight: bold;
   color: #ffffff;
-  flex-shrink: 0; 
-  position: relative; 
+  flex-shrink: 0;
+  gap: 12px;
 }
 
 /* Contenedor del logo y el nombre del chat */
 #logoContainer {
   display: flex;
   align-items: center;
-  gap: 10px; 
+  gap: 10px;
 }
 
 /* Contenedor del nombre de usuario */
@@ -69,12 +69,12 @@ body {
 
 /* Logo del chat */
 #chatLogo {
-  height: 50px; 
+  height: 42px;
 }
 
 /* Nombre del chat */
 #chatName {
-  font-size: 24px;
+  font-size: 1.3em;
   font-weight: bold;
   background: linear-gradient(90deg, #00dbde, #fc00ff, #8e2de2, #4a00e0);
   -webkit-background-clip: text;
@@ -85,10 +85,12 @@ body {
 
 /* Nombre de usuario */
 #usernameDisplay {
-  font-size: 20px;
+  font-size: 1.1em;
+  color: #00dbde;
   font-weight: bold;
-  color: #ffffff;
-  text-shadow: 0 0 5px #00ffcc, 0 0 10px #00ffcc, 0 0 15px #00ffcc;
+  text-align: center;
+  flex: 1;
+  text-shadow: 0 0 5px #00ffcc, 0 0 10px #00ffcc;
   background: linear-gradient(90deg, #00ffcc, #00ccff);
   -webkit-background-clip: text;
   color: transparent;
@@ -100,8 +102,8 @@ body {
   background: linear-gradient(90deg, #ff416c, #ff4b2b);
   border: none;
   color: white;
-  padding: 8px 16px;
-  border-radius: 12px;
+  padding: 8px 18px;
+  border-radius: 14px;
   cursor: pointer;
   font-weight: bold;
   transition: all 0.3s ease;
@@ -110,8 +112,8 @@ body {
 }
 
 #logoutButton:hover {
-  background-position: right center; 
-  transform: scale(1.1); 
+  background-position: right center;
+  transform: scale(1.1);
   box-shadow: 0 0 15px rgba(255, 75, 43, 0.7), 0 0 30px rgba(255, 65, 108, 0.5);
 }
 
@@ -326,10 +328,12 @@ body {
 
 /* Display de nombre de usuario */
 #usernameDisplay {
-  font-size: 20px;
+  font-size: 1.1em;
+  color: #00dbde;
   font-weight: bold;
-  color: #ffffff;
-  text-shadow: 0 0 5px #00ffcc, 0 0 10px #00ffcc, 0 0 15px #00ffcc;
+  text-align: center;
+  flex: 1;
+  text-shadow: 0 0 5px #00ffcc, 0 0 10px #00ffcc;
   background: linear-gradient(90deg, #00ffcc, #00ccff);
   -webkit-background-clip: text;
   color: transparent;
@@ -347,7 +351,7 @@ body {
 
 /* Display de nombre del chat */
 #chatName {
-  font-size: 24px;
+  font-size: 1.3em;
   font-weight: bold;
   background: linear-gradient(90deg, #00dbde, #fc00ff, #8e2de2, #4a00e0);
   -webkit-background-clip: text;
@@ -362,5 +366,84 @@ body {
   }
   100% {
     background-position: 100% 50%;
+  }
+}
+
+/* --- RESPONSIVE DESIGN --- */
+@media (max-width: 900px) {
+  #app {
+    width: 100vw;
+    height: 100vh;
+    max-width: 100vw;
+    max-height: 100vh;
+    border-radius: 0;
+    padding: 0;
+  }
+  #chatWindow {
+    flex-direction: column;
+  }
+  #sidebar {
+    width: 100vw;
+    min-width: 0;
+    max-width: 100vw;
+    border-right: none;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+    padding: 10px;
+    font-size: 1em;
+    position: static;
+  }
+  #chatArea {
+    height: auto;
+    min-height: 0;
+    padding: 0;
+  }
+  #chatDisplay {
+    padding: 10px 4px;
+    font-size: 1em;
+  }
+}
+
+@media (max-width: 600px) {
+  #app {
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+    min-width: 0;
+    min-height: 0;
+    padding: 0;
+  }
+  #menuTop {
+    flex-direction: column;
+    height: auto;
+    padding: 10px 5px;
+    font-size: 1em;
+  }
+  #chatLogo {
+    height: 32px;
+  }
+  #chatName {
+    font-size: 1.1em;
+  }
+  #sidebar {
+    font-size: 0.95em;
+    padding: 8px;
+  }
+  #chatDisplay {
+    padding: 6px 2px;
+    font-size: 0.95em;
+  }
+  #inputArea {
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px 4px;
+  }
+  #msgEntry {
+    width: 100%;
+    font-size: 1em;
+  }
+  #sendButton {
+    width: 100%;
+    margin-left: 0;
+    font-size: 1em;
   }
 }

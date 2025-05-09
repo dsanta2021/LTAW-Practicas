@@ -80,7 +80,7 @@
   #messages {
     background: rgba(255,255,255,0.08);
     border: 1px solid #8e2de2;
-    height: 200px;           
+    height: 250px;           
     overflow-y: auto;
     margin-top: 10px;
     padding: 10px;
@@ -168,6 +168,10 @@
         <div id="userCount" style="font-size:2em;">0</div>
         <h3 style="margin-top:20px;">Dirección IP</h3>
         <div id="url" style="word-break:break-all;"></div>
+        <div id="qr-container" style="text-align:center; margin-top:18px;">
+          <img id="qr-img" style="display:none; margin:auto; border-radius:12px; box-shadow:0 0 12px #00dbde;" alt="QR para acceder al chat"/>
+          <div id="qr-label" style="color:#00dbde; font-size:1em; margin-top:8px; display:none;">Escanea para acceder al chat</div>
+        </div>
       </div>
       <div class="test-box">
         <h2>Pruebas</h2>

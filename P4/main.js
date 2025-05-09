@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const os = require('os');
+const qrcode = require('qrcode');
 const { fork } = require('child_process');
 
 let win = null;
@@ -49,11 +50,19 @@ app.whenReady().then(() => {
 
   // Envía info de versiones y URL al render
   win.webContents.on('did-finish-load', () => {
+    const url = `http://${getLocalIP()}:8082/`;
     win.webContents.send('info', {
       node: process.versions.node,
       electron: process.versions.electron,
       chrome: process.versions.chrome,
-      url: `http://${getLocalIP()}:8082/`
+      url
+    });
+
+    // Generar QR como data URL (para mostrarlo en HTML)
+    qrcode.toDataURL(url, { margin: 2, width: 200 }, (err, dataUrl) => {
+      if (!err) {
+        win.webContents.send('qr', dataUrl);
+      }
     });
   });
 });
