@@ -35,24 +35,28 @@ document.getElementById('testBtn').onclick = () => {
   ipcRenderer.send('send-test-message');
 };
 
-let sysInfoVisible = false;
-
 const showSysInfoBtn = document.getElementById('showSysInfoBtn');
-const sysInfoDiv = document.getElementById('sysInfo');
+const sysInfoModal = document.getElementById('sysInfoModal');
+const sysInfoPopup = document.getElementById('sysInfoPopup');
+const closeSysInfo = document.getElementById('closeSysInfo');
 
 showSysInfoBtn.onclick = () => {
-  if (!sysInfoVisible) {
-    ipcRenderer.send('get-sys-info');
-  } else {
-    sysInfoDiv.style.display = 'none';
-    showSysInfoBtn.textContent = 'Mostrar información del sistema';
-    sysInfoVisible = false;
+  ipcRenderer.send('get-sys-info');
+};
+
+closeSysInfo.onclick = () => {
+  sysInfoModal.style.display = 'none';
+};
+
+window.onclick = (event) => {
+  if (event.target === sysInfoModal) {
+    sysInfoModal.style.display = 'none';
   }
 };
 
 ipcRenderer.on('sys-info', (event, info) => {
-  sysInfoDiv.innerHTML = `
-    <b>Usuario:</b> ${info.usuario}
+  sysInfoPopup.innerHTML = `
+    <b>Usuario:</b> ${info.usuario}<br>
     <b>Plataforma:</b> ${info.plataforma}<br>
     <b>Arquitectura:</b> ${info.arquitectura}<br>
     <b>CPU:</b> ${info.cpu} (${info.núcleos} núcleos)<br>
@@ -63,8 +67,6 @@ ipcRenderer.on('sys-info', (event, info) => {
     <b>Directorio Temporal:</b> ${info.directorio_temp}<br>
     <b>Directorio Actual:</b> ${info.directorio_actual}<br>
   `;
-  sysInfoDiv.style.display = 'block';
-  showSysInfoBtn.textContent = 'Ocultar información de memoria';
-  sysInfoVisible = true;
+  sysInfoModal.style.display = 'flex';
 });
 
