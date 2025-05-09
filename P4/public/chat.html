@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GalactiChat</title>
+  <link rel="stylesheet" href="css/styles_chat.css">
+  <link rel="icon" href="img/favicon.ico" type="image/x-icon">
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+  <div id="app">
+    <div id="menuTop">
+      <div id="logoContainer">
+        <img id="chatLogo" src="img/chat.png" alt="Logo del Chat Galáctico">
+        <span id="chatName">GalactiChat</span>
+      </div>
+      <div id="usernameContainer">
+        <span id="usernameDisplay"></span>
+      </div>
+      <div id="userContainer">
+        <button id="logoutButton">Cerrar sesión</button>
+      </div>
+    </div>
+
+    <div id="chatWindow">
+      <div id="sidebar">
+        <!-- Aquí irían los usuarios o las conversaciones -->
+        <h3>Chats</h3>
+        <ul id="chatList">
+          <!-- Lista de chats -->
+        </ul>
+      </div>
+
+      <div id="chatArea">
+        <div id="chatDisplay">
+          <!-- Aquí se mostrarán los mensajes -->
+        </div>
+        
+        <div id="inputArea">
+          <input type="text" id="msgEntry" placeholder="Escribe tu mensaje..." autocomplete="off">
+          <button id="sendButton">Enviar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const username = params.get('username');
+
+    if (!username) {
+      alert('No se proporcionó un nombre de usuario. Redirigiendo...');
+      window.location.href = '/';
+    } else {
+      document.getElementById('usernameDisplay').textContent = username;
+      window.username = username;
+    }
+  </script>
+
+  <script src="js/client.js" defer></script>
+</body>
+</html>

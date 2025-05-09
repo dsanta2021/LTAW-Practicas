@@ -1,0 +1,366 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+  font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+
+/* Área principal del chat */
+#app {
+  width: 90%;
+  max-width: 1200px;
+  height: 90%;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  box-shadow: 0 0 30px rgba(0, 255, 255, 0.3), 0 0 60px rgba(255, 0, 255, 0.2);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Menú superior */
+#menuTop {
+  height: 60px;
+  background: linear-gradient(90deg, #8e2de2, #4a00e0);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  font-size: 20px;
+  font-weight: bold;
+  color: #ffffff;
+  flex-shrink: 0; 
+  position: relative; 
+}
+
+/* Contenedor del logo y el nombre del chat */
+#logoContainer {
+  display: flex;
+  align-items: center;
+  gap: 10px; 
+}
+
+/* Contenedor del nombre de usuario */
+#usernameContainer {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+}
+
+/* Contenedor del nombre de usuario y el botón de cerrar sesión */
+#userContainer {
+  display: flex;
+  align-items: center;
+  gap: 15px; 
+}
+
+/* Logo del chat */
+#chatLogo {
+  height: 50px; 
+}
+
+/* Nombre del chat */
+#chatName {
+  font-size: 24px;
+  font-weight: bold;
+  background: linear-gradient(90deg, #00dbde, #fc00ff, #8e2de2, #4a00e0);
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: galaxyEffect 3s linear infinite;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Nombre de usuario */
+#usernameDisplay {
+  font-size: 20px;
+  font-weight: bold;
+  color: #ffffff;
+  text-shadow: 0 0 5px #00ffcc, 0 0 10px #00ffcc, 0 0 15px #00ffcc;
+  background: linear-gradient(90deg, #00ffcc, #00ccff);
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: glowEffect 2s ease-in-out infinite alternate;
+}
+
+/* Botón de cerrar sesión */
+#logoutButton {
+  background: linear-gradient(90deg, #ff416c, #ff4b2b);
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  background-size: 200% auto;
+  box-shadow: 0 0 10px rgba(255, 75, 43, 0.5), 0 0 20px rgba(255, 65, 108, 0.3);
+}
+
+#logoutButton:hover {
+  background-position: right center; 
+  transform: scale(1.1); 
+  box-shadow: 0 0 15px rgba(255, 75, 43, 0.7), 0 0 30px rgba(255, 65, 108, 0.5);
+}
+
+/* Contenedor principal del chat */
+#chatWindow {
+  flex: 1;
+  display: flex;
+  overflow: hidden; 
+}
+
+/* Barra lateral */
+#sidebar {
+  width: 260px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  padding: 20px;
+  border-right: 1px solid rgba(255, 255, 255, 0.15);
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+#sidebar h3 {
+  margin-bottom: 15px;
+  font-size: 22px;
+  background: linear-gradient(90deg, #00dbde, #fc00ff);
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+#chatList {
+  list-style: none;
+}
+
+#chatList li {
+  margin-bottom: 12px;
+  padding: 10px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+}
+
+#chatList li:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+}
+
+#chatList li.active {
+  background: linear-gradient(135deg, #00ff99, #00ccff);
+  color: white;
+  font-weight: bold;
+}
+
+/* Área del chat */
+#chatArea {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.03);
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Zona donde se muestran los mensajes */
+#chatDisplay {
+  flex: 1; 
+  overflow-y: auto; 
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+#chatDisplay::-webkit-scrollbar {
+  width: 8px;
+}
+
+#chatDisplay::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+#chatDisplay::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+/* Zona de entrada de mensajes */
+#inputArea {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  flex-shrink: 0; 
+  gap: 10px;
+}
+
+/* Indicador de escritura */
+#typingIndicator {
+  font-style: italic;
+  color: #ccc;
+  margin: 5px 20px;
+  position: absolute;
+  bottom: 60px; 
+  left: 20px;
+}
+
+/* Mensajes */
+.message {
+  max-width: 60%;
+  padding: 10px 15px;
+  margin: 8px;
+  border-radius: 20px;
+  word-wrap: break-word;
+  font-size: 16px;
+  animation: fadeIn 0.5s ease;
+
+}
+
+/* Mensaje propio */
+.message.own {
+  background: linear-gradient(135deg, #00f0ff, #8a2be2);
+  color: white;
+  text-align: right;
+  align-self: flex-end;
+  margin-left: auto;
+  border-top-right-radius: 5px;
+  border-top-left-radius: 20px;
+}
+
+/* Mensaje de otro usuario */
+.message.other {
+  background: linear-gradient(135deg, #ff00c8, #4b0082);
+  color: white;
+  align-self: flex-start;
+  text-align: left;
+  margin-right: auto;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 20px;
+}
+
+/* Mensaje del servidor */
+.message.server {
+  background: linear-gradient(135deg, #8e2de2, #4a00e0);
+  color: #ffffff;
+  font-style: italic;
+  align-self: center;
+  text-align: center;
+  margin: 15px auto;
+  border-radius: 20px;
+  box-shadow: 0 0 15px rgba(138, 43, 226, 0.6), 0 0 30px rgba(74, 0, 224, 0.4);
+}
+
+/* Animación de entrada */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#msgEntry {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 20px;
+  outline: none;
+  background: rgba(65, 65, 65, 0.1);
+  color: #fff;
+  font-size: 16px;
+  backdrop-filter: blur(10px);
+}
+
+#sendButton {
+  padding: 12px 20px;
+  margin-left: 10px;
+  border: none;
+  border-radius: 20px;
+  background: linear-gradient(90deg, #00c6ff, #0072ff);
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+}
+
+#sendButton:hover {
+  background: linear-gradient(90deg, #0072ff, #00c6ff);
+  transform: scale(1.05);
+}
+
+/* Badge para mensajes no leídos */
+.unread-badge {
+  display: inline-block;
+  background: red;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 50%;
+  padding: 2px 6px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+/* Display de nombre de usuario */
+#usernameDisplay {
+  font-size: 20px;
+  font-weight: bold;
+  color: #ffffff;
+  text-shadow: 0 0 5px #00ffcc, 0 0 10px #00ffcc, 0 0 15px #00ffcc;
+  background: linear-gradient(90deg, #00ffcc, #00ccff);
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: glowEffect 2s ease-in-out infinite alternate;
+}
+
+@keyframes glowEffect {
+  from {
+    text-shadow: 0 0 5px #00ffcc, 0 0 10px #00ffcc, 0 0 15px #00ffcc;
+  }
+  to {
+    text-shadow: 0 0 10px #00ccff, 0 0 20px #00ccff, 0 0 30px #00ccff;
+  }
+}
+
+/* Display de nombre del chat */
+#chatName {
+  font-size: 24px;
+  font-weight: bold;
+  background: linear-gradient(90deg, #00dbde, #fc00ff, #8e2de2, #4a00e0);
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: galaxyEffect 3s linear infinite;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3); 
+}
+
+@keyframes galaxyEffect {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
