@@ -130,6 +130,10 @@ socket.on('serverMessage', ({ msg, room }) => {
   if (currentRoom === targetRoom) {
     añadirMensaje(msg, 'server');
   }
+
+  notificationSound.play().catch(err => {
+    console.warn('Error al reproducir sonido:', err);
+  });
 });
 
 //-- Recibir mensajes de error
