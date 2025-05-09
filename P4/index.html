@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>CHAT SERVER</title>
+  <style>
+    body { font-family: Arial; background: #fff; }
+    #main { max-width: 900px; margin: 20px auto; }
+    h1 { text-align: center; margin: 20px; font-size: 2.2em; box-shadow: 2px 2px 8px #888; padding: 10px; border-radius: 10px;}
+    .panel { display: flex; gap: 30px; }
+    .info-box, .test-box { box-shadow: 2px 2px 8px #888; border-radius: 15px; padding: 20px; background: #e3f3fa; min-width: 350px;}
+    .info-box { background: #c6e6f7; flex: 1; }
+    .test-box { background: #fff; flex: 1; }
+    .info-box h2, .test-box h2 { margin-bottom: 10px; }
+    #messages { background: #f9f9f9; border: 1px solid #ccc; min-height: 120px; max-height: 200px; overflow-y: auto; margin-top: 10px; padding: 10px; border-radius: 8px;}
+    #testBtn { margin-top: 10px; }
+    .msg-server { color: #333; }
+    .msg-user { color: #0077cc; }
+  </style>
+</head>
+<body>
+  <div id="main">
+    <h1>HOME CHAT (Server)</h1>
+    <div class="panel">
+      <div class="info-box">
+        <h2>Información</h2>
+        <div>Version de Node: <span id="node"></span></div>
+        <div>Version de Chrome: <span id="chrome"></span></div>
+        <div>Version Electron: <span id="electron"></span></div>
+        <h3 style="margin-top:20px;">Usuarios conectados</h3>
+        <div id="userCount" style="font-size:2em;">0</div>
+        <h3 style="margin-top:20px;">Dirección IP</h3>
+        <div id="url" style="word-break:break-all;"></div>
+      </div>
+      <div class="test-box">
+        <h2>Pruebas</h2>
+        <button id="testBtn">Enviar Mensaje de prueba</button>
+        <h2 style="margin-top:30px;">Mensajes</h2>
+        <div id="messages"></div>
+      </div>
+    </div>
+  </div>
+  <script src="render.js"></script>
+</body>
+</html>
